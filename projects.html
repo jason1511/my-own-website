@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Projects | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Projects by Jason Leonard — Bike Store Management App and this portfolio website, plus selected university work and hobby projects."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html" aria-current="page">Projects</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <!-- Projects Hero -->
+    <section class="about-hero">
+      <div class="container about-hero__grid">
+        <div class="about-hero__content">
+          <h1>Projects</h1>
+          <p>
+            Here are the projects I’m actively maintaining and comfortable sharing publicly.
+            My focus is practical software development, clean structure, and iterative improvements.
+          </p>
+
+          <div class="about-hero__actions">
+            <a class="btn btn--primary" href="https://github.com/jason1511" target="_blank" rel="noopener">
+              GitHub Profile
+            </a>
+            <a class="btn" href="#featured">Featured</a>
+            <a class="btn" href="#coursework">Coursework</a>
+          </div>
+        </div>
+
+        <aside class="profile-card" aria-label="Quick view">
+          <div class="profile-card__header">
+            <div>
+              <p class="profile-card__name">Quick View</p>
+              <p class="profile-card__role">Public projects & highlights</p>
+            </div>
+          </div>
+
+          <dl class="profile-card__list">
+            <div class="profile-card__item">
+              <dt>Public</dt>
+              <dd>Bike Store App, Portfolio Website</dd>
+            </div>
+            <div class="profile-card__item">
+              <dt>Private</dt>
+              <dd>Selected uni assignments (local)</dd>
+            </div>
+            <div class="profile-card__item">
+              <dt>Other</dt>
+              <dd>Steam Workshop mods (hobby)</dd>
+            </div>
+          </dl>
+
+          <div class="profile-card__links">
+            <a href="#featured">Featured</a>
+            <a href="#coursework">Coursework</a>
+            <a href="#hobby">Hobby</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Featured -->
+    <section id="featured">
+      <div class="container">
+        <h2>Featured</h2>
+        <p class="section-lead">
+          These are the projects I’m currently showcasing publicly.
+        </p>
+
+        <div class="cards">
+          <!-- Bike Store App -->
+          <article class="card">
+            <header class="card__header">
+              <h3>Bike Store Inventory &amp; Sales Management App</h3>
+              <p class="card__meta">C#, .NET WinForms, SQLite</p>
+            </header>
+
+            <p>
+              A desktop application built to support day-to-day business operations: inventory tracking,
+              transaction logging, and basic reporting. Designed for usability and data accuracy, refined through
+              real user feedback.
+            </p>
+
+            <ul class="tag-list" aria-label="Key highlights">
+              <li class="tag">Offline-first</li>
+              <li class="tag">Inventory</li>
+              <li class="tag">Transactions</li>
+              <li class="tag">Reporting</li>
+            </ul>
+
+            <div class="card__actions">
+              <a class="btn btn--small btn--primary"
+                 href="https://github.com/jason1511/Bike-STore-Project"
+                 target="_blank" rel="noopener">
+                GitHub Repo
+              </a>
+              <!-- Optional: later add a case study page -->
+              <a class="btn btn--small btn--primary" href="bike-store.html">Case Study</a>
+            </div>
+          </article>
+
+          <!-- Portfolio Website -->
+          <article class="card">
+            <header class="card__header">
+              <h3>Personal Portfolio Website (This Site)</h3>
+              <p class="card__meta">HTML, CSS, responsive layout</p>
+            </header>
+
+            <p>
+              The website you’re viewing right now. Built from scratch using semantic HTML, reusable layout patterns,
+              and responsive design. Created to present projects clearly and professionally.
+            </p>
+
+            <ul class="tag-list" aria-label="Key highlights">
+              <li class="tag">Semantic HTML</li>
+              <li class="tag">Responsive CSS</li>
+              <li class="tag">Reusable components</li>
+            </ul>
+
+            <div class="card__actions">
+              <!-- Replace these once you push this site to GitHub -->
+              <a class="btn btn--small btn--primary" href="#" target="_blank" rel="noopener">
+                GitHub Repo
+              </a>
+              <a class="btn btn--small" href="#" target="_blank" rel="noopener">
+                Live Demo
+              </a>
+            </div>
+
+            <p style="margin-top: 0.75rem; font-size: 0.95rem;">
+              <em>Links will be added after I publish this site to GitHub Pages.</em>
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coursework / Local Projects -->
+    <section id="coursework">
+      <div class="container">
+        <h2>Selected Coursework (Local)</h2>
+        <p class="section-lead">
+          Some university projects are currently stored locally and not yet published. I can share details,
+          screenshots, or a private repo on request.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <header>
+              <h3>Smart IoT Gate System</h3>
+              <p class="card__meta">Arduino, Raspberry Pi, MQTT, MariaDB, Flask</p>
+            </header>
+            <p>
+              Built an IoT-based automated gate integrating sensors, motors, and a Raspberry Pi for access control,
+              with real-time data logging and a Flask dashboard for monitoring.
+            </p>
+            <ul class="tag-list" aria-label="Key highlights">
+              <li class="tag">Hardware + software</li>
+              <li class="tag">MQTT</li>
+              <li class="tag">Dashboard</li>
+            </ul>
+            <div class="card__actions">
+              <a class="btn btn--small" href="contact.html">Request details</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <header>
+              <h3>SwinAdventure (OOP Game)</h3>
+              <p class="card__meta">C# · Object-Oriented Programming</p>
+            </header>
+            <p>
+              An interactive adventure game built using object-oriented programming principles, focused on clean class
+              design and core gameplay mechanics.
+            </p>
+            <div class="card__actions">
+              <a class="btn btn--small" href="contact.html">Request details</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hobby / Experience -->
+    <section id="hobby">
+      <div class="container">
+        <h2>Hobby / Experience</h2>
+        <p class="section-lead">
+          Creative projects I do outside my main development focus.
+        </p>
+        <div style="margin-bottom: 1.5rem;">
+  <a
+    class="btn btn--primary"
+    href="https://steamcommunity.com/id/jason0977/myworkshopfiles/"
+    target="_blank"
+    rel="noopener"
+  >
+    View Steam Workshop Profile
+  </a>
+</div>
+
+
+        <div class="cards">
+  <!-- Transport Fever 2 -->
+  <article class="card">
+    <header>
+      <h3>KAI CC 206 Re(Logo) Indonesia</h3>
+      <p class="card__meta">Transport Fever 2 · Reskin/Livery</p>
+    </header>
+
+    <p>
+      Indonesian locomotive reskin/livery work for Transport Fever 2. Published on Steam Workshop as a hobby project.
+    </p>
+
+    <ul class="tag-list" aria-label="Stats">
+      <li class="tag">1,629 visitors</li>
+      <li class="tag">745 subscribers</li>
+      <li class="tag">15 favorites</li>
+    </ul>
+
+    <div class="card__actions">
+      <a class="btn btn--small btn--primary"
+         href="https://steamcommunity.com/sharedfiles/filedetails/?id=3492276585"
+         target="_blank" rel="noopener">
+        View on Steam
+      </a>
+    </div>
+  </article>
+
+  <article class="card">
+    <header>
+      <h3>Kereta Mild Steel Livery 2014–2025 (Narrow Gauge 1067)</h3>
+      <p class="card__meta">Transport Fever 2 · Livery pack</p>
+    </header>
+
+    <p>
+      Livery pack for KAI mild steel cars (narrow gauge 1067), covering 2014–2025 era styling.
+    </p>
+
+    <ul class="tag-list" aria-label="Stats">
+      <li class="tag">773 visitors</li>
+      <li class="tag">250 subscribers</li>
+      <li class="tag">7 favorites</li>
+    </ul>
+
+    <div class="card__actions">
+      <a class="btn btn--small btn--primary"
+         href="https://steamcommunity.com/sharedfiles/filedetails/?id=3621865519"
+         target="_blank" rel="noopener">
+        View on Steam
+      </a>
+    </div>
+  </article>
+
+  <article class="card">
+    <header>
+      <h3>KAI Kereta Stainless Steel 2018</h3>
+      <p class="card__meta">Transport Fever 2 · Livery/asset</p>
+    </header>
+
+    <p>
+      Stainless steel rolling stock themed for KAI (2018). Published as a Transport Fever 2 Workshop item.
+    </p>
+
+    <ul class="tag-list" aria-label="Stats">
+      <li class="tag">236 visitors</li>
+      <li class="tag">48 subscribers</li>
+      <li class="tag">2 favorites</li>
+    </ul>
+
+    <div class="card__actions">
+      <a class="btn btn--small btn--primary"
+         href="https://steamcommunity.com/sharedfiles/filedetails/?id=3649155955"
+         target="_blank" rel="noopener">
+        View on Steam
+      </a>
+    </div>
+  </article>
+
+  <!-- Arma 3 -->
+  <article class="card">
+    <header>
+      <h3>Pindad SS2 temp RHS compat</h3>
+      <p class="card__meta">Arma 3 · Compatibility addon</p>
+    </header>
+
+    <p>
+      A small compatibility addon enabling RHS magazine/scopes support for the BWI Pindad SS2 rifle mod.
+      (Requires BWI SS2 Series + RHSUSAF + CBA_A3.)
+    </p>
+
+    <ul class="tag-list" aria-label="Stats">
+      <li class="tag">649 visitors</li>
+      <li class="tag">383 subscribers</li>
+      <li class="tag">17 favorites</li>
+    </ul>
+
+    <div class="card__actions">
+      <a class="btn btn--small btn--primary"
+         href="https://steamcommunity.com/sharedfiles/filedetails/?id=2271009083"
+         target="_blank" rel="noopener">
+        View on Steam
+      </a>
+    </div>
+  </article>
+
+  <!-- Contributor -->
+  <article class="card">
+    <header>
+      <h3>JOS Tentara Nasional Indonesia (Contributor)</h3>
+      <p class="card__meta">Arma 3 · Team mod contribution</p>
+    </header>
+
+    <p>
+      Contributed as part of the JOS team mod project representing Indonesia’s armed forces content for Arma 3.
+    </p>
+
+    <ul class="tag-list" aria-label="Stats">
+      <li class="tag">8,641 visitors</li>
+      <li class="tag">2,561 subscribers</li>
+      <li class="tag">191 favorites</li>
+    </ul>
+
+    <div class="card__actions">
+      <a class="btn btn--small btn--primary"
+         href="https://steamcommunity.com/sharedfiles/filedetails/?id=1687587803"
+         target="_blank" rel="noopener">
+        View on Steam
+      </a>
+    </div>
+  </article>
+</div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

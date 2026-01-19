@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Contact | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Contact Jason Leonard — ICT graduate specialising in Software Technology."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <!-- Contact Hero -->
+    <section class="about-hero">
+      <div class="container about-hero__grid">
+        <div class="about-hero__content">
+          <h1>Contact</h1>
+
+          <p>
+            Want to get in touch about a project, a role, or collaboration? The easiest way is email.
+          </p>
+
+          <div class="about-hero__actions">
+            <!-- Placeholder email is your real email; change anytime -->
+            <a class="btn btn--primary" href="mailto:jasonleonard46@gmail.com">
+              Email Me
+            </a>
+            <a class="btn" href="projects.html">View Projects</a>
+          </div>
+
+          <p style="margin-top: 1rem;">
+            You can also reach me via LinkedIn. I usually respond within a reasonable time.
+          </p>
+        </div>
+
+        <!-- Contact Card -->
+        <aside class="profile-card" aria-label="Contact details">
+          <div class="profile-card__header">
+            <div>
+              <p class="profile-card__name">Contact Details</p>
+              <p class="profile-card__role">Fastest ways to reach me</p>
+            </div>
+          </div>
+
+          <dl class="profile-card__list">
+            <div class="profile-card__item">
+              <dt>Email</dt>
+              <dd>
+                <a href="mailto:jasonleonard46@gmail.com">jasonleonard46@gmail.com</a>
+              </dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>GitHub</dt>
+              <dd>
+                <a href="https://github.com/jason1511" target="_blank" rel="noopener">github.com/jason1511</a>
+              </dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>LinkedIn</dt>
+              <dd>
+                <a href="https://www.linkedin.com/in/jason-leonard-197230163/" target="_blank" rel="noopener">
+                  linkedin.com/in/jason-leonard-197230163
+                </a>
+              </dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Location</dt>
+              <dd>Melbourne, Australia</dd>
+            </div>
+          </dl>
+
+          <div class="profile-card__links">
+            <a href="mailto:jasonleonard46@gmail.com">Email</a>
+            <a href="https://www.linkedin.com/in/jason-leonard-197230163/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Contact Form (Placeholder) -->
+    <section>
+      <div class="container">
+        <h2>Message Form (Placeholder)</h2>
+        <p class="section-lead">
+          This form is currently a placeholder (no backend yet). For now, it will open your email client.
+        </p>
+
+        <article class="card">
+          <form action="mailto:jasonleonard46@gmail.com" method="post" enctype="text/plain">
+            <div style="display:grid; gap: 0.9rem;">
+              <div>
+                <label for="name"><strong>Name</strong></label><br />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Your name"
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                />
+              </div>
+
+              <div>
+                <label for="email"><strong>Email</strong></label><br />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                />
+              </div>
+
+              <div>
+                <label for="message"><strong>Message</strong></label><br />
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="6"
+                  placeholder="Write your message here..."
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                ></textarea>
+              </div>
+
+              <div style="display:flex; gap: 0.75rem; flex-wrap:wrap;">
+                <button
+                  class="btn btn--primary"
+                  type="submit"
+                >
+                  Send (opens email client)
+                </button>
+
+                <a class="btn" href="mailto:jasonleonard46@gmail.com">
+                  Use email instead
+                </a>
+              </div>
+            </div>
+          </form>
+        </article>
+
+        <p style="margin-top: 1rem; color: rgba(231,238,252,0.75);">
+          Later, we can connect this form to a service (e.g., Formspree / Netlify Forms) so it sends messages without
+          needing an email client.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

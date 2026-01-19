@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Jason Leonard | Software & Web Development</title>
+  <meta
+    name="description"
+    content="Jason Leonard — ICT graduate specialising in Software Technology, building practical software and web applications."
+  />
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <!-- Header / Nav -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <!-- Hero -->
+    <section class="about-hero">
+      <div class="container about-hero__grid">
+        <!-- Left: Hero Content -->
+        <div class="about-hero__content">
+          <h1>
+            Hi, I’m Jason —
+            <br />
+            I build practical software and web applications.
+          </h1>
+
+          <p>
+            I’m an ICT graduate specialising in <strong>Software Technology</strong>,
+            with experience building real-world systems such as inventory and sales
+            management tools, interactive web projects, and published Steam Workshop mods.
+          </p>
+
+          <p>
+            I enjoy turning real problems into clear, usable solutions and continuously
+            improving my skills through hands-on projects.
+          </p>
+
+          <div class="about-hero__actions">
+            <a class="btn btn--primary" href="projects.html">View My Projects</a>
+            <a class="btn" href="about.html">About Me</a>
+          </div>
+        </div>
+
+        <!-- Right: Quick Profile -->
+        <aside class="profile-card" aria-label="Quick profile">
+          <div class="profile-card__header">
+            <div>
+              <p class="profile-card__name">Jason Leonard</p>
+              <p class="profile-card__role">
+                ICT Graduate · Software &amp; Web Development
+              </p>
+            </div>
+          </div>
+
+          <dl class="profile-card__list">
+            <div class="profile-card__item">
+              <dt>Focus</dt>
+              <dd>Web development, practical software</dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Tech</dt>
+              <dd>HTML, CSS, JavaScript, C#, .NET, SQLite</dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Location</dt>
+              <dd>Melbourne, Australia</dd>
+            </div>
+          </dl>
+
+          <div class="profile-card__links">
+            <a
+              href="https://github.com/jason1511"
+              target="_blank"
+              rel="noopener"
+              >GitHub</a
+            >
+            <a
+              href="https://www.linkedin.com/in/jason-leonard-197230163/"
+              target="_blank"
+              rel="noopener"
+              >LinkedIn</a
+            >
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- What I Build -->
+    <section>
+      <div class="container">
+        <h2>What I Build</h2>
+        <p class="section-lead">
+          I focus on building reliable, user-focused software using clear structure
+          and practical design decisions.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <h3>Business Applications</h3>
+            <p>
+              Desktop and web applications that support real operations, such as
+              inventory tracking, sales recording, and reporting.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Web Interfaces</h3>
+            <p>
+              Responsive, accessible web pages built with semantic HTML, modern CSS,
+              and clean JavaScript.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Systems & Modding</h3>
+            <p>
+              Mod development and system-based projects that require understanding
+              existing architectures and iterating safely.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section>
+      <div class="container">
+        <h2>Featured Projects</h2>
+        <p class="section-lead">
+          Selected work that highlights my approach to problem-solving and development.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <header>
+              <h3>Bike Store Inventory &amp; Sales App</h3>
+              <p class="card__meta">C#, .NET WinForms, SQLite</p>
+            </header>
+
+            <p>
+              A desktop application built for a small electric bike retailer to manage
+              inventory, transactions, and service records, refined through real user
+              feedback.
+            </p>
+
+            <div class="card__actions">
+              <a class="btn btn--small btn--primary" href="bike-store.html">
+                View Case Study
+              </a>
+              <a
+                class="btn btn--small"
+                href="https://github.com/jason1511/Bike-STore-Project"
+                target="_blank"
+                rel="noopener"
+              >
+                GitHub
+              </a>
+            </div>
+          </article>
+
+          <article class="card">
+            <header>
+              <h3>Steam Workshop Mods</h3>
+              <p class="card__meta">Modding, iteration, user feedback</p>
+            </header>
+
+            <p>
+              Published mods on Steam Workshop, gaining experience in working within
+              existing systems, versioning changes, and responding to user feedback.
+            </p>
+
+            <div class="card__actions">
+              <a class="btn btn--small btn--primary" href="projects.html">
+                View Details
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section>
+      <div class="container">
+        <h2>Let’s Work Together</h2>
+        <p class="section-lead">
+          I’m currently seeking graduate or junior developer opportunities where I can
+          learn, contribute, and grow through real projects.
+        </p>
+
+        <a class="btn btn--primary" href="contact.html">Get in Touch</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
