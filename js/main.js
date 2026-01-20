@@ -101,3 +101,50 @@
     }
   })();
 })();
+  /* ---------------- GITHUB REPO STATS ---------------- */
+
+  (async () => {
+    const cards = document.querySelectorAll(".repo-card[data-gh-repo]");
+    if (cards.length === 0) return;
+
+    const repos = Array.from(cards)
+      .map((c) => c.getAttribute("data-gh-repo"))
+      .filter(Boolean);
+
+    const url =
+      "/.netlify/functions/github-repo-stats?repos=" +
+      encodeURIComponent(repos.join(","));
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`GitHub stats fetch failed: ${res.status}`);
+      const byRepo = await res.json();
+
+      cards.forEach((card) => {
+        const repo = card.getAttribute("data-gh-repo");
+        const data = byRepo[repo];
+        if (!data || data.error) return;
+
+        const starsEl = card.querySelector('[data-gh="stars"]');
+        const forksEl = card.querySelector('[data-gh="forks"]');
+        const updatedEl = card.querySelector('[data-gh="updated"]');
+
+        if (starsEl) starsEl.textContent = `${fmt(data.stargazers_count)} stars`;
+        if (forksEl) forksEl.textContent = `${fmt(data.forks_count)} forks`;
+        if (updatedEl) updatedEl.textContent = `${fmtDate(data.updated_at)} updated`;
+      });
+    } catch (err) {
+      console.warn("GitHub repo stats unavailable:", err);
+    }
+
+    function fmt(n) {
+      return Number.isFinite(n) ? n.toLocaleString() : "—";
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString(undefined, { year: "numeric", month: "short" });
+    }
+  })();
