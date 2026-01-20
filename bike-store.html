@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Case Study | Bike Store Management App</title>
+  <title>Case Study | Bike Store Inventory &amp; Sales App</title>
   <meta
     name="description"
     content="Case study: Bike Store Inventory & Sales Management App built with C# WinForms and SQLite."
@@ -37,8 +37,9 @@
           <p class="card__meta">Case Study · C#, .NET WinForms, SQLite</p>
 
           <p>
-            A desktop application built to support day-to-day operations for a small electric bike retail business:
-            inventory tracking, transaction logging, and basic reporting. Designed to be reliable and easy to use.
+            A desktop application built for a small electric bike retailer to manage inventory, sales transactions,
+            and service records. Designed to support daily operations with a focus on usability, accuracy, and
+            reliability.
           </p>
 
           <div class="about-hero__actions">
@@ -53,7 +54,7 @@
           <div class="profile-card__header">
             <div>
               <p class="profile-card__name">Project Summary</p>
-              <p class="profile-card__role">What this app delivers</p>
+              <p class="profile-card__role">At a glance</p>
             </div>
           </div>
 
@@ -67,49 +68,48 @@
               <dd>Small retail staff</dd>
             </div>
             <div class="profile-card__item">
-              <dt>Focus</dt>
-              <dd>Usability, accuracy, reliability</dd>
-            </div>
-            <div class="profile-card__item">
               <dt>Stack</dt>
               <dd>C#, WinForms, SQLite</dd>
+            </div>
+            <div class="profile-card__item">
+              <dt>Focus</dt>
+              <dd>Usability, accuracy, reliability</dd>
             </div>
           </dl>
 
           <div class="profile-card__links">
+            <a href="#overview">Overview</a>
             <a href="#features">Features</a>
-            <a href="#architecture">Architecture</a>
-            <a href="#learned">Learnings</a>
+            <a href="#tech">Tech</a>
+            <a href="#learnings">Learnings</a>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- Problem -->
-    <section>
+    <!-- Overview -->
+    <section id="overview">
       <div class="container">
-        <h2>The Problem</h2>
+        <h2>Overview</h2>
         <p class="section-lead">
-          Small businesses often track inventory and sales across spreadsheets or notebooks, which can lead to
-          inconsistent records, duplicated work, and low visibility of stock movement.
+          This project was built to replace manual tracking methods with a consistent system for recording stock,
+          transactions, and service activity.
         </p>
 
         <div class="cards">
           <article class="card">
-            <h3>Challenges</h3>
-            <ul>
-              <li>Manual tracking makes it easy to lose or duplicate records</li>
-              <li>Hard to quickly check stock availability</li>
-              <li>Sales and service history is scattered</li>
-              <li>Simple reporting takes time</li>
-            </ul>
+            <h3>Problem</h3>
+            <p>
+              Inventory and transaction tracking handled manually can become inconsistent over time, making it difficult
+              to check stock status quickly, review history, or create summaries without extra effort.
+            </p>
           </article>
 
           <article class="card">
-            <h3>Goal</h3>
+            <h3>Solution</h3>
             <p>
-              Build a simple desktop app that supports day-to-day operations with structured data storage and an easy UI,
-              while staying lightweight and reliable.
+              A lightweight desktop application with structured data storage and a simple workflow-based UI to manage
+              daily operations reliably.
             </p>
           </article>
         </div>
@@ -121,7 +121,8 @@
       <div class="container">
         <h2>Key Features</h2>
         <p class="section-lead">
-          Built around the core workflows: manage stock, record transactions, and review basic summaries.
+          Designed around the core workflows a small bike store needs: manage stock, record transactions, and review
+          history.
         </p>
 
         <div class="cards">
@@ -129,88 +130,96 @@
             <h3>Inventory Management</h3>
             <ul>
               <li>Create and update product records</li>
-              <li>Track quantities and item details</li>
-              <li>Designed for quick lookup and accuracy</li>
+              <li>Track stock quantities and item details</li>
+              <li>Support quick lookup and consistent data entry</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Sales & Transactions</h3>
+            <h3>Sales &amp; Transaction Logging</h3>
             <ul>
               <li>Record sales transactions consistently</li>
-              <li>Maintain a transaction log for review</li>
-              <li>Supports structured history of changes</li>
+              <li>Maintain a transaction log for review and auditing</li>
+              <li>Support structured history for store operations</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Reporting (Basic)</h3>
+            <h3>Service Records</h3>
             <ul>
-              <li>Simple summaries to support decision-making</li>
-              <li>Designed to be clear and easy for staff</li>
+              <li>Track service activity alongside sales</li>
+              <li>Store basic details to support follow-ups</li>
+              <li>Keep customer-facing work organised</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>Usability & Reliability</h3>
+            <h3>Offline-First Storage</h3>
             <ul>
-              <li>Focused UI for non-technical users</li>
-              <li>Offline-first with local SQLite database</li>
-              <li>Iterated based on user feedback</li>
+              <li>Local SQLite database for reliable storage</li>
+              <li>Works without internet access</li>
+              <li>Designed to be maintainable and extendable</li>
             </ul>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- Architecture -->
-    <section id="architecture">
+    <!-- Tech -->
+    <section id="tech">
       <div class="container">
-        <h2>Architecture & Implementation</h2>
+        <h2>Tech Stack &amp; Implementation</h2>
         <p class="section-lead">
-          The app is built with a straightforward structure to keep it maintainable and easy to extend.
+          Built with a straightforward structure to keep the codebase maintainable and easy to extend.
         </p>
 
         <div class="cards">
           <article class="card">
-            <h3>Core Design Choices</h3>
+            <h3>Stack</h3>
             <ul>
-              <li><strong>WinForms UI</strong> for fast desktop workflows</li>
-              <li><strong>SQLite</strong> for local, reliable storage</li>
-              <li><strong>Clear separation</strong> between UI and data logic (repository-style patterns)</li>
-              <li><strong>Incremental updates</strong> based on real usage</li>
+              <li><strong>C# / .NET WinForms</strong> for the desktop UI</li>
+              <li><strong>SQLite</strong> for local structured storage</li>
+              <li><strong>Git &amp; GitHub</strong> for version control</li>
             </ul>
           </article>
 
           <article class="card">
-            <h3>What I Would Add Next</h3>
+            <h3>Approach</h3>
             <ul>
-              <li>More advanced reports (export / summaries)</li>
-              <li>Better search and filtering</li>
-              <li>Role-based access</li>
-              <li>Optional cloud sync</li>
+              <li>Designed screens around real workflows</li>
+              <li>Improved features based on feedback and iteration</li>
+              <li>Kept the UI clean and consistent for non-technical users</li>
+              <li>Prioritised accuracy and reliability of records</li>
             </ul>
           </article>
+        </div>
+
+        <div style="margin-top: 1.25rem;">
+          <a class="btn btn--primary" href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">
+            View Source on GitHub
+          </a>
+          <a class="btn" href="projects.html">Back to Projects</a>
         </div>
       </div>
     </section>
 
     <!-- Learnings -->
-    <section id="learned">
+    <section id="learnings">
       <div class="container">
-        <h2>Challenges & Learnings</h2>
+        <h2>Challenges &amp; Learnings</h2>
         <p class="section-lead">
-          This project strengthened my ability to translate user needs into software features and iterate reliably.
+          This project strengthened my ability to translate user needs into software features and deliver a usable
+          system through iteration.
         </p>
 
         <div class="cards">
           <article class="card">
             <h3>What I Learned</h3>
             <ul>
-              <li>Gathering requirements and refining scope</li>
-              <li>Designing practical UI flows for non-technical users</li>
+              <li>Turning requirements into clear workflows and UI design</li>
               <li>Working with structured data using SQLite</li>
-              <li>Iterating improvements based on feedback</li>
+              <li>Building maintainable code that supports future improvements</li>
+              <li>Iterating quickly while keeping changes stable</li>
             </ul>
           </article>
 
@@ -218,17 +227,10 @@
             <h3>What I’m Proud Of</h3>
             <ul>
               <li>End-to-end ownership: plan → build → test → refine</li>
-              <li>A real-world use case with practical value</li>
-              <li>Clean, maintainable structure for future improvements</li>
+              <li>A practical solution designed for real store operations</li>
+              <li>Clear structure that can be extended over time</li>
             </ul>
           </article>
-        </div>
-
-        <div style="margin-top: 1.5rem;">
-          <a class="btn btn--primary" href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">
-            View Source on GitHub
-          </a>
-          <a class="btn" href="projects.html">Back to Projects</a>
         </div>
       </div>
     </section>
