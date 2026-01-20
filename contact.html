@@ -53,7 +53,6 @@
           </div>
         </div>
 
-        <!-- Contact Details -->
         <aside class="profile-card" aria-label="Contact details">
           <div class="profile-card__header">
             <div>
@@ -95,11 +94,6 @@
               <dd>Melbourne, Australia</dd>
             </div>
           </dl>
-
-          <div class="profile-card__links">
-            <a href="#message">Message Form</a>
-            <a href="mailto:jasonleonard46@gmail.com">Email</a>
-          </div>
         </aside>
       </div>
     </section>
@@ -113,7 +107,6 @@
         </p>
 
         <article class="card">
-          <!-- Netlify form: IMPORTANT attributes -->
           <form
             id="contactForm"
             name="contact"
@@ -121,13 +114,13 @@
             data-netlify="true"
             netlify-honeypot="bot-field"
           >
-            <!-- Required for Netlify form detection -->
+            <!-- Required for Netlify -->
             <input type="hidden" name="form-name" value="contact" />
 
-            <!-- Honeypot (spam trap) -->
+            <!-- Honeypot -->
             <p style="display:none;">
               <label>
-                Don’t fill this out if you’re human:
+                Don’t fill this out:
                 <input name="bot-field" />
               </label>
             </p>
@@ -140,7 +133,6 @@
                   name="name"
                   type="text"
                   required
-                  autocomplete="name"
                   placeholder="Your name"
                   style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
                 />
@@ -153,7 +145,6 @@
                   name="email"
                   type="email"
                   required
-                  autocomplete="email"
                   placeholder="you@example.com"
                   style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
                 />
@@ -171,13 +162,11 @@
                 ></textarea>
               </div>
 
-              <!-- Status text (JS will write here) -->
-              <p id="formStatus" style="margin: 0; color: rgba(231,238,252,0.85);"></p>
+              <p id="formStatus" style="margin:0;"></p>
 
-              <div style="display:flex; gap: 0.75rem; flex-wrap:wrap;">
-                <button class="btn btn--primary" type="submit">Send Message</button>
-                <a class="btn" href="mailto:jasonleonard46@gmail.com">Email Instead</a>
-              </div>
+              <button class="btn btn--primary" type="submit">
+                Send Message
+              </button>
             </div>
           </form>
         </article>
@@ -195,7 +184,6 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
-  <!-- Your global JS -->
   <script src="js/main.js"></script>
 </body>
 </html>
