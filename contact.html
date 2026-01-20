@@ -40,14 +40,8 @@
             feel free to get in touch.
           </p>
 
-          <p>
-            The best way to reach me is via email or LinkedIn.
-          </p>
-
           <div class="about-hero__actions">
-            <a class="btn btn--primary" href="mailto:jasonleonard46@gmail.com">
-              Email Me
-            </a>
+            <a class="btn btn--primary" href="mailto:jasonleonard46@gmail.com">Email Me</a>
             <a
               class="btn"
               href="https://www.linkedin.com/in/jason-leonard-197230163/"
@@ -71,11 +65,7 @@
           <dl class="profile-card__list">
             <div class="profile-card__item">
               <dt>Email</dt>
-              <dd>
-                <a href="mailto:jasonleonard46@gmail.com">
-                  jasonleonard46@gmail.com
-                </a>
-              </dd>
+              <dd><a href="mailto:jasonleonard46@gmail.com">jasonleonard46@gmail.com</a></dd>
             </div>
 
             <div class="profile-card__item">
@@ -94,11 +84,7 @@
             <div class="profile-card__item">
               <dt>GitHub</dt>
               <dd>
-                <a
-                  href="https://github.com/jason1511"
-                  target="_blank"
-                  rel="noopener"
-                >
+                <a href="https://github.com/jason1511" target="_blank" rel="noopener">
                   github.com/jason1511
                 </a>
               </dd>
@@ -111,16 +97,90 @@
           </dl>
 
           <div class="profile-card__links">
+            <a href="#message">Message Form</a>
             <a href="mailto:jasonleonard46@gmail.com">Email</a>
-            <a
-              href="https://www.linkedin.com/in/jason-leonard-197230163/"
-              target="_blank"
-              rel="noopener"
-            >
-              LinkedIn
-            </a>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <!-- Message Form -->
+    <section id="message">
+      <div class="container">
+        <h2>Send a Message</h2>
+        <p class="section-lead">
+          Use the form below and I’ll get back to you via email.
+        </p>
+
+        <article class="card">
+          <!-- Netlify form: IMPORTANT attributes -->
+          <form
+            id="contactForm"
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+          >
+            <!-- Required for Netlify form detection -->
+            <input type="hidden" name="form-name" value="contact" />
+
+            <!-- Honeypot (spam trap) -->
+            <p style="display:none;">
+              <label>
+                Don’t fill this out if you’re human:
+                <input name="bot-field" />
+              </label>
+            </p>
+
+            <div style="display:grid; gap: 0.9rem;">
+              <div>
+                <label for="name"><strong>Name</strong></label><br />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  autocomplete="name"
+                  placeholder="Your name"
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                />
+              </div>
+
+              <div>
+                <label for="email"><strong>Email</strong></label><br />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                />
+              </div>
+
+              <div>
+                <label for="messageText"><strong>Message</strong></label><br />
+                <textarea
+                  id="messageText"
+                  name="message"
+                  rows="6"
+                  required
+                  placeholder="Write your message here..."
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                ></textarea>
+              </div>
+
+              <!-- Status text (JS will write here) -->
+              <p id="formStatus" style="margin: 0; color: rgba(231,238,252,0.85);"></p>
+
+              <div style="display:flex; gap: 0.75rem; flex-wrap:wrap;">
+                <button class="btn btn--primary" type="submit">Send Message</button>
+                <a class="btn" href="mailto:jasonleonard46@gmail.com">Email Instead</a>
+              </div>
+            </div>
+          </form>
+        </article>
       </div>
     </section>
   </main>
@@ -134,5 +194,8 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+
+  <!-- Your global JS -->
+  <script src="js/main.js"></script>
 </body>
 </html>
