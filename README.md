@@ -2,7 +2,7 @@
 
 A responsive personal portfolio website showcasing my software and web development projects, including real-world backend integrations and live production data.
 
-🔗 **Live site:** https://YOUR-NETLIFY-URL  
+🔗 **Live site:**  https://jasonportofolio.netlify.app/ 
 🔗 **Source code:** https://github.com/jason1511/my-own-website
 
 ---
