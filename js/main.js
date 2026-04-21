@@ -1,6 +1,6 @@
 // js/main.js
 (() => {
-  /* ---------------- CONTACT FORM (Netlify) ---------------- */
+  /* ---------------- CONTACT FORM (Cloudflare) ---------------- */
 
   function encode(data) {
     return Object.keys(data)
@@ -33,14 +33,13 @@
 
       try {
         const data = {
-          "form-name": form.getAttribute("name"),
           name,
           email,
           message,
           "bot-field": form.elements["bot-field"].value,
         };
 
-        const res = await fetch(window.location.pathname, {
+        const res = await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: encode(data),
@@ -71,8 +70,7 @@
       .filter(Boolean);
 
     const url =
-      "/.netlify/functions/workshop-stats?ids=" +
-      encodeURIComponent(ids.join(","));
+      "/workshop-stats?ids=" + encodeURIComponent(ids.join(","));
 
     try {
       const res = await fetch(url);
@@ -100,7 +98,7 @@
       return Number.isFinite(n) ? n.toLocaleString() : "—";
     }
   })();
-})();
+
   /* ---------------- GITHUB REPO STATS ---------------- */
 
   (async () => {
@@ -112,8 +110,7 @@
       .filter(Boolean);
 
     const url =
-      "/.netlify/functions/github-repo-stats?repos=" +
-      encodeURIComponent(repos.join(","));
+      "/github-repo-stats?repos=" + encodeURIComponent(repos.join(","));
 
     try {
       const res = await fetch(url);
@@ -145,6 +142,10 @@
       if (!iso) return "—";
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return "—";
-      return d.toLocaleDateString(undefined, { year: "numeric", month: "short" });
+      return d.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+      });
     }
   })();
+})();
