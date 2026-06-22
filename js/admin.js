@@ -1,9 +1,82 @@
 // js/admin.js
 (() => {
-loadAdminProjects();
-loadAdminBlogPosts();
-loadAdminWorkshopItems();
+  setupAdminBlogForm();
 
+  loadAdminProjects();
+  loadAdminBlogPosts();
+  loadAdminWorkshopItems();
+  /* ---------------- BLOG CREATE FORM ---------------- */
+
+  function setupAdminBlogForm() {
+    const form = document.getElementById("adminBlogForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminBlogStatus");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const password = form.elements["adminPassword"].value.trim();
+      const title = form.elements["title"].value.trim();
+      const slug = form.elements["slug"].value.trim();
+      const excerpt = form.elements["excerpt"].value.trim();
+      const content = form.elements["content"].value.trim();
+      const displayOrder = Number(form.elements["display_order"].value || 0);
+      const isPublished = form.elements["is_published"].checked;
+
+      if (!password || !title || !slug || !excerpt || !content) {
+        setStatus("Please fill in all required fields.");
+        return;
+      }
+
+      setStatus("Creating blog post...");
+
+      try {
+        const res = await fetch("/api/admin/blog", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": password,
+          },
+          body: JSON.stringify({
+            title,
+            slug,
+            excerpt,
+            content,
+            cover_image_key: "",
+            is_published: isPublished,
+            display_order: displayOrder,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${res.status}`);
+        }
+
+        setStatus("Blog post created successfully.");
+
+        form.elements["title"].value = "";
+        form.elements["slug"].value = "";
+        form.elements["excerpt"].value = "";
+        form.elements["content"].value = "";
+        form.elements["display_order"].value = "0";
+        form.elements["is_published"].checked = true;
+
+        loadAdminBlogPosts();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Failed to create blog post.");
+      }
+    });
+
+    function setStatus(message) {
+      if (statusEl) {
+        statusEl.textContent = message;
+      }
+    }
+  }
   /* ---------------- PROJECTS ---------------- */
 
   async function loadAdminProjects() {

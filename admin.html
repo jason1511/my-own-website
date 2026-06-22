@@ -140,16 +140,112 @@
     </section>
 
     <section id="admin-blog">
-      <div class="container">
-        <h2>Blog Posts</h2>
-        <p class="section-lead">Blog management will be added next.</p>
-        <div class="cards" data-admin-blog>
-          <article class="card">
-            <p>No blog posts loaded yet.</p>
-          </article>
+  <div class="container">
+    <h2>Blog Posts</h2>
+    <p class="section-lead">
+      Create and review blog posts stored in D1.
+    </p>
+
+    <article class="card" style="margin-bottom: 1.5rem;">
+      <h3>Create Blog Post</h3>
+
+      <form id="adminBlogForm">
+        <div style="display: grid; gap: 0.9rem;">
+          <div>
+            <label for="adminPassword"><strong>Admin Password</strong></label><br />
+            <input
+              id="adminPassword"
+              name="adminPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+              placeholder="Enter admin password"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="blogTitle"><strong>Title</strong></label><br />
+            <input
+              id="blogTitle"
+              name="title"
+              type="text"
+              required
+              placeholder="Blog post title"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="blogSlug"><strong>Slug</strong></label><br />
+            <input
+              id="blogSlug"
+              name="slug"
+              type="text"
+              required
+              placeholder="example-blog-post"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="blogExcerpt"><strong>Excerpt</strong></label><br />
+            <textarea
+              id="blogExcerpt"
+              name="excerpt"
+              rows="3"
+              required
+              placeholder="Short summary for the blog list page..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="blogContent"><strong>Content</strong></label><br />
+            <textarea
+              id="blogContent"
+              name="content"
+              rows="10"
+              required
+              placeholder="Write the full blog post here..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="blogDisplayOrder"><strong>Display Order</strong></label><br />
+            <input
+              id="blogDisplayOrder"
+              name="display_order"
+              type="number"
+              value="0"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <label>
+            <input id="blogPublished" name="is_published" type="checkbox" checked />
+            Publish immediately
+          </label>
+
+          <p id="adminBlogStatus" style="margin:0;"></p>
+
+          <div>
+            <button class="btn btn--primary" type="submit">
+              Create Blog Post
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
+      </form>
+    </article>
+
+    <div class="cards" data-admin-blog>
+      <article class="card">
+        <p>Loading blog posts…</p>
+      </article>
+    </div>
+  </div>
+</section>
 
     <section id="admin-workshop">
       <div class="container">
