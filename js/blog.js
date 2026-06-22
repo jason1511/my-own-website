@@ -28,24 +28,27 @@
     }
   }
 
-  function renderBlogCard(post) {
-    return `
-      <article class="card">
-        <header>
-          <h3>${escapeHtml(post.title)}</h3>
-          <p class="card__meta">${formatDate(post.created_at)}</p>
-        </header>
+function renderBlogCard(post) {
+  return `
+    <article class="card">
+      <header>
+        <h3>${escapeHtml(post.title)}</h3>
+        <p class="card__meta">${formatDate(post.created_at)}</p>
+      </header>
 
-        <p>${escapeHtml(post.excerpt)}</p>
+      <p>${escapeHtml(post.excerpt)}</p>
 
-        <div class="card__actions">
-          <a class="btn btn--small btn--primary" href="blog-post.html?slug=${encodeURIComponent(post.slug)}">
-            Read Post
-          </a>
-        </div>
-      </article>
-    `;
-  }
+      <div class="card__actions">
+        <a
+          class="btn btn--small btn--primary"
+          href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
+        >
+          Read Post
+        </a>
+      </div>
+    </article>
+  `;
+}
 
   function renderEmptyState() {
     return `
