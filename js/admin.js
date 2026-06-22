@@ -5,6 +5,7 @@
   loadAdminProjects();
   loadAdminBlogPosts();
   loadAdminWorkshopItems();
+
   /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
   function setupAdminBlogForm() {
@@ -114,6 +115,7 @@
       }
     }
   }
+
   /* ---------------- PROJECTS ---------------- */
 
   async function loadAdminProjects() {
@@ -147,7 +149,9 @@
       <article class="card">
         <header>
           <h3>${escapeHtml(project.title)}</h3>
-          <p class="card__meta">${escapeHtml(project.type)} · ${escapeHtml(project.tech_stack || "No tech stack")}</p>
+          <p class="card__meta">${escapeHtml(project.type)} · ${escapeHtml(
+      project.tech_stack || "No tech stack"
+    )}</p>
         </header>
 
         <p>${escapeHtml(project.summary)}</p>
@@ -162,18 +166,23 @@
         <div class="card__actions">
           ${
             project.github_url
-              ? `<a class="btn btn--small" href="${escapeAttr(project.github_url)}" target="_blank" rel="noopener">GitHub</a>`
+              ? `<a class="btn btn--small" href="${escapeAttr(
+                  project.github_url
+                )}" target="_blank" rel="noopener">GitHub</a>`
               : ""
           }
           ${
             project.live_url
-              ? `<a class="btn btn--small" href="${escapeAttr(project.live_url)}" target="_blank" rel="noopener">Live</a>`
+              ? `<a class="btn btn--small" href="${escapeAttr(
+                  project.live_url
+                )}" target="_blank" rel="noopener">Live</a>`
               : ""
           }
         </div>
       </article>
     `;
   }
+
   /* ---------------- BLOG POSTS ---------------- */
 
   async function loadAdminBlogPosts() {
@@ -196,7 +205,7 @@
       }
 
       container.innerHTML = data.blog_posts.map(renderBlogPostCard).join("");
-            setupBlogEditButtons(container);
+      setupBlogEditButtons(container);
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load blog posts.");
@@ -246,7 +255,8 @@
       </article>
     `;
   }
-    function setupBlogEditButtons(container) {
+
+  function setupBlogEditButtons(container) {
     const buttons = container.querySelectorAll("[data-blog-edit]");
     const form = document.getElementById("adminBlogForm");
     const submitBtn = document.getElementById("adminBlogSubmitBtn");
@@ -274,6 +284,7 @@
       });
     });
   }
+
   /* ---------------- WORKSHOP ITEMS ---------------- */
 
   async function loadAdminWorkshopItems() {
@@ -307,7 +318,9 @@
       <article class="card">
         <header>
           <h3>${escapeHtml(item.title)}</h3>
-          <p class="card__meta">${escapeHtml(item.game)} · Steam ID ${escapeHtml(item.steam_id)}</p>
+          <p class="card__meta">${escapeHtml(item.game)} · Steam ID ${escapeHtml(
+      item.steam_id
+    )}</p>
         </header>
 
         <p>${escapeHtml(item.description)}</p>
