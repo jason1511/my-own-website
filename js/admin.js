@@ -1,10 +1,82 @@
 // js/admin.js
 (() => {
+  const ADMIN_PASSWORD_KEY = "portfolioAdminPassword";
+
+  setupAdminLogin();
   setupAdminBlogForm();
 
-  loadAdminProjects();
-  loadAdminBlogPosts();
-  loadAdminWorkshopItems();
+  // If the password was already entered in this browser session,
+  // unlock the dashboard automatically.
+  if (getStoredAdminPassword()) {
+    unlockAdminDashboard();
+  }
+
+  /* ---------------- ADMIN LOGIN ---------------- */
+
+  function setupAdminLogin() {
+    const form = document.getElementById("adminLoginForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminLoginStatus");
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const password = form.elements["password"].value.trim();
+
+      if (!password) {
+        setText(statusEl, "Please enter the admin password.");
+        return;
+      }
+
+      if (submitBtn) submitBtn.disabled = true;
+      setText(statusEl, "Checking password...");
+
+      try {
+        const response = await fetch("/api/admin/session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password }),
+        });
+
+        const data = await readJsonSafe(response);
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${response.status}`);
+        }
+
+        sessionStorage.setItem(ADMIN_PASSWORD_KEY, password);
+        form.reset();
+        setText(statusEl, "");
+
+        unlockAdminDashboard();
+      } catch (error) {
+        console.error(error);
+        setText(statusEl, error.message || "Unable to unlock admin.");
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  function unlockAdminDashboard() {
+    const loginSection = document.getElementById("adminLoginSection");
+    const dashboard = document.getElementById("adminDashboard");
+
+    if (loginSection) loginSection.hidden = true;
+    if (dashboard) dashboard.hidden = false;
+
+    loadAdminProjects();
+    loadAdminBlogPosts();
+    loadAdminWorkshopItems();
+  }
+
+  function getStoredAdminPassword() {
+    return sessionStorage.getItem(ADMIN_PASSWORD_KEY) || "";
+  }
 
   /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
@@ -19,7 +91,7 @@
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const password = form.elements["adminPassword"].value.trim();
+      const password = getStoredAdminPassword();
       const blogId = form.elements["blog_id"].value.trim();
       const title = form.elements["title"].value.trim();
       const slug = form.elements["slug"].value.trim();
@@ -28,7 +100,12 @@
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isPublished = form.elements["is_published"].checked;
 
-      if (!password || !title || !slug || !excerpt || !content) {
+      if (!password) {
+        setStatus("Admin session missing. Please unlock the admin page again.");
+        return;
+      }
+
+      if (!title || !slug || !excerpt || !content) {
         setStatus("Please fill in all required fields.");
         return;
       }
@@ -74,7 +151,7 @@
             : "Blog post created successfully."
         );
 
-        resetBlogForm({ keepPassword: true });
+        resetBlogForm();
         await loadAdminBlogPosts();
       } catch (error) {
         console.error(error);
@@ -86,14 +163,12 @@
 
     if (cancelEditBtn) {
       cancelEditBtn.addEventListener("click", () => {
-        resetBlogForm({ keepPassword: true });
+        resetBlogForm();
         setStatus("Edit cancelled.");
       });
     }
 
-    function resetBlogForm({ keepPassword } = { keepPassword: true }) {
-      const currentPassword = form.elements["adminPassword"].value;
-
+    function resetBlogForm() {
       form.elements["blog_id"].value = "";
       form.elements["title"].value = "";
       form.elements["slug"].value = "";
@@ -101,12 +176,6 @@
       form.elements["content"].value = "";
       form.elements["display_order"].value = "0";
       form.elements["is_published"].checked = true;
-
-      if (keepPassword) {
-        form.elements["adminPassword"].value = currentPassword;
-      } else {
-        form.elements["adminPassword"].value = "";
-      }
 
       if (submitBtn) submitBtn.textContent = "Create Blog Post";
       if (cancelEditBtn) cancelEditBtn.hidden = true;
@@ -117,7 +186,7 @@
     }
 
     function setStatus(message) {
-      if (statusEl) statusEl.textContent = message;
+      setText(statusEl, message);
     }
   }
 
@@ -330,6 +399,10 @@
   async function readJsonSafe(response) {
     const text = await response.text();
     return text ? JSON.parse(text) : {};
+  }
+
+  function setText(element, message) {
+    if (element) element.textContent = message;
   }
 
   function renderLinkButton(url, label) {

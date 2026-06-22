@@ -18,263 +18,301 @@
       <nav class="site-nav" aria-label="Admin navigation">
         <a href="index.html">Public Site</a>
         <a href="projects.html">Projects</a>
+        <a href="blog.html">Blog</a>
         <a href="contact.html">Contact</a>
       </nav>
     </div>
   </header>
 
   <main class="site-main">
-    <section class="about-hero">
-      <div class="container about-hero__grid">
-        <div class="about-hero__content">
-          <h1>Admin</h1>
-
-          <p>
-            Private dashboard for managing portfolio content, blog posts, workshop
-            entries, and media assets.
+    <!-- Admin Login -->
+    <section id="adminLoginSection" class="about-hero">
+      <div class="container">
+        <article class="card" style="max-width: 560px;">
+          <h1>Admin Login</h1>
+          <p class="section-lead">
+            Enter the admin password to unlock the dashboard.
           </p>
 
-          <p>
-            Start with read-only views first. Editing and uploads can be added once
-            the data flow is stable.
+          <form id="adminLoginForm">
+            <div style="display:grid; gap:0.9rem;">
+              <div>
+                <label for="adminLoginPassword"><strong>Password</strong></label><br />
+                <input
+                  id="adminLoginPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+                  placeholder="Enter admin password"
+                  style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                />
+              </div>
+
+              <p id="adminLoginStatus" style="margin:0;"></p>
+
+              <div>
+                <button class="btn btn--primary" type="submit">
+                  Unlock Admin
+                </button>
+              </div>
+            </div>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" hidden>
+      <!-- Admin Hero -->
+      <section class="about-hero">
+        <div class="container about-hero__grid">
+          <div class="about-hero__content">
+            <h1>Admin</h1>
+
+            <p>
+              Private dashboard for managing portfolio content, blog posts,
+              workshop entries, and media assets.
+            </p>
+
+            <p>
+              Blog posts can be created and edited from this dashboard. Project,
+              workshop, and media editing can be added later.
+            </p>
+          </div>
+
+          <aside class="profile-card" aria-label="Admin summary">
+            <div class="profile-card__header">
+              <div>
+                <p class="profile-card__name">Admin Mode</p>
+                <p class="profile-card__role">D1 + R2 content management</p>
+              </div>
+            </div>
+
+            <dl class="profile-card__list">
+              <div class="profile-card__item">
+                <dt>Status</dt>
+                <dd>Blog create/edit enabled</dd>
+              </div>
+
+              <div class="profile-card__item">
+                <dt>Database</dt>
+                <dd>Cloudflare D1</dd>
+              </div>
+
+              <div class="profile-card__item">
+                <dt>Storage</dt>
+                <dd>Cloudflare R2 planned</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Overview -->
+      <section>
+        <div class="container">
+          <h2>Content Overview</h2>
+          <p class="section-lead">
+            These sections load content from D1.
           </p>
+
+          <div class="cards">
+            <article class="card">
+              <h3>Projects</h3>
+              <p>
+                Portfolio projects such as the Bike Store App and this website.
+              </p>
+              <div class="card__actions">
+                <a class="btn btn--small btn--primary" href="#admin-projects">
+                  View Projects
+                </a>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Blog Posts</h3>
+              <p>
+                Personal blog entries and development notes.
+              </p>
+              <div class="card__actions">
+                <a class="btn btn--small btn--primary" href="#admin-blog">
+                  View Blog
+                </a>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Workshop Items</h3>
+              <p>
+                Steam Workshop entries stored in D1, with live stats fetched separately.
+              </p>
+              <div class="card__actions">
+                <a class="btn btn--small btn--primary" href="#admin-workshop">
+                  View Workshop
+                </a>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Media Assets</h3>
+              <p>
+                Future R2 image uploads and asset references.
+              </p>
+              <div class="card__actions">
+                <a class="btn btn--small btn--primary" href="#admin-media">
+                  View Media
+                </a>
+              </div>
+            </article>
+          </div>
         </div>
+      </section>
 
-        <aside class="profile-card" aria-label="Admin summary">
-          <div class="profile-card__header">
-            <div>
-              <p class="profile-card__name">Admin Mode</p>
-              <p class="profile-card__role">D1 + R2 content management</p>
-            </div>
+      <!-- Projects -->
+      <section id="admin-projects">
+        <div class="container">
+          <h2>Projects</h2>
+          <p class="section-lead">Read-only project data from D1.</p>
+
+          <div class="cards" data-admin-projects>
+            <article class="card">
+              <p>Loading projects…</p>
+            </article>
           </div>
-
-          <dl class="profile-card__list">
-            <div class="profile-card__item">
-              <dt>Status</dt>
-              <dd>Read-only setup</dd>
-            </div>
-
-            <div class="profile-card__item">
-              <dt>Database</dt>
-              <dd>Cloudflare D1</dd>
-            </div>
-
-            <div class="profile-card__item">
-              <dt>Storage</dt>
-              <dd>Cloudflare R2 planned</dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
-    </section>
-
-    <section>
-      <div class="container">
-        <h2>Content Overview</h2>
-        <p class="section-lead">
-          These sections will load content from D1.
-        </p>
-
-        <div class="cards">
-          <article class="card">
-            <h3>Projects</h3>
-            <p>
-              Portfolio projects such as the Bike Store App and this website.
-            </p>
-            <div class="card__actions">
-              <a class="btn btn--small btn--primary" href="#admin-projects">
-                View Projects
-              </a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Blog Posts</h3>
-            <p>
-              Future personal blog entries and development notes.
-            </p>
-            <div class="card__actions">
-              <a class="btn btn--small btn--primary" href="#admin-blog">
-                View Blog
-              </a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Workshop Items</h3>
-            <p>
-              Steam Workshop entries stored in D1, with live stats fetched separately.
-            </p>
-            <div class="card__actions">
-              <a class="btn btn--small btn--primary" href="#admin-workshop">
-                View Workshop
-              </a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Media Assets</h3>
-            <p>
-              Future R2 image uploads and asset references.
-            </p>
-            <div class="card__actions">
-              <a class="btn btn--small btn--primary" href="#admin-media">
-                View Media
-              </a>
-            </div>
-          </article>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="admin-projects">
-      <div class="container">
-        <h2>Projects</h2>
-        <p class="section-lead">Read-only project data from D1.</p>
-        <div class="cards" data-admin-projects>
-          <article class="card">
-            <p>Loading projects…</p>
+      <!-- Blog Posts -->
+      <section id="admin-blog">
+        <div class="container">
+          <h2>Blog Posts</h2>
+          <p class="section-lead">
+            Create, edit, and review blog posts stored in D1.
+          </p>
+
+          <article class="card" style="margin-bottom: 1.5rem;">
+            <h3>Create Blog Post</h3>
+
+            <form id="adminBlogForm">
+              <input id="adminBlogId" name="blog_id" type="hidden" />
+
+              <div style="display:grid; gap:0.9rem;">
+                <div>
+                  <label for="blogTitle"><strong>Title</strong></label><br />
+                  <input
+                    id="blogTitle"
+                    name="title"
+                    type="text"
+                    required
+                    placeholder="Blog post title"
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  />
+                </div>
+
+                <div>
+                  <label for="blogSlug"><strong>Slug</strong></label><br />
+                  <input
+                    id="blogSlug"
+                    name="slug"
+                    type="text"
+                    required
+                    placeholder="example-blog-post"
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  />
+                </div>
+
+                <div>
+                  <label for="blogExcerpt"><strong>Excerpt</strong></label><br />
+                  <textarea
+                    id="blogExcerpt"
+                    name="excerpt"
+                    rows="3"
+                    required
+                    placeholder="Short summary for the blog list page..."
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label for="blogContent"><strong>Content</strong></label><br />
+                  <textarea
+                    id="blogContent"
+                    name="content"
+                    rows="10"
+                    required
+                    placeholder="Write the full blog post here..."
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label for="blogDisplayOrder"><strong>Display Order</strong></label><br />
+                  <input
+                    id="blogDisplayOrder"
+                    name="display_order"
+                    type="number"
+                    value="0"
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  />
+                </div>
+
+                <label>
+                  <input id="blogPublished" name="is_published" type="checkbox" checked />
+                  Publish immediately
+                </label>
+
+                <p id="adminBlogStatus" style="margin:0;"></p>
+
+                <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                  <button id="adminBlogSubmitBtn" class="btn btn--primary" type="submit">
+                    Create Blog Post
+                  </button>
+
+                  <button id="adminBlogCancelEditBtn" class="btn" type="button" hidden>
+                    Cancel Edit
+                  </button>
+                </div>
+              </div>
+            </form>
           </article>
+
+          <div class="cards" data-admin-blog>
+            <article class="card">
+              <p>Loading blog posts…</p>
+            </article>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="admin-blog">
-  <div class="container">
-    <h2>Blog Posts</h2>
-    <p class="section-lead">
-      Create and review blog posts stored in D1.
-    </p>
+      <!-- Workshop Items -->
+      <section id="admin-workshop">
+        <div class="container">
+          <h2>Workshop Items</h2>
+          <p class="section-lead">Read-only workshop data from D1.</p>
 
-    <article class="card" style="margin-bottom: 1.5rem;">
-      <h3>Create Blog Post</h3>
-
-      <form id="adminBlogForm">
-        <input id="adminBlogId" name="blog_id" type="hidden" />
-        <div style="display: grid; gap: 0.9rem;">
-          <div>
-            <label for="adminPassword"><strong>Admin Password</strong></label><br />
-            <input
-              id="adminPassword"
-              name="adminPassword"
-              type="password"
-              autocomplete="current-password"
-              required
-              placeholder="Enter admin password"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
+          <div class="cards" data-admin-workshop>
+            <article class="card">
+              <p>Loading workshop items…</p>
+            </article>
           </div>
-
-          <div>
-            <label for="blogTitle"><strong>Title</strong></label><br />
-            <input
-              id="blogTitle"
-              name="title"
-              type="text"
-              required
-              placeholder="Blog post title"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
-          </div>
-
-          <div>
-            <label for="blogSlug"><strong>Slug</strong></label><br />
-            <input
-              id="blogSlug"
-              name="slug"
-              type="text"
-              required
-              placeholder="example-blog-post"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
-          </div>
-
-          <div>
-            <label for="blogExcerpt"><strong>Excerpt</strong></label><br />
-            <textarea
-              id="blogExcerpt"
-              name="excerpt"
-              rows="3"
-              required
-              placeholder="Short summary for the blog list page..."
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            ></textarea>
-          </div>
-
-          <div>
-            <label for="blogContent"><strong>Content</strong></label><br />
-            <textarea
-              id="blogContent"
-              name="content"
-              rows="10"
-              required
-              placeholder="Write the full blog post here..."
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            ></textarea>
-          </div>
-
-          <div>
-            <label for="blogDisplayOrder"><strong>Display Order</strong></label><br />
-            <input
-              id="blogDisplayOrder"
-              name="display_order"
-              type="number"
-              value="0"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
-          </div>
-
-          <label>
-            <input id="blogPublished" name="is_published" type="checkbox" checked />
-            Publish immediately
-          </label>
-
-          <p id="adminBlogStatus" style="margin:0;"></p>
-
-          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-  <button id="adminBlogSubmitBtn" class="btn btn--primary" type="submit">
-    Create Blog Post
-  </button>
-
-  <button id="adminBlogCancelEditBtn" class="btn" type="button" hidden>
-    Cancel Edit
-  </button>
-</div>
         </div>
-      </form>
-    </article>
+      </section>
 
-    <div class="cards" data-admin-blog>
-      <article class="card">
-        <p>Loading blog posts…</p>
-      </article>
+      <!-- Media Assets -->
+      <section id="admin-media">
+        <div class="container">
+          <h2>Media Assets</h2>
+          <p class="section-lead">R2 media management will be added later.</p>
+
+          <div class="cards" data-admin-media>
+            <article class="card">
+              <p>No media assets loaded yet.</p>
+            </article>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
-</section>
-
-    <section id="admin-workshop">
-      <div class="container">
-        <h2>Workshop Items</h2>
-        <p class="section-lead">Read-only workshop data from D1.</p>
-        <div class="cards" data-admin-workshop>
-          <article class="card">
-            <p>Loading workshop items…</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="admin-media">
-      <div class="container">
-        <h2>Media Assets</h2>
-        <p class="section-lead">R2 media management will be added later.</p>
-        <div class="cards" data-admin-media>
-          <article class="card">
-            <p>No media assets loaded yet.</p>
-          </article>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">
@@ -283,7 +321,7 @@
     </div>
   </footer>
 
-<script src="js/main.js"></script>
-<script src="js/admin.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
