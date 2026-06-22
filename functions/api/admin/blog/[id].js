@@ -19,20 +19,16 @@ export async function onRequestPut(context) {
     const data = await context.request.json();
 
     const title = String(data.title || "").trim();
-    const slug = String(data.slug || "").trim();
     const excerpt = String(data.excerpt || "").trim();
     const content = String(data.content || "").trim();
     const coverImageKey = String(data.cover_image_key || "").trim();
     const isPublished = data.is_published ? 1 : 0;
-    const displayOrder = Number.isFinite(Number(data.display_order))
-      ? Number(data.display_order)
-      : 0;
 
-    if (!title || !slug || !excerpt || !content) {
+    if (!title || !excerpt || !content) {
       return json(
         {
           ok: false,
-          error: "Title, slug, excerpt, and content are required.",
+          error: "Title, excerpt, and content are required.",
         },
         400
       );
@@ -60,6 +56,8 @@ export async function onRequestPut(context) {
       );
     }
 
+    const slug = await createUniqueSlug(db, title, id);
+
     await db
       .prepare(
         `
@@ -71,7 +69,6 @@ export async function onRequestPut(context) {
           content = ?,
           cover_image_key = ?,
           is_published = ?,
-          display_order = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
         `
@@ -83,7 +80,6 @@ export async function onRequestPut(context) {
         content,
         coverImageKey,
         isPublished,
-        displayOrder,
         id
       )
       .run();
@@ -113,32 +109,60 @@ export async function onRequestPut(context) {
     return json({
       ok: true,
       message: "Blog post updated.",
+      slug,
       post: updatedPost,
     });
   } catch (error) {
     console.error(error);
 
-    const message = String(error.message || error);
-
-    if (message.includes("UNIQUE constraint failed")) {
-      return json(
-        {
-          ok: false,
-          error: "A blog post with this slug already exists.",
-        },
-        409
-      );
-    }
-
     return json(
       {
         ok: false,
         error: "Failed to update blog post.",
-        detail: message,
+        detail: String(error.message || error),
       },
       500
     );
   }
+}
+
+async function createUniqueSlug(db, title, currentPostId) {
+  const baseSlug = slugify(title) || "blog-post";
+  let slug = baseSlug;
+  let counter = 2;
+
+  while (await slugExists(db, slug, currentPostId)) {
+    slug = `${baseSlug}-${counter}`;
+    counter += 1;
+  }
+
+  return slug;
+}
+
+async function slugExists(db, slug, currentPostId) {
+  const existing = await db
+    .prepare(
+      `
+      SELECT id
+      FROM blog_posts
+      WHERE slug = ?
+        AND id != ?
+      LIMIT 1
+      `
+    )
+    .bind(slug, currentPostId)
+    .first();
+
+  return Boolean(existing);
+}
+
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function checkAdminPassword(context) {
