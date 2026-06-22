@@ -1,0 +1,7 @@
+name = "my-own-website"
+compatibility_date = "2026-06-22"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-own-website-db"
+database_id = "df02387f-e4ee-4e4d-9d4d-5e82d82dad9b"
