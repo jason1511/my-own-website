@@ -4,6 +4,7 @@
 setupAdminLogin();
 setupAdminBlogForm();
 setupAdminProjectForm();
+setupAdminWorkshopForm();
 
   // If the password was already entered in this browser session,
   // unlock the dashboard automatically.
@@ -76,6 +77,122 @@ setupAdminProjectForm();
 
   function getStoredAdminPassword() {
     return sessionStorage.getItem(ADMIN_PASSWORD_KEY) || "";
+  }
+    /* ---------------- WORKSHOP CREATE / EDIT FORM ---------------- */
+
+  function setupAdminWorkshopForm() {
+    const form = document.getElementById("adminWorkshopForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminWorkshopStatus");
+    const submitBtn = document.getElementById("adminWorkshopSubmitBtn");
+    const cancelEditBtn = document.getElementById("adminWorkshopCancelEditBtn");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const password = getStoredAdminPassword();
+      const workshopId = form.elements["workshop_id"].value.trim();
+
+      const steamId = form.elements["steam_id"].value.trim();
+      const title = form.elements["title"].value.trim();
+      const game = form.elements["game"].value.trim();
+      const description = form.elements["description"].value.trim();
+      const workshopUrl = form.elements["workshop_url"].value.trim();
+      const displayOrder = Number(form.elements["display_order"].value || 0);
+      const isPublished = form.elements["is_published"].checked;
+
+      if (!password) {
+        setStatus("Admin session missing. Please unlock the admin page again.");
+        return;
+      }
+
+      if (!steamId || !title || !game || !description || !workshopUrl) {
+        setStatus("Steam ID, title, game, description, and Workshop URL are required.");
+        return;
+      }
+
+      const isEditing = Boolean(workshopId);
+
+      setStatus(
+        isEditing ? "Updating workshop item..." : "Creating workshop item..."
+      );
+      setSubmitDisabled(true);
+
+      try {
+        const endpoint = isEditing
+          ? `/api/admin/workshop/${encodeURIComponent(workshopId)}`
+          : "/api/admin/workshop";
+
+        const method = isEditing ? "PUT" : "POST";
+
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": password,
+          },
+          body: JSON.stringify({
+            steam_id: steamId,
+            title,
+            game,
+            description,
+            workshop_url: workshopUrl,
+            display_order: displayOrder,
+            is_published: isPublished,
+          }),
+        });
+
+        const data = await readJsonSafe(response);
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${response.status}`);
+        }
+
+        setStatus(
+          isEditing
+            ? "Workshop item updated successfully."
+            : "Workshop item created successfully."
+        );
+
+        resetWorkshopForm();
+        await loadAdminWorkshopItems();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Failed to save workshop item.");
+      } finally {
+        setSubmitDisabled(false);
+      }
+    });
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener("click", () => {
+        resetWorkshopForm();
+        setStatus("Edit cancelled.");
+      });
+    }
+
+    function resetWorkshopForm() {
+      form.elements["workshop_id"].value = "";
+      form.elements["steam_id"].value = "";
+      form.elements["title"].value = "";
+      form.elements["game"].value = "";
+      form.elements["description"].value = "";
+      form.elements["workshop_url"].value = "";
+      form.elements["display_order"].value = "0";
+      form.elements["is_published"].checked = true;
+
+      if (submitBtn) submitBtn.textContent = "Create Workshop Item";
+      if (cancelEditBtn) cancelEditBtn.hidden = true;
+    }
+
+    function setSubmitDisabled(isDisabled) {
+      if (submitBtn) submitBtn.disabled = isDisabled;
+    }
+
+    function setStatus(message) {
+      setText(statusEl, message);
+    }
   }
   /* ---------------- PROJECT CREATE / EDIT FORM ---------------- */
 
@@ -544,39 +661,90 @@ function setupProjectEditButtons(container) {
         throw new Error("Invalid workshop API response");
       }
 
-      container.innerHTML = data.workshop_items.length
-        ? data.workshop_items.map(renderWorkshopCard).join("")
-        : renderEmptyCard("No workshop items found.");
+      if (data.workshop_items.length === 0) {
+  container.innerHTML = renderEmptyCard("No workshop items found.");
+  return;
+}
+
+container.innerHTML = data.workshop_items.map(renderWorkshopCard).join("");
+setupWorkshopEditButtons(container);
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load workshop items.");
     }
   }
 
-  function renderWorkshopCard(item) {
-    return `
-      <article class="card">
-        <header>
-          <h3>${escapeHtml(item.title)}</h3>
-          <p class="card__meta">
-            ${escapeHtml(item.game)} · Steam ID ${escapeHtml(item.steam_id)}
-          </p>
-        </header>
+function renderWorkshopCard(item) {
+  return `
+    <article class="card">
+      <header>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p class="card__meta">
+          ${escapeHtml(item.game)} · Steam ID ${escapeHtml(item.steam_id)}
+        </p>
+      </header>
 
-        <p>${escapeHtml(item.description)}</p>
+      <p>${escapeHtml(item.description)}</p>
 
-        <ul class="tag-list">
-          <li class="tag">${item.is_published ? "Published" : "Draft"}</li>
-          <li class="tag">Order: ${Number(item.display_order)}</li>
-        </ul>
+      <ul class="tag-list">
+        <li class="tag">${item.is_published ? "Published" : "Draft"}</li>
+        <li class="tag">Order: ${Number(item.display_order)}</li>
+        <li class="tag">ID: ${Number(item.id)}</li>
+      </ul>
 
-        <div class="card__actions">
-          ${renderPrimaryLinkButton(item.workshop_url, "View on Steam")}
-        </div>
-      </article>
-    `;
-  }
+      <div class="card__actions">
+        <button
+          class="btn btn--small btn--primary"
+          type="button"
+          data-workshop-edit
+          data-workshop-id="${Number(item.id)}"
+          data-workshop-steam-id="${escapeAttr(item.steam_id)}"
+          data-workshop-title="${escapeAttr(item.title)}"
+          data-workshop-game="${escapeAttr(item.game)}"
+          data-workshop-description="${escapeAttr(item.description)}"
+          data-workshop-url="${escapeAttr(item.workshop_url)}"
+          data-workshop-order="${Number(item.display_order)}"
+          data-workshop-published="${item.is_published ? "1" : "0"}"
+        >
+          Edit
+        </button>
 
+        ${renderPrimaryLinkButton(item.workshop_url, "View on Steam")}
+      </div>
+    </article>
+  `;
+}
+function setupWorkshopEditButtons(container) {
+  const buttons = container.querySelectorAll("[data-workshop-edit]");
+  const form = document.getElementById("adminWorkshopForm");
+  const submitBtn = document.getElementById("adminWorkshopSubmitBtn");
+  const cancelEditBtn = document.getElementById("adminWorkshopCancelEditBtn");
+  const statusEl = document.getElementById("adminWorkshopStatus");
+
+  if (!form) return;
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      form.elements["workshop_id"].value = button.dataset.workshopId || "";
+      form.elements["steam_id"].value = button.dataset.workshopSteamId || "";
+      form.elements["title"].value = button.dataset.workshopTitle || "";
+      form.elements["game"].value = button.dataset.workshopGame || "";
+      form.elements["description"].value =
+        button.dataset.workshopDescription || "";
+      form.elements["workshop_url"].value = button.dataset.workshopUrl || "";
+      form.elements["display_order"].value =
+        button.dataset.workshopOrder || "0";
+      form.elements["is_published"].checked =
+        button.dataset.workshopPublished === "1";
+
+      if (submitBtn) submitBtn.textContent = "Update Workshop Item";
+      if (cancelEditBtn) cancelEditBtn.hidden = false;
+      if (statusEl) statusEl.textContent = "Editing existing workshop item.";
+
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
   /* ---------------- HELPERS ---------------- */
 
   async function readJsonSafe(response) {
