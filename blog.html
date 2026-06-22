@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Blog | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Blog posts and development notes by Jason Leonard."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="blog.html" aria-current="page">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="about-hero">
+      <div class="container about-hero__grid">
+        <div class="about-hero__content">
+          <h1>Blog</h1>
+
+          <p>
+            Development notes, project updates, and write-ups about what I’m building
+            and learning through practical software projects.
+          </p>
+        </div>
+
+        <aside class="profile-card" aria-label="Blog summary">
+          <div class="profile-card__header">
+            <div>
+              <p class="profile-card__name">Writing Focus</p>
+              <p class="profile-card__role">Projects · Development · Notes</p>
+            </div>
+          </div>
+
+          <dl class="profile-card__list">
+            <div class="profile-card__item">
+              <dt>Topics</dt>
+              <dd>Web development, backend, project notes</dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Source</dt>
+              <dd>Loaded from Cloudflare D1</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Latest Posts</h2>
+        <p class="section-lead">
+          Posts are loaded dynamically from D1.
+        </p>
+
+        <div class="cards" data-blog-list>
+          <article class="card">
+            <p>No blog posts published yet.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/blog.js"></script>
+</body>
+</html>
