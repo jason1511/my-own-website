@@ -170,18 +170,155 @@
       </section>
 
       <!-- Projects -->
-      <section id="admin-projects">
-        <div class="container">
-          <h2>Projects</h2>
-          <p class="section-lead">Read-only project data from D1.</p>
+      <!-- Projects -->
+<section id="admin-projects">
+  <div class="container">
+    <h2>Projects</h2>
+    <p class="section-lead">
+      Create, edit, and review portfolio projects stored in D1.
+    </p>
 
-          <div class="cards" data-admin-projects>
-            <article class="card">
-              <p>Loading projects…</p>
-            </article>
+    <article class="card" style="margin-bottom: 1.5rem;">
+      <h3>Create Project</h3>
+
+      <form id="adminProjectForm">
+        <input id="adminProjectId" name="project_id" type="hidden" />
+
+        <div style="display:grid; gap:0.9rem;">
+          <div>
+            <label for="projectTitle"><strong>Title</strong></label><br />
+            <input
+              id="projectTitle"
+              name="title"
+              type="text"
+              required
+              placeholder="Project title"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectSummary"><strong>Summary</strong></label><br />
+            <textarea
+              id="projectSummary"
+              name="summary"
+              rows="3"
+              required
+              placeholder="Short project summary..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="projectBody"><strong>Body / Details</strong></label><br />
+            <textarea
+              id="projectBody"
+              name="body"
+              rows="7"
+              placeholder="Longer project details..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="projectType"><strong>Type</strong></label><br />
+            <input
+              id="projectType"
+              name="type"
+              type="text"
+              value="project"
+              placeholder="web-app, desktop-app, project"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectTechStack"><strong>Tech Stack</strong></label><br />
+            <input
+              id="projectTechStack"
+              name="tech_stack"
+              type="text"
+              placeholder="HTML, CSS, JavaScript, Cloudflare D1"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectGithubUrl"><strong>GitHub URL</strong></label><br />
+            <input
+              id="projectGithubUrl"
+              name="github_url"
+              type="url"
+              placeholder="https://github.com/..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectLiveUrl"><strong>Live URL</strong></label><br />
+            <input
+              id="projectLiveUrl"
+              name="live_url"
+              type="url"
+              placeholder="https://..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectImageKey"><strong>Image Key</strong></label><br />
+            <input
+              id="projectImageKey"
+              name="image_key"
+              type="text"
+              placeholder="R2 image key later"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <div>
+            <label for="projectDisplayOrder"><strong>Display Order</strong></label><br />
+            <input
+              id="projectDisplayOrder"
+              name="display_order"
+              type="number"
+              value="0"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+          </div>
+
+          <label>
+            <input id="projectFeatured" name="is_featured" type="checkbox" />
+            Featured project
+          </label>
+
+          <label>
+            <input id="projectPublished" name="is_published" type="checkbox" checked />
+            Published
+          </label>
+
+          <p id="adminProjectStatus" style="margin:0;"></p>
+
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <button id="adminProjectSubmitBtn" class="btn btn--primary" type="submit">
+              Create Project
+            </button>
+
+            <button id="adminProjectCancelEditBtn" class="btn" type="button" hidden>
+              Cancel Edit
+            </button>
           </div>
         </div>
-      </section>
+      </form>
+    </article>
+
+    <div class="cards" data-admin-projects>
+      <article class="card">
+        <p>Loading projects…</p>
+      </article>
+    </div>
+  </div>
+</section>
 
       <!-- Blog Posts -->
       <section id="admin-blog">

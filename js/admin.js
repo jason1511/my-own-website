@@ -1,9 +1,9 @@
 // js/admin.js
 (() => {
   const ADMIN_PASSWORD_KEY = "portfolioAdminPassword";
-
-  setupAdminLogin();
-  setupAdminBlogForm();
+setupAdminLogin();
+setupAdminBlogForm();
+setupAdminProjectForm();
 
   // If the password was already entered in this browser session,
   // unlock the dashboard automatically.
@@ -77,7 +77,132 @@
   function getStoredAdminPassword() {
     return sessionStorage.getItem(ADMIN_PASSWORD_KEY) || "";
   }
+  /* ---------------- PROJECT CREATE / EDIT FORM ---------------- */
 
+  function setupAdminProjectForm() {
+    const form = document.getElementById("adminProjectForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminProjectStatus");
+    const submitBtn = document.getElementById("adminProjectSubmitBtn");
+    const cancelEditBtn = document.getElementById("adminProjectCancelEditBtn");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const password = getStoredAdminPassword();
+      const projectId = form.elements["project_id"].value.trim();
+
+      const title = form.elements["title"].value.trim();
+      const summary = form.elements["summary"].value.trim();
+      const body = form.elements["body"].value.trim();
+      const type = form.elements["type"].value.trim() || "project";
+      const techStack = form.elements["tech_stack"].value.trim();
+      const githubUrl = form.elements["github_url"].value.trim();
+      const liveUrl = form.elements["live_url"].value.trim();
+      const imageKey = form.elements["image_key"].value.trim();
+      const displayOrder = Number(form.elements["display_order"].value || 0);
+      const isFeatured = form.elements["is_featured"].checked;
+      const isPublished = form.elements["is_published"].checked;
+
+      if (!password) {
+        setStatus("Admin session missing. Please unlock the admin page again.");
+        return;
+      }
+
+      if (!title || !summary) {
+        setStatus("Title and summary are required.");
+        return;
+      }
+
+      const isEditing = Boolean(projectId);
+
+      setStatus(isEditing ? "Updating project..." : "Creating project...");
+      setSubmitDisabled(true);
+
+      try {
+        const endpoint = isEditing
+          ? `/api/admin/projects/${encodeURIComponent(projectId)}`
+          : "/api/admin/projects";
+
+        const method = isEditing ? "PUT" : "POST";
+
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": password,
+          },
+          body: JSON.stringify({
+            title,
+            summary,
+            body,
+            type,
+            tech_stack: techStack,
+            github_url: githubUrl,
+            live_url: liveUrl,
+            image_key: imageKey,
+            is_featured: isFeatured,
+            is_published: isPublished,
+            display_order: displayOrder,
+          }),
+        });
+
+        const data = await readJsonSafe(response);
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${response.status}`);
+        }
+
+        setStatus(
+          isEditing
+            ? "Project updated successfully."
+            : "Project created successfully."
+        );
+
+        resetProjectForm();
+        await loadAdminProjects();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Failed to save project.");
+      } finally {
+        setSubmitDisabled(false);
+      }
+    });
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener("click", () => {
+        resetProjectForm();
+        setStatus("Edit cancelled.");
+      });
+    }
+
+    function resetProjectForm() {
+      form.elements["project_id"].value = "";
+      form.elements["title"].value = "";
+      form.elements["summary"].value = "";
+      form.elements["body"].value = "";
+      form.elements["type"].value = "project";
+      form.elements["tech_stack"].value = "";
+      form.elements["github_url"].value = "";
+      form.elements["live_url"].value = "";
+      form.elements["image_key"].value = "";
+      form.elements["display_order"].value = "0";
+      form.elements["is_featured"].checked = false;
+      form.elements["is_published"].checked = true;
+
+      if (submitBtn) submitBtn.textContent = "Create Project";
+      if (cancelEditBtn) cancelEditBtn.hidden = true;
+    }
+
+    function setSubmitDisabled(isDisabled) {
+      if (submitBtn) submitBtn.disabled = isDisabled;
+    }
+
+    function setStatus(message) {
+      setText(statusEl, message);
+    }
+  }
   /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
   function setupAdminBlogForm() {
@@ -206,42 +331,100 @@
         throw new Error("Invalid projects API response");
       }
 
-      container.innerHTML = data.projects.length
-        ? data.projects.map(renderProjectCard).join("")
-        : renderEmptyCard("No projects found.");
+      if (data.projects.length === 0) {
+  container.innerHTML = renderEmptyCard("No projects found.");
+  return;
+}
+
+container.innerHTML = data.projects.map(renderProjectCard).join("");
+setupProjectEditButtons(container);
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load projects.");
     }
   }
 
-  function renderProjectCard(project) {
-    return `
-      <article class="card">
-        <header>
-          <h3>${escapeHtml(project.title)}</h3>
-          <p class="card__meta">
-            ${escapeHtml(project.type)} · ${escapeHtml(project.tech_stack || "No tech stack")}
-          </p>
-        </header>
+function renderProjectCard(project) {
+  return `
+    <article class="card">
+      <header>
+        <h3>${escapeHtml(project.title)}</h3>
+        <p class="card__meta">
+          ${escapeHtml(project.type)} · ${escapeHtml(project.tech_stack || "No tech stack")}
+        </p>
+      </header>
 
-        <p>${escapeHtml(project.summary)}</p>
+      <p>${escapeHtml(project.summary)}</p>
 
-        <ul class="tag-list">
-          <li class="tag">Slug: ${escapeHtml(project.slug)}</li>
-          <li class="tag">${project.is_featured ? "Featured" : "Not featured"}</li>
-          <li class="tag">${project.is_published ? "Published" : "Draft"}</li>
-          <li class="tag">Order: ${Number(project.display_order)}</li>
-        </ul>
+      <ul class="tag-list">
+        <li class="tag">Slug: ${escapeHtml(project.slug)}</li>
+        <li class="tag">${project.is_featured ? "Featured" : "Not featured"}</li>
+        <li class="tag">${project.is_published ? "Published" : "Draft"}</li>
+        <li class="tag">Order: ${Number(project.display_order)}</li>
+        <li class="tag">ID: ${Number(project.id)}</li>
+      </ul>
 
-        <div class="card__actions">
-          ${project.github_url ? renderLinkButton(project.github_url, "GitHub") : ""}
-          ${project.live_url ? renderLinkButton(project.live_url, "Live") : ""}
-        </div>
-      </article>
-    `;
-  }
+      <div class="card__actions">
+        <button
+          class="btn btn--small btn--primary"
+          type="button"
+          data-project-edit
+          data-project-id="${Number(project.id)}"
+          data-project-title="${escapeAttr(project.title)}"
+          data-project-summary="${escapeAttr(project.summary)}"
+          data-project-body="${escapeAttr(project.body || "")}"
+          data-project-type="${escapeAttr(project.type || "project")}"
+          data-project-tech-stack="${escapeAttr(project.tech_stack || "")}"
+          data-project-github-url="${escapeAttr(project.github_url || "")}"
+          data-project-live-url="${escapeAttr(project.live_url || "")}"
+          data-project-image-key="${escapeAttr(project.image_key || "")}"
+          data-project-order="${Number(project.display_order)}"
+          data-project-featured="${project.is_featured ? "1" : "0"}"
+          data-project-published="${project.is_published ? "1" : "0"}"
+        >
+          Edit
+        </button>
 
+        ${project.github_url ? renderLinkButton(project.github_url, "GitHub") : ""}
+        ${project.live_url ? renderLinkButton(project.live_url, "Live") : ""}
+      </div>
+    </article>
+  `;
+}
+function setupProjectEditButtons(container) {
+  const buttons = container.querySelectorAll("[data-project-edit]");
+  const form = document.getElementById("adminProjectForm");
+  const submitBtn = document.getElementById("adminProjectSubmitBtn");
+  const cancelEditBtn = document.getElementById("adminProjectCancelEditBtn");
+  const statusEl = document.getElementById("adminProjectStatus");
+
+  if (!form) return;
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      form.elements["project_id"].value = button.dataset.projectId || "";
+      form.elements["title"].value = button.dataset.projectTitle || "";
+      form.elements["summary"].value = button.dataset.projectSummary || "";
+      form.elements["body"].value = button.dataset.projectBody || "";
+      form.elements["type"].value = button.dataset.projectType || "project";
+      form.elements["tech_stack"].value = button.dataset.projectTechStack || "";
+      form.elements["github_url"].value = button.dataset.projectGithubUrl || "";
+      form.elements["live_url"].value = button.dataset.projectLiveUrl || "";
+      form.elements["image_key"].value = button.dataset.projectImageKey || "";
+      form.elements["display_order"].value = button.dataset.projectOrder || "0";
+      form.elements["is_featured"].checked =
+        button.dataset.projectFeatured === "1";
+      form.elements["is_published"].checked =
+        button.dataset.projectPublished === "1";
+
+      if (submitBtn) submitBtn.textContent = "Update Project";
+      if (cancelEditBtn) cancelEditBtn.hidden = false;
+      if (statusEl) statusEl.textContent = "Editing existing project.";
+
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
   /* ---------------- BLOG POSTS ---------------- */
 
   async function loadAdminBlogPosts() {
