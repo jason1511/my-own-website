@@ -5,18 +5,21 @@
   loadAdminProjects();
   loadAdminBlogPosts();
   loadAdminWorkshopItems();
-  /* ---------------- BLOG CREATE FORM ---------------- */
+  /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
   function setupAdminBlogForm() {
     const form = document.getElementById("adminBlogForm");
     if (!form) return;
 
     const statusEl = document.getElementById("adminBlogStatus");
+    const submitBtn = document.getElementById("adminBlogSubmitBtn");
+    const cancelEditBtn = document.getElementById("adminBlogCancelEditBtn");
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const password = form.elements["adminPassword"].value.trim();
+      const blogId = form.elements["blog_id"].value.trim();
       const title = form.elements["title"].value.trim();
       const slug = form.elements["slug"].value.trim();
       const excerpt = form.elements["excerpt"].value.trim();
@@ -29,11 +32,19 @@
         return;
       }
 
-      setStatus("Creating blog post...");
+      const isEditing = Boolean(blogId);
+
+      setStatus(isEditing ? "Updating blog post..." : "Creating blog post...");
 
       try {
-        const res = await fetch("/api/admin/blog", {
-          method: "POST",
+        const endpoint = isEditing
+          ? `/api/admin/blog/${encodeURIComponent(blogId)}`
+          : "/api/admin/blog";
+
+        const method = isEditing ? "PUT" : "POST";
+
+        const res = await fetch(endpoint, {
+          method,
           headers: {
             "Content-Type": "application/json",
             "x-admin-password": password,
@@ -55,21 +66,47 @@
           throw new Error(data.error || `Request failed: ${res.status}`);
         }
 
-        setStatus("Blog post created successfully.");
+        setStatus(
+          isEditing
+            ? "Blog post updated successfully."
+            : "Blog post created successfully."
+        );
 
-        form.elements["title"].value = "";
-        form.elements["slug"].value = "";
-        form.elements["excerpt"].value = "";
-        form.elements["content"].value = "";
-        form.elements["display_order"].value = "0";
-        form.elements["is_published"].checked = true;
-
-        loadAdminBlogPosts();
+        resetBlogForm({ keepPassword: true });
+        await loadAdminBlogPosts();
       } catch (error) {
         console.error(error);
-        setStatus(error.message || "Failed to create blog post.");
+        setStatus(error.message || "Failed to save blog post.");
       }
     });
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener("click", () => {
+        resetBlogForm({ keepPassword: true });
+        setStatus("Edit cancelled.");
+      });
+    }
+
+    function resetBlogForm({ keepPassword } = { keepPassword: true }) {
+      const currentPassword = form.elements["adminPassword"].value;
+
+      form.elements["blog_id"].value = "";
+      form.elements["title"].value = "";
+      form.elements["slug"].value = "";
+      form.elements["excerpt"].value = "";
+      form.elements["content"].value = "";
+      form.elements["display_order"].value = "0";
+      form.elements["is_published"].checked = true;
+
+      if (keepPassword) {
+        form.elements["adminPassword"].value = currentPassword;
+      } else {
+        form.elements["adminPassword"].value = "";
+      }
+
+      if (submitBtn) submitBtn.textContent = "Create Blog Post";
+      if (cancelEditBtn) cancelEditBtn.hidden = true;
+    }
 
     function setStatus(message) {
       if (statusEl) {
@@ -159,6 +196,7 @@
       }
 
       container.innerHTML = data.blog_posts.map(renderBlogPostCard).join("");
+            setupBlogEditButtons(container);
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load blog posts.");
@@ -179,8 +217,62 @@
           <li class="tag">${post.is_published ? "Published" : "Draft"}</li>
           <li class="tag">Order: ${Number(post.display_order)}</li>
         </ul>
+
+        <div class="card__actions">
+          <button
+            class="btn btn--small btn--primary"
+            type="button"
+            data-blog-edit
+            data-blog-id="${Number(post.id)}"
+            data-blog-title="${escapeAttr(post.title)}"
+            data-blog-slug="${escapeAttr(post.slug)}"
+            data-blog-excerpt="${escapeAttr(post.excerpt)}"
+            data-blog-content="${escapeAttr(post.content)}"
+            data-blog-order="${Number(post.display_order)}"
+            data-blog-published="${post.is_published ? "1" : "0"}"
+          >
+            Edit
+          </button>
+
+          <a
+            class="btn btn--small"
+            href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
+            target="_blank"
+            rel="noopener"
+          >
+            View
+          </a>
+        </div>
       </article>
     `;
+  }
+    function setupBlogEditButtons(container) {
+    const buttons = container.querySelectorAll("[data-blog-edit]");
+    const form = document.getElementById("adminBlogForm");
+    const submitBtn = document.getElementById("adminBlogSubmitBtn");
+    const cancelEditBtn = document.getElementById("adminBlogCancelEditBtn");
+    const statusEl = document.getElementById("adminBlogStatus");
+
+    if (!form) return;
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        form.elements["blog_id"].value = button.dataset.blogId || "";
+        form.elements["title"].value = button.dataset.blogTitle || "";
+        form.elements["slug"].value = button.dataset.blogSlug || "";
+        form.elements["excerpt"].value = button.dataset.blogExcerpt || "";
+        form.elements["content"].value = button.dataset.blogContent || "";
+        form.elements["display_order"].value = button.dataset.blogOrder || "0";
+        form.elements["is_published"].checked =
+          button.dataset.blogPublished === "1";
+
+        if (submitBtn) submitBtn.textContent = "Update Blog Post";
+        if (cancelEditBtn) cancelEditBtn.hidden = false;
+        if (statusEl) statusEl.textContent = "Editing existing blog post.";
+
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
   }
   /* ---------------- WORKSHOP ITEMS ---------------- */
 

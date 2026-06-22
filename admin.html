@@ -150,6 +150,7 @@
       <h3>Create Blog Post</h3>
 
       <form id="adminBlogForm">
+        <input id="adminBlogId" name="blog_id" type="hidden" />
         <div style="display: grid; gap: 0.9rem;">
           <div>
             <label for="adminPassword"><strong>Admin Password</strong></label><br />
@@ -230,11 +231,15 @@
 
           <p id="adminBlogStatus" style="margin:0;"></p>
 
-          <div>
-            <button class="btn btn--primary" type="submit">
-              Create Blog Post
-            </button>
-          </div>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+  <button id="adminBlogSubmitBtn" class="btn btn--primary" type="submit">
+    Create Blog Post
+  </button>
+
+  <button id="adminBlogCancelEditBtn" class="btn" type="button" hidden>
+    Cancel Edit
+  </button>
+</div>
         </div>
       </form>
     </article>
