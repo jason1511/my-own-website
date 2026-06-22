@@ -1,7 +1,8 @@
 // js/admin.js
 (() => {
-  loadAdminProjects();
-  loadAdminWorkshopItems();
+loadAdminProjects();
+loadAdminBlogPosts();
+loadAdminWorkshopItems();
 
   /* ---------------- PROJECTS ---------------- */
 
@@ -63,7 +64,51 @@
       </article>
     `;
   }
+  /* ---------------- BLOG POSTS ---------------- */
 
+  async function loadAdminBlogPosts() {
+    const container = document.querySelector("[data-admin-blog]");
+    if (!container) return;
+
+    try {
+      const res = await fetch("/api/blog");
+      if (!res.ok) throw new Error(`Blog API failed: ${res.status}`);
+
+      const data = await res.json();
+
+      if (!data.ok || !Array.isArray(data.blog_posts)) {
+        throw new Error("Invalid blog API response");
+      }
+
+      if (data.blog_posts.length === 0) {
+        container.innerHTML = renderEmptyCard("No blog posts found.");
+        return;
+      }
+
+      container.innerHTML = data.blog_posts.map(renderBlogPostCard).join("");
+    } catch (error) {
+      console.error(error);
+      container.innerHTML = renderErrorCard("Could not load blog posts.");
+    }
+  }
+
+  function renderBlogPostCard(post) {
+    return `
+      <article class="card">
+        <header>
+          <h3>${escapeHtml(post.title)}</h3>
+          <p class="card__meta">Slug: ${escapeHtml(post.slug)}</p>
+        </header>
+
+        <p>${escapeHtml(post.excerpt)}</p>
+
+        <ul class="tag-list">
+          <li class="tag">${post.is_published ? "Published" : "Draft"}</li>
+          <li class="tag">Order: ${Number(post.display_order)}</li>
+        </ul>
+      </article>
+    `;
+  }
   /* ---------------- WORKSHOP ITEMS ---------------- */
 
   async function loadAdminWorkshopItems() {
