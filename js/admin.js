@@ -36,6 +36,7 @@
       const isEditing = Boolean(blogId);
 
       setStatus(isEditing ? "Updating blog post..." : "Creating blog post...");
+      setSubmitDisabled(true);
 
       try {
         const endpoint = isEditing
@@ -44,7 +45,7 @@
 
         const method = isEditing ? "PUT" : "POST";
 
-        const res = await fetch(endpoint, {
+        const response = await fetch(endpoint, {
           method,
           headers: {
             "Content-Type": "application/json",
@@ -61,10 +62,10 @@
           }),
         });
 
-        const data = await res.json();
+        const data = await readJsonSafe(response);
 
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || `Request failed: ${res.status}`);
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${response.status}`);
         }
 
         setStatus(
@@ -78,6 +79,8 @@
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Failed to save blog post.");
+      } finally {
+        setSubmitDisabled(false);
       }
     });
 
@@ -109,10 +112,12 @@
       if (cancelEditBtn) cancelEditBtn.hidden = true;
     }
 
+    function setSubmitDisabled(isDisabled) {
+      if (submitBtn) submitBtn.disabled = isDisabled;
+    }
+
     function setStatus(message) {
-      if (statusEl) {
-        statusEl.textContent = message;
-      }
+      if (statusEl) statusEl.textContent = message;
     }
   }
 
@@ -123,21 +128,18 @@
     if (!container) return;
 
     try {
-      const res = await fetch("/api/projects");
-      if (!res.ok) throw new Error(`Projects API failed: ${res.status}`);
+      const response = await fetch("/api/projects");
+      if (!response.ok) throw new Error(`Projects API failed: ${response.status}`);
 
-      const data = await res.json();
+      const data = await response.json();
 
       if (!data.ok || !Array.isArray(data.projects)) {
         throw new Error("Invalid projects API response");
       }
 
-      if (data.projects.length === 0) {
-        container.innerHTML = renderEmptyCard("No projects found.");
-        return;
-      }
-
-      container.innerHTML = data.projects.map(renderProjectCard).join("");
+      container.innerHTML = data.projects.length
+        ? data.projects.map(renderProjectCard).join("")
+        : renderEmptyCard("No projects found.");
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load projects.");
@@ -149,9 +151,9 @@
       <article class="card">
         <header>
           <h3>${escapeHtml(project.title)}</h3>
-          <p class="card__meta">${escapeHtml(project.type)} · ${escapeHtml(
-      project.tech_stack || "No tech stack"
-    )}</p>
+          <p class="card__meta">
+            ${escapeHtml(project.type)} · ${escapeHtml(project.tech_stack || "No tech stack")}
+          </p>
         </header>
 
         <p>${escapeHtml(project.summary)}</p>
@@ -164,20 +166,8 @@
         </ul>
 
         <div class="card__actions">
-          ${
-            project.github_url
-              ? `<a class="btn btn--small" href="${escapeAttr(
-                  project.github_url
-                )}" target="_blank" rel="noopener">GitHub</a>`
-              : ""
-          }
-          ${
-            project.live_url
-              ? `<a class="btn btn--small" href="${escapeAttr(
-                  project.live_url
-                )}" target="_blank" rel="noopener">Live</a>`
-              : ""
-          }
+          ${project.github_url ? renderLinkButton(project.github_url, "GitHub") : ""}
+          ${project.live_url ? renderLinkButton(project.live_url, "Live") : ""}
         </div>
       </article>
     `;
@@ -190,10 +180,10 @@
     if (!container) return;
 
     try {
-      const res = await fetch("/api/blog");
-      if (!res.ok) throw new Error(`Blog API failed: ${res.status}`);
+      const response = await fetch("/api/blog");
+      if (!response.ok) throw new Error(`Blog API failed: ${response.status}`);
 
-      const data = await res.json();
+      const data = await response.json();
 
       if (!data.ok || !Array.isArray(data.blog_posts)) {
         throw new Error("Invalid blog API response");
@@ -225,6 +215,7 @@
         <ul class="tag-list">
           <li class="tag">${post.is_published ? "Published" : "Draft"}</li>
           <li class="tag">Order: ${Number(post.display_order)}</li>
+          <li class="tag">ID: ${Number(post.id)}</li>
         </ul>
 
         <div class="card__actions">
@@ -292,21 +283,18 @@
     if (!container) return;
 
     try {
-      const res = await fetch("/api/workshop");
-      if (!res.ok) throw new Error(`Workshop API failed: ${res.status}`);
+      const response = await fetch("/api/workshop");
+      if (!response.ok) throw new Error(`Workshop API failed: ${response.status}`);
 
-      const data = await res.json();
+      const data = await response.json();
 
       if (!data.ok || !Array.isArray(data.workshop_items)) {
         throw new Error("Invalid workshop API response");
       }
 
-      if (data.workshop_items.length === 0) {
-        container.innerHTML = renderEmptyCard("No workshop items found.");
-        return;
-      }
-
-      container.innerHTML = data.workshop_items.map(renderWorkshopCard).join("");
+      container.innerHTML = data.workshop_items.length
+        ? data.workshop_items.map(renderWorkshopCard).join("")
+        : renderEmptyCard("No workshop items found.");
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load workshop items.");
@@ -318,9 +306,9 @@
       <article class="card">
         <header>
           <h3>${escapeHtml(item.title)}</h3>
-          <p class="card__meta">${escapeHtml(item.game)} · Steam ID ${escapeHtml(
-      item.steam_id
-    )}</p>
+          <p class="card__meta">
+            ${escapeHtml(item.game)} · Steam ID ${escapeHtml(item.steam_id)}
+          </p>
         </header>
 
         <p>${escapeHtml(item.description)}</p>
@@ -331,20 +319,44 @@
         </ul>
 
         <div class="card__actions">
-          <a
-            class="btn btn--small btn--primary"
-            href="${escapeAttr(item.workshop_url)}"
-            target="_blank"
-            rel="noopener"
-          >
-            View on Steam
-          </a>
+          ${renderPrimaryLinkButton(item.workshop_url, "View on Steam")}
         </div>
       </article>
     `;
   }
 
   /* ---------------- HELPERS ---------------- */
+
+  async function readJsonSafe(response) {
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
+  }
+
+  function renderLinkButton(url, label) {
+    return `
+      <a
+        class="btn btn--small"
+        href="${escapeAttr(url)}"
+        target="_blank"
+        rel="noopener"
+      >
+        ${escapeHtml(label)}
+      </a>
+    `;
+  }
+
+  function renderPrimaryLinkButton(url, label) {
+    return `
+      <a
+        class="btn btn--small btn--primary"
+        href="${escapeAttr(url)}"
+        target="_blank"
+        rel="noopener"
+      >
+        ${escapeHtml(label)}
+      </a>
+    `;
+  }
 
   function renderEmptyCard(message) {
     return `

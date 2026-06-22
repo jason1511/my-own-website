@@ -1,62 +1,67 @@
 // js/blog.js
 (() => {
+  const blogList = document.querySelector("[data-blog-list]");
+  if (!blogList) return;
+
   loadBlogPosts();
 
   async function loadBlogPosts() {
-    const container = document.querySelector("[data-blog-list]");
-    if (!container) return;
-
     try {
-      const res = await fetch("/api/blog");
-      if (!res.ok) throw new Error(`Blog API failed: ${res.status}`);
+      const response = await fetch("/api/blog");
 
-      const data = await res.json();
+      if (!response.ok) {
+        throw new Error(`Blog API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
 
       if (!data.ok || !Array.isArray(data.blog_posts)) {
         throw new Error("Invalid blog API response");
       }
 
-      if (data.blog_posts.length === 0) {
-        container.innerHTML = renderEmptyState();
-        return;
-      }
-
-      container.innerHTML = data.blog_posts.map(renderBlogCard).join("");
+      renderBlogPosts(data.blog_posts);
     } catch (error) {
       console.error(error);
-      container.innerHTML = renderErrorState();
+      blogList.innerHTML = renderErrorState();
     }
   }
 
-function renderBlogCard(post) {
-  return `
-    <article class="card">
-      <header>
-        <h3>${escapeHtml(post.title)}</h3>
-        <p class="card__meta">${formatDate(post.created_at)}</p>
-      </header>
+  function renderBlogPosts(posts) {
+    if (posts.length === 0) {
+      blogList.innerHTML = renderEmptyState();
+      return;
+    }
 
-      <p>${escapeHtml(post.excerpt)}</p>
+    blogList.innerHTML = posts.map(renderBlogCard).join("");
+  }
 
-      <div class="card__actions">
-        <a
-          class="btn btn--small btn--primary"
-          href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
-        >
-          Read Post
-        </a>
-      </div>
-    </article>
-  `;
-}
+  function renderBlogCard(post) {
+    return `
+      <article class="card">
+        <header>
+          <h3>${escapeHtml(post.title)}</h3>
+          <p class="card__meta">${formatDate(post.created_at)}</p>
+        </header>
+
+        <p>${escapeHtml(post.excerpt)}</p>
+
+        <div class="card__actions">
+          <a
+            class="btn btn--small btn--primary"
+            href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
+          >
+            Read Post
+          </a>
+        </div>
+      </article>
+    `;
+  }
 
   function renderEmptyState() {
     return `
       <article class="card">
         <h3>No posts yet</h3>
-        <p>
-          Blog posts will appear here once published.
-        </p>
+        <p>Blog posts will appear here once published.</p>
       </article>
     `;
   }
@@ -65,9 +70,7 @@ function renderBlogCard(post) {
     return `
       <article class="card">
         <h3>Unable to load posts</h3>
-        <p>
-          Blog posts could not be loaded right now. Please try again later.
-        </p>
+        <p>Blog posts could not be loaded right now. Please try again later.</p>
       </article>
     `;
   }

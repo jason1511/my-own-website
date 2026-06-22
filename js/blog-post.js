@@ -1,36 +1,35 @@
 // js/blog-post.js
 (() => {
+  const postContainer = document.querySelector("[data-blog-post]");
+  if (!postContainer) return;
+
   loadBlogPost();
 
   async function loadBlogPost() {
-    const container = document.querySelector("[data-blog-post]");
-    if (!container) return;
-
     const slug = getSlugFromUrl();
 
     if (!slug) {
-      container.innerHTML = renderErrorState("No blog post was selected.");
+      postContainer.innerHTML = renderErrorState("No blog post was selected.");
       return;
     }
 
     try {
-      const res = await fetch(`/api/blog/${encodeURIComponent(slug)}`);
+      const response = await fetch(`/api/blog/${encodeURIComponent(slug)}`);
 
-      if (!res.ok) {
-        throw new Error(`Blog post API failed: ${res.status}`);
+      if (!response.ok) {
+        throw new Error(`Blog post API failed: ${response.status}`);
       }
 
-      const data = await res.json();
+      const data = await response.json();
 
       if (!data.ok || !data.post) {
         throw new Error("Invalid blog post API response");
       }
 
-      container.innerHTML = renderBlogPost(data.post);
-      document.title = `${data.post.title} | Jason Leonard`;
+      renderBlogPost(data.post);
     } catch (error) {
       console.error(error);
-      container.innerHTML = renderErrorState(
+      postContainer.innerHTML = renderErrorState(
         "This blog post could not be loaded."
       );
     }
@@ -42,7 +41,9 @@
   }
 
   function renderBlogPost(post) {
-    return `
+    document.title = `${post.title} | Jason Leonard`;
+
+    postContainer.innerHTML = `
       <header>
         <p class="card__meta">${formatDate(post.created_at)}</p>
         <h1>${escapeHtml(post.title)}</h1>
