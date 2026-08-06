@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Project | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Software project by Jason Leonard."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html" aria-current="page">Projects</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="project-detail">
+      <div class="container">
+        <a class="project-detail__back" href="projects.html">
+          ← Back to projects
+        </a>
+
+        <div
+          class="project-detail__status"
+          data-project-status
+          role="status"
+          aria-live="polite"
+        >
+          Loading project…
+        </div>
+
+        <article data-project-detail hidden>
+          <header class="project-detail__header">
+            <p class="project-detail__type" data-project-type></p>
+            <h1 data-project-title></h1>
+            <p class="project-detail__summary" data-project-summary></p>
+          </header>
+
+          <ul
+            class="tag-list project-detail__technologies"
+            data-project-technologies
+            aria-label="Technologies used"
+          ></ul>
+
+          <div class="project-detail__body" data-project-body></div>
+
+          <div
+            class="project-detail__actions"
+            data-project-actions
+          ></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/project-detail.js"></script>
+</body>
+</html>
