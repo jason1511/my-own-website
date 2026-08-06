@@ -7,16 +7,22 @@
     if (!container) return;
 
     try {
-      const res = await fetch("/api/projects");
-      if (!res.ok) throw new Error(`Projects API failed: ${res.status}`);
+      const response = await fetch("/api/projects");
 
-      const data = await res.json();
+      if (!response.ok) {
+        throw new Error(`Projects API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       if (!data.ok || !Array.isArray(data.projects)) {
         throw new Error("Invalid projects API response");
       }
 
       const projects = container.hasAttribute("data-featured-only")
-        ? data.projects.filter((project) => Boolean(project.is_featured))
+        ? data.projects.filter((project) =>
+            Boolean(project.is_featured)
+          )
         : data.projects;
 
       container.innerHTML = projects.length
@@ -24,12 +30,14 @@
         : renderEmptyCard("No projects are available yet.");
     } catch (error) {
       console.warn("D1 projects unavailable:", error);
-      // Keep existing hardcoded content if API fails
+      // Keep the existing hardcoded content if the API fails.
     }
   }
 
   function renderProjectCard(project) {
     const githubRepo = repoFromUrl(project.github_url);
+    const projectSlug = safeProjectSlug(project.slug);
+
     const techTags = splitTags(project.tech_stack)
       .map((tag) => `<li class="tag">${escapeHtml(tag)}</li>`)
       .join("");
@@ -37,16 +45,49 @@
     const githubUrl = safeExternalUrl(project.github_url);
     const liveUrl = safeExternalUrl(project.live_url);
 
-    const githubLink = githubUrl
-      ? `<a class="btn btn--small" href="${escapeAttr(githubUrl)}" target="_blank" rel="noopener">GitHub</a>`
-      : "";
-
-    const liveLink = liveUrl
-      ? `<a class="btn btn--small btn--primary" href="${escapeAttr(liveUrl)}" target="_blank" rel="noopener">Live Demo</a>`
+    const detailLink = projectSlug
+      ? `
+        <a
+          class="btn btn--small btn--primary"
+          href="project.html?slug=${encodeURIComponent(projectSlug)}"
+        >
+          Project Details
+        </a>
+      `
       : "";
 
     const caseStudyLink = isBikeStoreProject(project, githubRepo)
-      ? `<a class="btn btn--small btn--primary" href="bike-store.html">Case Study</a>`
+      ? `
+        <a class="btn btn--small" href="bike-store.html">
+          Detailed Case Study
+        </a>
+      `
+      : "";
+
+    const liveLink = liveUrl
+      ? `
+        <a
+          class="btn btn--small"
+          href="${escapeAttr(liveUrl)}"
+          target="_blank"
+          rel="noopener"
+        >
+          Live Demo
+        </a>
+      `
+      : "";
+
+    const githubLink = githubUrl
+      ? `
+        <a
+          class="btn btn--small"
+          href="${escapeAttr(githubUrl)}"
+          target="_blank"
+          rel="noopener"
+        >
+          GitHub
+        </a>
+      `
       : "";
 
     const stats = githubRepo
@@ -59,15 +100,29 @@
       `
       : "";
 
-    const actions = [caseStudyLink, liveLink, githubLink].filter(Boolean).join("");
+    const actions = [
+      detailLink,
+      caseStudyLink,
+      liveLink,
+      githubLink,
+    ]
+      .filter(Boolean)
+      .join("");
 
     return `
-      <article class="card${githubRepo ? " repo-card" : ""}"${
-        githubRepo ? ` data-gh-repo="${escapeAttr(githubRepo)}"` : ""
-      }>
+      <article
+        class="card${githubRepo ? " repo-card" : ""}"
+        ${
+          githubRepo
+            ? `data-gh-repo="${escapeAttr(githubRepo)}"`
+            : ""
+        }
+      >
         <header>
           <h3>${escapeHtml(project.title)}</h3>
-          <p class="card__meta">${escapeHtml(project.tech_stack || project.type)}</p>
+          <p class="card__meta">
+            ${escapeHtml(project.tech_stack || project.type)}
+          </p>
         </header>
 
         <p>${escapeHtml(project.summary)}</p>
@@ -76,7 +131,11 @@
 
         ${stats}
 
-        ${actions ? `<div class="card__actions">${actions}</div>` : ""}
+        ${
+          actions
+            ? `<div class="card__actions">${actions}</div>`
+            : ""
+        }
       </article>
     `;
   }
@@ -88,10 +147,14 @@
     if (!container) return;
 
     try {
-      const res = await fetch("/api/workshop");
-      if (!res.ok) throw new Error(`Workshop API failed: ${res.status}`);
+      const response = await fetch("/api/workshop");
 
-      const data = await res.json();
+      if (!response.ok) {
+        throw new Error(`Workshop API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       if (!data.ok || !Array.isArray(data.workshop_items)) {
         throw new Error("Invalid workshop API response");
       }
@@ -101,7 +164,7 @@
         : renderEmptyCard("No workshop items are available yet.");
     } catch (error) {
       console.warn("D1 workshop unavailable:", error);
-      // Keep existing hardcoded content if API fails
+      // Keep the existing hardcoded content if the API fails.
     }
   }
 
@@ -109,10 +172,15 @@
     const workshopUrl = safeExternalUrl(item.workshop_url);
 
     return `
-      <article class="card workshop-card" data-workshop-id="${escapeAttr(item.steam_id)}">
+      <article
+        class="card workshop-card"
+        data-workshop-id="${escapeAttr(item.steam_id)}"
+      >
         <header>
           <h3>${escapeHtml(item.title)}</h3>
-          <p class="card__meta">${escapeHtml(item.game)} · Steam Workshop</p>
+          <p class="card__meta">
+            ${escapeHtml(item.game)} · Steam Workshop
+          </p>
         </header>
 
         <p>${escapeHtml(item.description)}</p>
@@ -125,7 +193,8 @@
 
         ${
           workshopUrl
-            ? `<div class="card__actions">
+            ? `
+              <div class="card__actions">
                 <a
                   class="btn btn--small btn--primary"
                   href="${escapeAttr(workshopUrl)}"
@@ -134,7 +203,8 @@
                 >
                   View on Steam
                 </a>
-              </div>`
+              </div>
+            `
             : ""
         }
       </article>
@@ -145,9 +215,10 @@
 
   function splitTags(value) {
     if (!value) return [];
-    return value
+
+    return String(value)
       .split(",")
-      .map((x) => x.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean);
   }
 
@@ -157,7 +228,10 @@
 
     try {
       const parsed = new URL(safeUrl);
-      if (!["github.com", "www.github.com"].includes(parsed.hostname.toLowerCase())) {
+
+      const allowedHosts = ["github.com", "www.github.com"];
+
+      if (!allowedHosts.includes(parsed.hostname.toLowerCase())) {
         return "";
       }
 
@@ -166,10 +240,18 @@
         .filter(Boolean)
         .slice(0, 2);
 
-      return owner && repository ? `${owner}/${repository}` : "";
+      return owner && repository
+        ? `${owner}/${repository}`
+        : "";
     } catch {
       return "";
     }
+  }
+
+  function safeProjectSlug(value) {
+    const slug = String(value || "").trim().toLowerCase();
+
+    return /^[a-z0-9-]+$/.test(slug) ? slug : "";
   }
 
   function safeExternalUrl(value) {
@@ -177,7 +259,10 @@
 
     try {
       const parsed = new URL(String(value).trim());
-      return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+
+      return ["http:", "https:"].includes(parsed.protocol)
+        ? parsed.href
+        : "";
     } catch {
       return "";
     }
@@ -190,12 +275,17 @@
     return (
       slug === "bike-store" ||
       slug === "bike-store-inventory-sales-management-app" ||
+      slug === "bike-store-inventory-sales-system" ||
       repo === "jason1511/bike-store-project"
     );
   }
 
   function renderEmptyCard(message) {
-    return `<article class="card"><p>${escapeHtml(message)}</p></article>`;
+    return `
+      <article class="card">
+        <p>${escapeHtml(message)}</p>
+      </article>
+    `;
   }
 
   function escapeHtml(value) {
@@ -211,7 +301,12 @@
     return escapeHtml(value);
   }
 
-  Promise.all([loadProjectsFromD1(), loadWorkshopFromD1()]).finally(() => {
-    document.dispatchEvent(new CustomEvent("portfolio:content-loaded"));
+  Promise.all([
+    loadProjectsFromD1(),
+    loadWorkshopFromD1(),
+  ]).finally(() => {
+    document.dispatchEvent(
+      new CustomEvent("portfolio:content-loaded")
+    );
   });
 })();
