@@ -1,0 +1,121 @@
+/* =========================
+   Project Detail
+========================= */
+
+.project-detail {
+  min-height: calc(100vh - 12rem);
+}
+
+.project-detail .container {
+  width: min(820px, 100% - 2rem);
+}
+
+.project-detail__back {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.project-detail__back:hover {
+  color: var(--text);
+}
+
+.project-detail__status {
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+}
+
+.project-detail__status--error {
+  border-color: rgba(255, 107, 107, 0.5);
+  background: rgba(255, 107, 107, 0.08);
+  color: #ffd7d7;
+}
+
+.project-detail article {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(17, 31, 58, 0.96),
+      rgba(15, 26, 47, 0.96)
+    );
+  box-shadow: var(--shadow);
+}
+
+.project-detail__header {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-detail__type {
+  margin-bottom: 0.65rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.project-detail__header h1 {
+  max-width: 18ch;
+  margin-bottom: 1rem;
+}
+
+.project-detail__summary {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  line-height: 1.7;
+}
+
+.project-detail__technologies {
+  margin: 1.5rem 0;
+}
+
+.project-detail__body {
+  max-width: 70ch;
+}
+
+.project-detail__body p {
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+}
+
+.project-detail__body p:last-child {
+  margin-bottom: 0;
+}
+
+.project-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+  .project-detail article {
+    padding: 1.25rem;
+  }
+
+  .project-detail__header h1 {
+    max-width: none;
+  }
+
+  .project-detail__actions {
+    flex-direction: column;
+  }
+
+  .project-detail__actions .btn {
+    width: 100%;
+  }
+}
