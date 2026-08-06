@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Case Studies | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Case studies by Jason Leonard, including practical software and web development projects."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="case-studies.html" aria-current="page">Case Studies</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="about-hero">
+      <div class="container about-hero__grid">
+        <div class="about-hero__content">
+          <h1>Case Studies</h1>
+
+          <p>
+            Deeper write-ups of selected projects, focusing on the problem,
+            design decisions, technical implementation, challenges, and what I learned.
+          </p>
+
+          <p>
+            These case studies are intended to show not only what I built, but how I
+            approach practical software development.
+          </p>
+        </div>
+
+        <aside class="profile-card" aria-label="Case studies summary">
+          <div class="profile-card__header">
+            <div>
+              <p class="profile-card__name">Project Deep Dives</p>
+              <p class="profile-card__role">Problem · Solution · Technical Decisions</p>
+            </div>
+          </div>
+
+          <dl class="profile-card__list">
+            <div class="profile-card__item">
+              <dt>Focus</dt>
+              <dd>Practical software development</dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Current</dt>
+              <dd>Bike Store App</dd>
+            </div>
+
+            <div class="profile-card__item">
+              <dt>Next</dt>
+              <dd>Portfolio website case study</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Featured Case Studies</h2>
+        <p class="section-lead">
+          Selected projects with a deeper explanation of the development process.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <header>
+              <h3>Bike Store Inventory &amp; Sales Management App</h3>
+              <p class="card__meta">C#, .NET WinForms, SQLite</p>
+            </header>
+
+            <p>
+              A desktop application built for a small electric bike retailer to manage
+              inventory, sales transactions, service records, and basic reporting.
+            </p>
+
+            <ul class="tag-list" aria-label="Case study highlights">
+              <li class="tag">Real business problem</li>
+              <li class="tag">Offline-first</li>
+              <li class="tag">FIFO stock logic</li>
+              <li class="tag">SQLite database</li>
+            </ul>
+
+            <div class="card__actions">
+              <a class="btn btn--small btn--primary" href="bike-store.html">
+                Read Case Study
+              </a>
+
+              <a
+                class="btn btn--small"
+                href="https://github.com/jason1511/Bike-STore-Project"
+                target="_blank"
+                rel="noopener"
+              >
+                GitHub
+              </a>
+            </div>
+          </article>
+
+          <article class="card">
+            <header>
+              <h3>Personal Portfolio Website</h3>
+              <p class="card__meta">HTML, CSS, JavaScript, Cloudflare D1</p>
+            </header>
+
+            <p>
+              A portfolio website that evolved from a static site into a dynamic
+              project with serverless functions, D1 database content, and admin tools.
+            </p>
+
+            <ul class="tag-list" aria-label="Case study highlights">
+              <li class="tag">Cloudflare Pages</li>
+              <li class="tag">D1 database</li>
+              <li class="tag">Admin dashboard</li>
+              <li class="tag">API integrations</li>
+            </ul>
+
+            <div class="card__actions">
+              <a class="btn btn--small" href="projects.html">
+                View Project
+              </a>
+
+              <a
+                class="btn btn--small"
+                href="https://github.com/jason1511/my-own-website"
+                target="_blank"
+                rel="noopener"
+              >
+                GitHub
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
