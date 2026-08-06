@@ -173,6 +173,16 @@ h3 {
   font-size: 0.92rem;
 }
 
+.btn--danger {
+  border-color: rgba(255, 107, 107, 0.6);
+  background: rgba(255, 107, 107, 0.12);
+  color: #ffd7d7;
+}
+
+.btn--danger:hover {
+  background: rgba(255, 107, 107, 0.2);
+}
+
 /* =========================
    About Hero (Split Layout)
 ========================= */

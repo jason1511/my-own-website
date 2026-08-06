@@ -1,3 +1,38 @@
+export async function onRequestGet(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const { results } = await context.env.DB.prepare(
+      `
+      SELECT
+        id,
+        title,
+        slug,
+        summary,
+        body,
+        type,
+        tech_stack,
+        github_url,
+        live_url,
+        image_key,
+        is_featured,
+        is_published,
+        display_order,
+        created_at,
+        updated_at
+      FROM projects
+      ORDER BY display_order ASC, created_at DESC
+      `
+    ).all();
+
+    return json({ ok: true, projects: results });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to load admin projects." }, 500);
+  }
+}
+
 export async function onRequestPost(context) {
   try {
     const authError = checkAdminPassword(context);
@@ -7,6 +42,7 @@ export async function onRequestPost(context) {
     const data = await context.request.json();
 
     const title = String(data.title || "").trim();
+    const requestedSlug = String(data.slug || "").trim();
     const summary = String(data.summary || "").trim();
     const body = String(data.body || "").trim();
     const type = String(data.type || "project").trim();
@@ -30,7 +66,7 @@ export async function onRequestPost(context) {
       );
     }
 
-    const slug = await createUniqueSlug(db, title);
+    const slug = await createUniqueSlug(db, requestedSlug || title);
 
     const result = await db
       .prepare(
@@ -88,8 +124,8 @@ export async function onRequestPost(context) {
   }
 }
 
-async function createUniqueSlug(db, title) {
-  const baseSlug = slugify(title) || "project";
+async function createUniqueSlug(db, value) {
+  const baseSlug = slugify(value) || "project";
   let slug = baseSlug;
   let counter = 2;
 
@@ -158,6 +194,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }

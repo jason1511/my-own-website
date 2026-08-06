@@ -18,7 +18,7 @@ export async function onRequestGet(context) {
           updated_at
         FROM blog_posts
         WHERE is_published = 1
-        ORDER BY datetime(created_at) DESC, id DESC
+        ORDER BY display_order ASC, datetime(created_at) DESC, id DESC
         `
       )
       .all();

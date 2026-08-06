@@ -1,3 +1,36 @@
+export async function onRequestGet(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const { results } = await context.env.DB.prepare(
+      `
+      SELECT
+        id,
+        steam_id,
+        title,
+        game,
+        description,
+        workshop_url,
+        display_order,
+        is_published,
+        created_at,
+        updated_at
+      FROM workshop_items
+      ORDER BY display_order ASC, created_at DESC
+      `
+    ).all();
+
+    return json({ ok: true, workshop_items: results });
+  } catch (error) {
+    console.error(error);
+    return json(
+      { ok: false, error: "Failed to load admin workshop items." },
+      500
+    );
+  }
+}
+
 export async function onRequestPost(context) {
   try {
     const authError = checkAdminPassword(context);
@@ -116,6 +149,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }

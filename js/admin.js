@@ -1,16 +1,12 @@
 // js/admin.js
 (() => {
   const ADMIN_PASSWORD_KEY = "portfolioAdminPassword";
-setupAdminLogin();
-setupAdminBlogForm();
-setupAdminProjectForm();
-setupAdminWorkshopForm();
-
-  // If the password was already entered in this browser session,
-  // unlock the dashboard automatically.
-  if (getStoredAdminPassword()) {
-    unlockAdminDashboard();
-  }
+  setupAdminLogin();
+  setupAdminLogout();
+  setupAdminBlogForm();
+  setupAdminProjectForm();
+  setupAdminWorkshopForm();
+  restoreAdminSession();
 
   /* ---------------- ADMIN LOGIN ---------------- */
 
@@ -35,19 +31,7 @@ setupAdminWorkshopForm();
       setText(statusEl, "Checking password...");
 
       try {
-        const response = await fetch("/api/admin/session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ password }),
-        });
-
-        const data = await readJsonSafe(response);
-
-        if (!response.ok || !data.ok) {
-          throw new Error(data.error || `Request failed: ${response.status}`);
-        }
+        await verifyAdminPassword(password);
 
         sessionStorage.setItem(ADMIN_PASSWORD_KEY, password);
         form.reset();
@@ -63,6 +47,50 @@ setupAdminWorkshopForm();
     });
   }
 
+  function setupAdminLogout() {
+    const logoutBtn = document.getElementById("adminLogoutBtn");
+    if (!logoutBtn) return;
+
+    logoutBtn.addEventListener("click", () => {
+      clearAdminSession();
+      lockAdminDashboard("You have been logged out.");
+    });
+  }
+
+  async function restoreAdminSession() {
+    const password = getStoredAdminPassword();
+    if (!password) return;
+
+    const statusEl = document.getElementById("adminLoginStatus");
+    setText(statusEl, "Checking saved admin session...");
+
+    try {
+      await verifyAdminPassword(password);
+      setText(statusEl, "");
+      unlockAdminDashboard();
+    } catch (error) {
+      console.error(error);
+      clearAdminSession();
+      setText(statusEl, "Your saved admin session has expired. Please log in again.");
+    }
+  }
+
+  async function verifyAdminPassword(password) {
+    const response = await fetch("/api/admin/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ password }),
+    });
+
+    const data = await readJsonSafe(response);
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || `Request failed: ${response.status}`);
+    }
+  }
+
   function unlockAdminDashboard() {
     const loginSection = document.getElementById("adminLoginSection");
     const dashboard = document.getElementById("adminDashboard");
@@ -75,8 +103,43 @@ setupAdminWorkshopForm();
     loadAdminWorkshopItems();
   }
 
+  function lockAdminDashboard(message = "Please log in to continue.") {
+    const loginSection = document.getElementById("adminLoginSection");
+    const dashboard = document.getElementById("adminDashboard");
+    const statusEl = document.getElementById("adminLoginStatus");
+
+    if (loginSection) loginSection.hidden = false;
+    if (dashboard) dashboard.hidden = true;
+    setText(statusEl, message);
+  }
+
+  function clearAdminSession() {
+    sessionStorage.removeItem(ADMIN_PASSWORD_KEY);
+  }
+
   function getStoredAdminPassword() {
     return sessionStorage.getItem(ADMIN_PASSWORD_KEY) || "";
+  }
+
+  async function adminFetch(url, options = {}) {
+    const password = getStoredAdminPassword();
+    if (!password) {
+      lockAdminDashboard("Admin session missing. Please log in again.");
+      throw new Error("Admin session missing. Please log in again.");
+    }
+
+    const headers = new Headers(options.headers || {});
+    headers.set("x-admin-password", password);
+
+    const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+      clearAdminSession();
+      lockAdminDashboard("Your admin session has expired. Please log in again.");
+      throw new Error("Admin session expired.");
+    }
+
+    return response;
   }
     /* ---------------- WORKSHOP CREATE / EDIT FORM ---------------- */
 
@@ -126,7 +189,7 @@ setupAdminWorkshopForm();
 
         const method = isEditing ? "PUT" : "POST";
 
-        const response = await fetch(endpoint, {
+        const response = await adminFetch(endpoint, {
           method,
           headers: {
             "Content-Type": "application/json",
@@ -211,6 +274,7 @@ setupAdminWorkshopForm();
       const projectId = form.elements["project_id"].value.trim();
 
       const title = form.elements["title"].value.trim();
+      const slug = form.elements["slug"].value.trim();
       const summary = form.elements["summary"].value.trim();
       const body = form.elements["body"].value.trim();
       const type = form.elements["type"].value.trim() || "project";
@@ -244,7 +308,7 @@ setupAdminWorkshopForm();
 
         const method = isEditing ? "PUT" : "POST";
 
-        const response = await fetch(endpoint, {
+        const response = await adminFetch(endpoint, {
           method,
           headers: {
             "Content-Type": "application/json",
@@ -252,6 +316,7 @@ setupAdminWorkshopForm();
           },
           body: JSON.stringify({
             title,
+            slug,
             summary,
             body,
             type,
@@ -297,6 +362,7 @@ setupAdminWorkshopForm();
     function resetProjectForm() {
       form.elements["project_id"].value = "";
       form.elements["title"].value = "";
+      form.elements["slug"].value = "";
       form.elements["summary"].value = "";
       form.elements["body"].value = "";
       form.elements["type"].value = "project";
@@ -364,7 +430,7 @@ setupAdminWorkshopForm();
 
         const method = isEditing ? "PUT" : "POST";
 
-        const response = await fetch(endpoint, {
+        const response = await adminFetch(endpoint, {
           method,
           headers: {
             "Content-Type": "application/json",
@@ -439,7 +505,7 @@ setupAdminWorkshopForm();
     if (!container) return;
 
     try {
-      const response = await fetch("/api/projects");
+      const response = await adminFetch("/api/admin/projects");
       if (!response.ok) throw new Error(`Projects API failed: ${response.status}`);
 
       const data = await response.json();
@@ -455,6 +521,12 @@ setupAdminWorkshopForm();
 
 container.innerHTML = data.projects.map(renderProjectCard).join("");
 setupProjectEditButtons(container);
+setupDeleteButtons(container, {
+  selector: "[data-project-delete]",
+  endpoint: "/api/admin/projects",
+  itemLabel: "project",
+  reload: loadAdminProjects,
+});
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load projects.");
@@ -488,6 +560,7 @@ function renderProjectCard(project) {
           data-project-edit
           data-project-id="${Number(project.id)}"
           data-project-title="${escapeAttr(project.title)}"
+          data-project-slug="${escapeAttr(project.slug)}"
           data-project-summary="${escapeAttr(project.summary)}"
           data-project-body="${escapeAttr(project.body || "")}"
           data-project-type="${escapeAttr(project.type || "project")}"
@@ -500,6 +573,16 @@ function renderProjectCard(project) {
           data-project-published="${project.is_published ? "1" : "0"}"
         >
           Edit
+        </button>
+
+        <button
+          class="btn btn--small btn--danger"
+          type="button"
+          data-project-delete
+          data-delete-id="${Number(project.id)}"
+          data-delete-title="${escapeAttr(project.title)}"
+        >
+          Delete
         </button>
 
         ${project.github_url ? renderLinkButton(project.github_url, "GitHub") : ""}
@@ -521,6 +604,7 @@ function setupProjectEditButtons(container) {
     button.addEventListener("click", () => {
       form.elements["project_id"].value = button.dataset.projectId || "";
       form.elements["title"].value = button.dataset.projectTitle || "";
+      form.elements["slug"].value = button.dataset.projectSlug || "";
       form.elements["summary"].value = button.dataset.projectSummary || "";
       form.elements["body"].value = button.dataset.projectBody || "";
       form.elements["type"].value = button.dataset.projectType || "project";
@@ -549,7 +633,7 @@ function setupProjectEditButtons(container) {
     if (!container) return;
 
     try {
-      const response = await fetch("/api/blog");
+      const response = await adminFetch("/api/admin/blog");
       if (!response.ok) throw new Error(`Blog API failed: ${response.status}`);
 
       const data = await response.json();
@@ -565,6 +649,12 @@ function setupProjectEditButtons(container) {
 
       container.innerHTML = data.blog_posts.map(renderBlogPostCard).join("");
       setupBlogEditButtons(container);
+      setupDeleteButtons(container, {
+        selector: "[data-blog-delete]",
+        endpoint: "/api/admin/blog",
+        itemLabel: "blog post",
+        reload: loadAdminBlogPosts,
+      });
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load blog posts.");
@@ -603,14 +693,28 @@ function setupProjectEditButtons(container) {
             Edit
           </button>
 
-          <a
-            class="btn btn--small"
-            href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
-            target="_blank"
-            rel="noopener"
+          <button
+            class="btn btn--small btn--danger"
+            type="button"
+            data-blog-delete
+            data-delete-id="${Number(post.id)}"
+            data-delete-title="${escapeAttr(post.title)}"
           >
-            View
-          </a>
+            Delete
+          </button>
+
+          ${
+            post.is_published
+              ? `<a
+                  class="btn btn--small"
+                  href="blog-post.html?slug=${encodeURIComponent(post.slug)}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  View
+                </a>`
+              : ""
+          }
         </div>
       </article>
     `;
@@ -652,7 +756,7 @@ function setupProjectEditButtons(container) {
     if (!container) return;
 
     try {
-      const response = await fetch("/api/workshop");
+      const response = await adminFetch("/api/admin/workshop");
       if (!response.ok) throw new Error(`Workshop API failed: ${response.status}`);
 
       const data = await response.json();
@@ -668,6 +772,12 @@ function setupProjectEditButtons(container) {
 
 container.innerHTML = data.workshop_items.map(renderWorkshopCard).join("");
 setupWorkshopEditButtons(container);
+setupDeleteButtons(container, {
+  selector: "[data-workshop-delete]",
+  endpoint: "/api/admin/workshop",
+  itemLabel: "workshop item",
+  reload: loadAdminWorkshopItems,
+});
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load workshop items.");
@@ -709,6 +819,16 @@ function renderWorkshopCard(item) {
           Edit
         </button>
 
+        <button
+          class="btn btn--small btn--danger"
+          type="button"
+          data-workshop-delete
+          data-delete-id="${Number(item.id)}"
+          data-delete-title="${escapeAttr(item.title)}"
+        >
+          Delete
+        </button>
+
         ${renderPrimaryLinkButton(item.workshop_url, "View on Steam")}
       </div>
     </article>
@@ -746,6 +866,47 @@ function setupWorkshopEditButtons(container) {
   });
 }
   /* ---------------- HELPERS ---------------- */
+
+  function setupDeleteButtons(
+    container,
+    { selector, endpoint, itemLabel, reload }
+  ) {
+    const buttons = container.querySelectorAll(selector);
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.dataset.deleteId;
+        const title = button.dataset.deleteTitle || `this ${itemLabel}`;
+
+        if (!id) return;
+
+        const confirmed = window.confirm(
+          `Delete “${title}”? This action cannot be undone.`
+        );
+        if (!confirmed) return;
+
+        button.disabled = true;
+
+        try {
+          const response = await adminFetch(
+            `${endpoint}/${encodeURIComponent(id)}`,
+            { method: "DELETE" }
+          );
+          const data = await readJsonSafe(response);
+
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || `Request failed: ${response.status}`);
+          }
+
+          await reload();
+        } catch (error) {
+          console.error(error);
+          window.alert(error.message || `Failed to delete ${itemLabel}.`);
+          button.disabled = false;
+        }
+      });
+    });
+  }
 
   async function readJsonSafe(response) {
     const text = await response.text();

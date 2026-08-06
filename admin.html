@@ -76,9 +76,15 @@
             </p>
 
             <p>
-              Blog posts can be created and edited from this dashboard. Project,
-              workshop, and media editing can be added later.
+              Projects, blog posts, and workshop entries can be created, edited,
+              published, unpublished, and deleted from this dashboard.
             </p>
+
+            <div class="about-hero__actions">
+              <button id="adminLogoutBtn" class="btn" type="button">
+                Log Out
+              </button>
+            </div>
           </div>
 
           <aside class="profile-card" aria-label="Admin summary">
@@ -92,7 +98,7 @@
             <dl class="profile-card__list">
               <div class="profile-card__item">
                 <dt>Status</dt>
-                <dd>Blog create/edit enabled</dd>
+                <dd>Content management enabled</dd>
               </div>
 
               <div class="profile-card__item">
@@ -207,6 +213,17 @@
               placeholder="Short project summary..."
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             ></textarea>
+          </div>
+
+          <div>
+            <label for="projectSlug"><strong>Slug</strong></label><br />
+            <input
+              id="projectSlug"
+              name="slug"
+              type="text"
+              placeholder="Generated from the title if left blank"
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
           </div>
 
           <div>

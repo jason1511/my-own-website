@@ -142,6 +142,42 @@ export async function onRequestPut(context) {
   }
 }
 
+export async function onRequestDelete(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const db = context.env.DB;
+    const id = Number(context.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return json({ ok: false, error: "Invalid workshop item ID." }, 400);
+    }
+
+    const existing = await db
+      .prepare(
+        "SELECT id, title, steam_id FROM workshop_items WHERE id = ? LIMIT 1"
+      )
+      .bind(id)
+      .first();
+
+    if (!existing) {
+      return json({ ok: false, error: "Workshop item not found." }, 404);
+    }
+
+    await db.prepare("DELETE FROM workshop_items WHERE id = ?").bind(id).run();
+
+    return json({
+      ok: true,
+      message: "Workshop item deleted.",
+      workshop_item: existing,
+    });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to delete workshop item." }, 500);
+  }
+}
+
 function checkAdminPassword(context) {
   const expectedPassword = context.env.ADMIN_PASSWORD;
   const providedPassword = context.request.headers.get("x-admin-password");
@@ -174,6 +210,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }

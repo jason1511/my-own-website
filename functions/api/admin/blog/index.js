@@ -1,3 +1,33 @@
+export async function onRequestGet(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const { results } = await context.env.DB.prepare(
+      `
+      SELECT
+        id,
+        title,
+        slug,
+        excerpt,
+        content,
+        cover_image_key,
+        is_published,
+        display_order,
+        created_at,
+        updated_at
+      FROM blog_posts
+      ORDER BY display_order ASC, created_at DESC
+      `
+    ).all();
+
+    return json({ ok: true, blog_posts: results });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to load admin blog posts." }, 500);
+  }
+}
+
 export async function onRequestPost(context) {
   try {
     const authError = checkAdminPassword(context);
@@ -7,10 +37,14 @@ export async function onRequestPost(context) {
     const data = await context.request.json();
 
     const title = String(data.title || "").trim();
+    const requestedSlug = String(data.slug || "").trim();
     const excerpt = String(data.excerpt || "").trim();
     const content = String(data.content || "").trim();
     const coverImageKey = String(data.cover_image_key || "").trim();
     const isPublished = data.is_published ? 1 : 0;
+    const displayOrder = Number.isFinite(Number(data.display_order))
+      ? Number(data.display_order)
+      : 0;
 
     if (!title || !excerpt || !content) {
       return json(
@@ -22,7 +56,7 @@ export async function onRequestPost(context) {
       );
     }
 
-    const slug = await createUniqueSlug(db, title);
+    const slug = await createUniqueSlug(db, requestedSlug || title);
 
     const result = await db
       .prepare(
@@ -36,10 +70,18 @@ export async function onRequestPost(context) {
           is_published,
           display_order
         )
-        VALUES (?, ?, ?, ?, ?, ?, 0)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         `
       )
-      .bind(title, slug, excerpt, content, coverImageKey, isPublished)
+      .bind(
+        title,
+        slug,
+        excerpt,
+        content,
+        coverImageKey,
+        isPublished,
+        displayOrder
+      )
       .run();
 
     return json({
@@ -62,8 +104,8 @@ export async function onRequestPost(context) {
   }
 }
 
-async function createUniqueSlug(db, title) {
-  const baseSlug = slugify(title) || "blog-post";
+async function createUniqueSlug(db, value) {
+  const baseSlug = slugify(value) || "blog-post";
   let slug = baseSlug;
   let counter = 2;
 
@@ -132,6 +174,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }

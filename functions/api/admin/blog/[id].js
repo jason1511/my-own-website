@@ -19,10 +19,14 @@ export async function onRequestPut(context) {
     const data = await context.request.json();
 
     const title = String(data.title || "").trim();
+    const requestedSlug = String(data.slug || "").trim();
     const excerpt = String(data.excerpt || "").trim();
     const content = String(data.content || "").trim();
     const coverImageKey = String(data.cover_image_key || "").trim();
     const isPublished = data.is_published ? 1 : 0;
+    const displayOrder = Number.isFinite(Number(data.display_order))
+      ? Number(data.display_order)
+      : 0;
 
     if (!title || !excerpt || !content) {
       return json(
@@ -37,7 +41,7 @@ export async function onRequestPut(context) {
     const existing = await db
       .prepare(
         `
-        SELECT id
+        SELECT id, slug
         FROM blog_posts
         WHERE id = ?
         LIMIT 1
@@ -56,7 +60,11 @@ export async function onRequestPut(context) {
       );
     }
 
-    const slug = await createUniqueSlug(db, title, id);
+    const slug = await createUniqueSlug(
+      db,
+      requestedSlug || existing.slug || title,
+      id
+    );
 
     await db
       .prepare(
@@ -69,6 +77,7 @@ export async function onRequestPut(context) {
           content = ?,
           cover_image_key = ?,
           is_published = ?,
+          display_order = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
         `
@@ -80,6 +89,7 @@ export async function onRequestPut(context) {
         content,
         coverImageKey,
         isPublished,
+        displayOrder,
         id
       )
       .run();
@@ -126,8 +136,38 @@ export async function onRequestPut(context) {
   }
 }
 
-async function createUniqueSlug(db, title, currentPostId) {
-  const baseSlug = slugify(title) || "blog-post";
+export async function onRequestDelete(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const db = context.env.DB;
+    const id = Number(context.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return json({ ok: false, error: "Invalid blog post ID." }, 400);
+    }
+
+    const existing = await db
+      .prepare("SELECT id, title, slug FROM blog_posts WHERE id = ? LIMIT 1")
+      .bind(id)
+      .first();
+
+    if (!existing) {
+      return json({ ok: false, error: "Blog post not found." }, 404);
+    }
+
+    await db.prepare("DELETE FROM blog_posts WHERE id = ?").bind(id).run();
+
+    return json({ ok: true, message: "Blog post deleted.", post: existing });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to delete blog post." }, 500);
+  }
+}
+
+async function createUniqueSlug(db, value, currentPostId) {
+  const baseSlug = slugify(value) || "blog-post";
   let slug = baseSlug;
   let counter = 2;
 
@@ -197,6 +237,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }

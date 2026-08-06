@@ -19,6 +19,7 @@ export async function onRequestPut(context) {
     const data = await context.request.json();
 
     const title = String(data.title || "").trim();
+    const requestedSlug = String(data.slug || "").trim();
     const summary = String(data.summary || "").trim();
     const body = String(data.body || "").trim();
     const type = String(data.type || "project").trim();
@@ -45,7 +46,7 @@ export async function onRequestPut(context) {
     const existing = await db
       .prepare(
         `
-        SELECT id
+        SELECT id, slug
         FROM projects
         WHERE id = ?
         LIMIT 1
@@ -64,7 +65,11 @@ export async function onRequestPut(context) {
       );
     }
 
-    const slug = await createUniqueSlug(db, title, id);
+    const slug = await createUniqueSlug(
+      db,
+      requestedSlug || existing.slug || title,
+      id
+    );
 
     await db
       .prepare(
@@ -151,8 +156,38 @@ export async function onRequestPut(context) {
   }
 }
 
-async function createUniqueSlug(db, title, currentProjectId) {
-  const baseSlug = slugify(title) || "project";
+export async function onRequestDelete(context) {
+  try {
+    const authError = checkAdminPassword(context);
+    if (authError) return authError;
+
+    const db = context.env.DB;
+    const id = Number(context.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return json({ ok: false, error: "Invalid project ID." }, 400);
+    }
+
+    const existing = await db
+      .prepare("SELECT id, title FROM projects WHERE id = ? LIMIT 1")
+      .bind(id)
+      .first();
+
+    if (!existing) {
+      return json({ ok: false, error: "Project not found." }, 404);
+    }
+
+    await db.prepare("DELETE FROM projects WHERE id = ?").bind(id).run();
+
+    return json({ ok: true, message: "Project deleted.", project: existing });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to delete project." }, 500);
+  }
+}
+
+async function createUniqueSlug(db, value, currentProjectId) {
+  const baseSlug = slugify(value) || "project";
   let slug = baseSlug;
   let counter = 2;
 
@@ -222,6 +257,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
     },
   });
 }
