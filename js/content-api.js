@@ -248,6 +248,7 @@
       .join("");
     const githubUrl = safeExternalUrl(caseStudy.github_url);
     const liveUrl = safeExternalUrl(caseStudy.live_url);
+    const imageUrl = safeImageUrl(caseStudy.image_key);
     const slug = safeProjectSlug(caseStudy.slug);
 
     const actions = [
@@ -284,7 +285,17 @@
       .join("");
 
     return `
-      <article class="card">
+      <article class="card case-study-card">
+        ${
+          imageUrl
+            ? `<img
+                class="case-study-card__image"
+                src="${escapeAttr(imageUrl)}"
+                alt="${escapeAttr(caseStudy.cover_image_alt || "")}"
+                loading="lazy"
+              />`
+            : ""
+        }
         <header>
           <h3>${escapeHtml(caseStudy.title)}</h3>
           <p class="card__meta">
@@ -350,6 +361,19 @@
     try {
       const parsed = new URL(String(value).trim());
 
+      return ["http:", "https:"].includes(parsed.protocol)
+        ? parsed.href
+        : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function safeImageUrl(value) {
+    if (!value) return "";
+
+    try {
+      const parsed = new URL(String(value).trim(), window.location.origin);
       return ["http:", "https:"].includes(parsed.protocol)
         ? parsed.href
         : "";

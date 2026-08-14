@@ -393,6 +393,47 @@
                   <textarea id="caseStudySummary" name="summary" rows="3" required></textarea>
                 </div>
 
+                <fieldset class="admin-case-study-facts">
+                  <legend>Quick Project Facts</legend>
+
+                  <div class="admin-case-study-facts__grid">
+                    <div>
+                      <label for="caseStudyRole"><strong>Your Role</strong></label>
+                      <input id="caseStudyRole" name="role" type="text" placeholder="Full-stack developer" />
+                    </div>
+
+                    <div>
+                      <label for="caseStudyType"><strong>Project Type</strong></label>
+                      <input id="caseStudyType" name="project_type" type="text" placeholder="Production retail system" />
+                    </div>
+
+                    <div>
+                      <label for="caseStudyUsers"><strong>Intended Users</strong></label>
+                      <input id="caseStudyUsers" name="intended_users" type="text" placeholder="Store administrators and staff" />
+                    </div>
+
+                    <div>
+                      <label for="caseStudyPlatform"><strong>Platform</strong></label>
+                      <input id="caseStudyPlatform" name="platform" type="text" placeholder="Responsive web application" />
+                    </div>
+
+                    <div>
+                      <label for="caseStudyStatus"><strong>Project Status</strong></label>
+                      <input id="caseStudyStatus" name="project_status" type="text" placeholder="Actively developed" />
+                    </div>
+
+                    <div>
+                      <label for="caseStudyTimeline"><strong>Timeline</strong></label>
+                      <input id="caseStudyTimeline" name="timeline" type="text" placeholder="2026 – present" />
+                    </div>
+                  </div>
+                </fieldset>
+
+                <p class="admin-form-help">
+                  The fields below remain available for short case studies and older entries.
+                  For a full visual case study, build the ordered sections further down.
+                </p>
+
                 <div>
                   <label for="caseStudyProblem"><strong>Problem</strong></label>
                   <textarea id="caseStudyProblem" name="problem" rows="5"></textarea>
@@ -449,14 +490,42 @@
                 </div>
 
                 <div>
-                  <label for="caseStudyImageKey"><strong>Image Key</strong></label>
+                  <label for="caseStudyImageKey"><strong>Cover Image Path or URL</strong></label>
                   <input
                     id="caseStudyImageKey"
                     name="image_key"
                     type="text"
-                    placeholder="Optional R2 image key"
+                    placeholder="images/projects/bike-store-dashboard.jpg or https://..."
                   />
                 </div>
+
+                <div>
+                  <label for="caseStudyCoverAlt"><strong>Cover Image Alt Text</strong></label>
+                  <input
+                    id="caseStudyCoverAlt"
+                    name="cover_image_alt"
+                    type="text"
+                    placeholder="Describe what is visible in the cover image"
+                  />
+                </div>
+
+                <fieldset class="admin-case-study-builder">
+                  <legend>Case Study Page Sections</legend>
+                  <p class="admin-form-help">
+                    Add sections in reading order. Each section can contain text, bullets,
+                    and an optional screenshot with its own caption.
+                  </p>
+
+                  <div data-case-study-sections></div>
+
+                  <button
+                    class="btn btn--small"
+                    type="button"
+                    data-add-case-study-section
+                  >
+                    Add Section
+                  </button>
+                </fieldset>
 
                 <div>
                   <label for="caseStudyDisplayOrder"><strong>Display Order</strong></label>

@@ -50,13 +50,24 @@
             <p class="case-study-detail__summary" data-case-study-summary></p>
           </header>
 
+          <figure class="case-study-detail__cover" data-case-study-cover hidden>
+            <img data-case-study-cover-image alt="" />
+          </figure>
+
+          <dl class="case-study-detail__facts" data-case-study-facts hidden></dl>
+
           <ul
             class="tag-list case-study-detail__technologies"
             data-case-study-technologies
             aria-label="Technologies used"
           ></ul>
 
-          <div class="case-study-detail__sections">
+          <nav class="case-study-detail__toc" data-case-study-toc hidden aria-label="Case study contents">
+            <h2>On this page</h2>
+            <ol data-case-study-toc-list></ol>
+          </nav>
+
+          <div class="case-study-detail__sections" data-case-study-sections-container>
             <section data-case-study-section="problem">
               <h2>The Problem</h2>
               <div data-case-study-content="problem"></div>

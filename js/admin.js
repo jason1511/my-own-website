@@ -400,6 +400,15 @@
     const cancelEditBtn = document.getElementById(
       "adminCaseStudyCancelEditBtn"
     );
+    const addSectionBtn = form.querySelector(
+      "[data-add-case-study-section]"
+    );
+
+    renderCaseStudySectionEditors([]);
+
+    addSectionBtn?.addEventListener("click", () => {
+      addCaseStudySectionEditor();
+    });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -410,14 +419,21 @@
       const problem = form.elements["problem"].value.trim();
       const solution = form.elements["solution"].value.trim();
       const isPublished = form.elements["is_published"].checked;
+      const contentSections = collectCaseStudySections();
 
       if (!title || !summary) {
         setStatus("Title and summary are required.");
         return;
       }
 
-      if (isPublished && (!problem || !solution)) {
-        setStatus("Published case studies require a problem and solution.");
+      if (
+        isPublished &&
+        (!problem || !solution) &&
+        contentSections.length === 0
+      ) {
+        setStatus(
+          "Published case studies require a problem and solution or at least one page section."
+        );
         return;
       }
 
@@ -448,6 +464,14 @@
             github_url: form.elements["github_url"].value.trim(),
             live_url: form.elements["live_url"].value.trim(),
             image_key: form.elements["image_key"].value.trim(),
+            cover_image_alt: form.elements["cover_image_alt"].value.trim(),
+            role: form.elements["role"].value.trim(),
+            project_type: form.elements["project_type"].value.trim(),
+            intended_users: form.elements["intended_users"].value.trim(),
+            platform: form.elements["platform"].value.trim(),
+            project_status: form.elements["project_status"].value.trim(),
+            timeline: form.elements["timeline"].value.trim(),
+            content_sections: contentSections,
             is_featured: form.elements["is_featured"].checked,
             is_published: isPublished,
             display_order: Number(form.elements["display_order"].value || 0),
@@ -484,6 +508,7 @@
       form.reset();
       form.elements["case_study_id"].value = "";
       form.elements["display_order"].value = "0";
+      renderCaseStudySectionEditors([]);
 
       if (submitBtn) submitBtn.textContent = "Create Case Study";
       if (cancelEditBtn) cancelEditBtn.hidden = true;
@@ -496,6 +521,136 @@
     function setStatus(message) {
       setText(statusEl, message);
     }
+  }
+
+  function collectCaseStudySections() {
+    const container = document.querySelector("[data-case-study-sections]");
+    if (!container) return [];
+
+    return [...container.querySelectorAll("[data-case-study-section-editor]")]
+      .map((editor) => {
+        const read = (name) =>
+          editor.querySelector(`[data-section-field="${name}"]`)?.value.trim() || "";
+
+        return {
+          title: read("title"),
+          body: read("body"),
+          bullets: read("bullets")
+            .split(/\r?\n/)
+            .map((item) => item.replace(/^[-*•]\s*/, "").trim())
+            .filter(Boolean),
+          image_url: read("image_url"),
+          image_alt: read("image_alt"),
+          image_caption: read("image_caption"),
+        };
+      })
+      .filter((section) =>
+        Boolean(
+          section.title ||
+          section.body ||
+          section.bullets.length ||
+          section.image_url
+        )
+      );
+  }
+
+  function renderCaseStudySectionEditors(sections) {
+    const container = document.querySelector("[data-case-study-sections]");
+    if (!container) return;
+
+    container.replaceChildren();
+    const entries = Array.isArray(sections) && sections.length
+      ? sections
+      : [{}];
+
+    for (const section of entries) {
+      addCaseStudySectionEditor(section);
+    }
+  }
+
+  function addCaseStudySectionEditor(section = {}) {
+    const container = document.querySelector("[data-case-study-sections]");
+    if (!container) return;
+
+    const editor = document.createElement("article");
+    editor.className = "admin-case-study-section";
+    editor.dataset.caseStudySectionEditor = "";
+    editor.innerHTML = `
+      <div class="admin-case-study-section__header">
+        <h4 data-section-number>Section</h4>
+        <div class="admin-case-study-section__actions">
+          <button class="btn btn--small" type="button" data-section-up>Move Up</button>
+          <button class="btn btn--small" type="button" data-section-down>Move Down</button>
+          <button class="btn btn--small btn--danger" type="button" data-section-remove>Remove</button>
+        </div>
+      </div>
+
+      <div class="admin-case-study-section__fields">
+        <div>
+          <label><strong>Section Heading</strong></label>
+          <input data-section-field="title" type="text" value="${escapeAttr(section.title || "")}" placeholder="The Problem, Architecture, Results..." />
+        </div>
+
+        <div>
+          <label><strong>Body</strong></label>
+          <textarea data-section-field="body" rows="7" placeholder="Use a blank line between paragraphs.">${escapeHtml(section.body || "")}</textarea>
+        </div>
+
+        <div>
+          <label><strong>Bullet Points</strong></label>
+          <textarea data-section-field="bullets" rows="5" placeholder="One bullet per line">${escapeHtml(Array.isArray(section.bullets) ? section.bullets.join("\n") : "")}</textarea>
+        </div>
+
+        <div>
+          <label><strong>Screenshot Path or URL</strong></label>
+          <input data-section-field="image_url" type="text" value="${escapeAttr(section.image_url || "")}" placeholder="images/projects/example.jpg or https://..." />
+        </div>
+
+        <div>
+          <label><strong>Screenshot Alt Text</strong></label>
+          <input data-section-field="image_alt" type="text" value="${escapeAttr(section.image_alt || "")}" placeholder="Describe what the screenshot shows" />
+        </div>
+
+        <div>
+          <label><strong>Screenshot Caption</strong></label>
+          <input data-section-field="image_caption" type="text" value="${escapeAttr(section.image_caption || "")}" placeholder="Optional explanation beneath the screenshot" />
+        </div>
+      </div>
+    `;
+
+    editor.querySelector("[data-section-up]")?.addEventListener("click", () => {
+      const previous = editor.previousElementSibling;
+      if (previous) container.insertBefore(editor, previous);
+      updateCaseStudySectionNumbers();
+    });
+
+    editor.querySelector("[data-section-down]")?.addEventListener("click", () => {
+      const next = editor.nextElementSibling;
+      if (next) container.insertBefore(next, editor);
+      updateCaseStudySectionNumbers();
+    });
+
+    editor.querySelector("[data-section-remove]")?.addEventListener("click", () => {
+      editor.remove();
+      if (!container.children.length) addCaseStudySectionEditor();
+      updateCaseStudySectionNumbers();
+    });
+
+    container.append(editor);
+    updateCaseStudySectionNumbers();
+  }
+
+  function updateCaseStudySectionNumbers() {
+    document
+      .querySelectorAll("[data-case-study-section-editor]")
+      .forEach((editor, index, editors) => {
+        const label = editor.querySelector("[data-section-number]");
+        const up = editor.querySelector("[data-section-up]");
+        const down = editor.querySelector("[data-section-down]");
+        if (label) label.textContent = `Section ${index + 1}`;
+        if (up) up.disabled = index === 0;
+        if (down) down.disabled = index === editors.length - 1;
+      });
   }
   /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
@@ -815,6 +970,7 @@ function setupProjectEditButtons(container) {
           <li class="tag">Slug: ${escapeHtml(caseStudy.slug)}</li>
           <li class="tag">${caseStudy.is_featured ? "Featured" : "Not featured"}</li>
           <li class="tag">${caseStudy.is_published ? "Published" : "Draft"}</li>
+          <li class="tag">${Array.isArray(caseStudy.content_sections) ? caseStudy.content_sections.length : 0} sections</li>
           <li class="tag">Order: ${Number(caseStudy.display_order)}</li>
           <li class="tag">ID: ${Number(caseStudy.id)}</li>
         </ul>
@@ -886,6 +1042,13 @@ function setupProjectEditButtons(container) {
           github_url: caseStudy.github_url,
           live_url: caseStudy.live_url,
           image_key: caseStudy.image_key,
+          cover_image_alt: caseStudy.cover_image_alt,
+          role: caseStudy.role,
+          project_type: caseStudy.project_type,
+          intended_users: caseStudy.intended_users,
+          platform: caseStudy.platform,
+          project_status: caseStudy.project_status,
+          timeline: caseStudy.timeline,
           display_order: caseStudy.display_order,
         };
 
@@ -897,6 +1060,7 @@ function setupProjectEditButtons(container) {
 
         form.elements["is_featured"].checked = Boolean(caseStudy.is_featured);
         form.elements["is_published"].checked = Boolean(caseStudy.is_published);
+        renderCaseStudySectionEditors(caseStudy.content_sections);
 
         if (submitBtn) submitBtn.textContent = "Update Case Study";
         if (cancelEditBtn) cancelEditBtn.hidden = false;

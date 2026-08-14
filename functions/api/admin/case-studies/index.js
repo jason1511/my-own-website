@@ -23,6 +23,14 @@ export async function onRequestGet(context) {
         cs.github_url,
         cs.live_url,
         cs.image_key,
+        cs.cover_image_alt,
+        cs.role,
+        cs.project_type,
+        cs.intended_users,
+        cs.platform,
+        cs.project_status,
+        cs.timeline,
+        cs.content_sections,
         cs.is_featured,
         cs.is_published,
         cs.display_order,
@@ -37,7 +45,7 @@ export async function onRequestGet(context) {
 
     return json({
       ok: true,
-      case_studies: results,
+      case_studies: results.map(normalizeCaseStudyRow),
     });
   } catch (error) {
     console.error("Failed to load admin case studies:", error);
@@ -76,6 +84,14 @@ export async function onRequestPost(context) {
     const githubUrl = String(data.github_url || "").trim();
     const liveUrl = String(data.live_url || "").trim();
     const imageKey = String(data.image_key || "").trim();
+    const coverImageAlt = String(data.cover_image_alt || "").trim();
+    const role = String(data.role || "").trim();
+    const projectType = String(data.project_type || "").trim();
+    const intendedUsers = String(data.intended_users || "").trim();
+    const platform = String(data.platform || "").trim();
+    const projectStatus = String(data.project_status || "").trim();
+    const timeline = String(data.timeline || "").trim();
+    const contentSections = normalizeContentSections(data.content_sections);
     const isFeatured = data.is_featured ? 1 : 0;
     const isPublished = data.is_published ? 1 : 0;
     const displayOrder = Number.isFinite(Number(data.display_order))
@@ -102,12 +118,34 @@ export async function onRequestPost(context) {
       );
     }
 
-    if (isPublished && (!problem || !solution)) {
+    if (contentSections === null) {
       return json(
         {
           ok: false,
           error:
-            "Published case studies require both a problem and solution.",
+            "Case-study sections are invalid. Images require alt text and a maximum of 30 sections is allowed.",
+        },
+        400
+      );
+    }
+
+    if (imageKey && !coverImageAlt) {
+      return json(
+        { ok: false, error: "A cover image requires descriptive alt text." },
+        400
+      );
+    }
+
+    if (
+      isPublished &&
+      (!problem || !solution) &&
+      contentSections.length === 0
+    ) {
+      return json(
+        {
+          ok: false,
+          error:
+            "Published case studies require a problem and solution or at least one structured section.",
         },
         400
       );
@@ -160,12 +198,20 @@ export async function onRequestPost(context) {
           github_url,
           live_url,
           image_key,
+          cover_image_alt,
+          role,
+          project_type,
+          intended_users,
+          platform,
+          project_status,
+          timeline,
+          content_sections,
           is_featured,
           is_published,
           display_order
         )
         VALUES (
-          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )
         `
       )
@@ -184,6 +230,14 @@ export async function onRequestPost(context) {
         githubUrl,
         liveUrl,
         imageKey,
+        coverImageAlt,
+        role,
+        projectType,
+        intendedUsers,
+        platform,
+        projectStatus,
+        timeline,
+        JSON.stringify(contentSections),
         isFeatured,
         isPublished,
         displayOrder
@@ -220,6 +274,59 @@ export async function onRequestPost(context) {
       500
     );
   }
+}
+
+function normalizeCaseStudyRow(row) {
+  return {
+    ...row,
+    content_sections: parseStoredSections(row.content_sections),
+  };
+}
+
+function parseStoredSections(value) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeContentSections(value) {
+  const sections = Array.isArray(value) ? value : [];
+  if (sections.length > 30) return null;
+
+  const normalized = [];
+
+  for (const section of sections) {
+    if (!section || typeof section !== "object") return null;
+
+    const title = String(section.title || "").trim();
+    const body = String(section.body || "").trim();
+    const imageUrl = String(section.image_url || "").trim();
+    const imageAlt = String(section.image_alt || "").trim();
+    const imageCaption = String(section.image_caption || "").trim();
+    const bullets = Array.isArray(section.bullets)
+      ? section.bullets
+          .map((item) => String(item || "").trim())
+          .filter(Boolean)
+          .slice(0, 50)
+      : [];
+
+    if (imageUrl && !imageAlt) return null;
+    if (!title && !body && !imageUrl && bullets.length === 0) continue;
+
+    normalized.push({
+      title,
+      body,
+      bullets,
+      image_url: imageUrl,
+      image_alt: imageAlt,
+      image_caption: imageCaption,
+    });
+  }
+
+  return normalized;
 }
 
 function parseOptionalProjectId(value) {

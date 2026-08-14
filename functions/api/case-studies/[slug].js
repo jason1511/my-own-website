@@ -32,6 +32,14 @@ export async function onRequestGet(context) {
         cs.github_url,
         cs.live_url,
         cs.image_key,
+        cs.cover_image_alt,
+        cs.role,
+        cs.project_type,
+        cs.intended_users,
+        cs.platform,
+        cs.project_status,
+        cs.timeline,
+        cs.content_sections,
         cs.is_featured,
         cs.display_order,
         cs.created_at,
@@ -59,7 +67,7 @@ export async function onRequestGet(context) {
 
     return json({
       ok: true,
-      case_study: caseStudy,
+      case_study: normalizeCaseStudyRow(caseStudy),
     });
   } catch (error) {
     console.error("Failed to load case study:", error);
@@ -72,6 +80,22 @@ export async function onRequestGet(context) {
       500
     );
   }
+}
+
+function normalizeCaseStudyRow(row) {
+  let sections = [];
+
+  try {
+    const parsed = JSON.parse(String(row.content_sections || "[]"));
+    if (Array.isArray(parsed)) sections = parsed;
+  } catch {
+    sections = [];
+  }
+
+  return {
+    ...row,
+    content_sections: sections,
+  };
 }
 
 function json(body, status = 200) {

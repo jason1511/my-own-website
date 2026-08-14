@@ -69,8 +69,75 @@
   line-height: 1.7;
 }
 
+.case-study-detail__cover {
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.case-study-detail__cover img {
+  width: 100%;
+  max-height: 560px;
+  object-fit: cover;
+}
+
+.case-study-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--border);
+}
+
+.case-study-detail__facts > div {
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.case-study-detail__facts dt {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.case-study-detail__facts dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
 .case-study-detail__technologies {
   margin: 1.5rem 0;
+}
+
+.case-study-detail__toc {
+  margin: 1.5rem 0 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: rgba(79, 140, 255, 0.08);
+}
+
+.case-study-detail__toc h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+}
+
+.case-study-detail__toc ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.case-study-detail__toc a {
+  color: var(--accent);
 }
 
 .case-study-detail__sections {
@@ -92,6 +159,25 @@
 .case-study-detail__sections p,
 .case-study-detail__sections li {
   line-height: 1.8;
+}
+
+.case-study-detail__sections figure {
+  margin: 1.5rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.case-study-detail__sections figure img {
+  width: 100%;
+}
+
+.case-study-detail__sections figcaption {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .case-study-detail__sections p:last-child {
@@ -118,5 +204,9 @@
 
   .case-study-detail__actions .btn {
     width: 100%;
+  }
+
+  .case-study-detail__facts {
+    grid-template-columns: 1fr;
   }
 }
