@@ -211,6 +211,96 @@
     `;
   }
 
+  /* ---------------- D1 CASE STUDIES RENDERING ---------------- */
+
+  async function loadCaseStudiesFromD1() {
+    const container = document.querySelector("[data-case-studies-list]");
+    if (!container) return;
+
+    try {
+      const response = await fetch("/api/case-studies");
+
+      if (!response.ok) {
+        throw new Error(`Case studies API failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.ok || !Array.isArray(data.case_studies)) {
+        throw new Error("Invalid case studies API response");
+      }
+
+      // Keep the existing hand-written cards until the first D1 case study is published.
+      if (data.case_studies.length === 0) return;
+
+      container.innerHTML = data.case_studies
+        .map(renderCaseStudyCard)
+        .join("");
+    } catch (error) {
+      console.warn("D1 case studies unavailable:", error);
+      // Keep the hand-written cards as a resilient public fallback.
+    }
+  }
+
+  function renderCaseStudyCard(caseStudy) {
+    const techTags = splitTags(caseStudy.tech_stack)
+      .map((tag) => `<li class="tag">${escapeHtml(tag)}</li>`)
+      .join("");
+    const githubUrl = safeExternalUrl(caseStudy.github_url);
+    const liveUrl = safeExternalUrl(caseStudy.live_url);
+    const slug = safeProjectSlug(caseStudy.slug);
+
+    const actions = [
+      slug
+        ? `<a
+            class="btn btn--small btn--primary"
+            href="case-study.html?slug=${encodeURIComponent(slug)}"
+          >
+            Read Case Study
+          </a>`
+        : "",
+      liveUrl
+        ? `<a
+            class="btn btn--small"
+            href="${escapeAttr(liveUrl)}"
+            target="_blank"
+            rel="noopener"
+          >
+            Live Demo
+          </a>`
+        : "",
+      githubUrl
+        ? `<a
+            class="btn btn--small"
+            href="${escapeAttr(githubUrl)}"
+            target="_blank"
+            rel="noopener"
+          >
+            GitHub
+          </a>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
+
+    return `
+      <article class="card">
+        <header>
+          <h3>${escapeHtml(caseStudy.title)}</h3>
+          <p class="card__meta">
+            ${escapeHtml(caseStudy.project_title || "Project case study")}
+          </p>
+        </header>
+
+        <p>${escapeHtml(caseStudy.summary)}</p>
+
+        ${techTags ? `<ul class="tag-list">${techTags}</ul>` : ""}
+
+        ${actions ? `<div class="card__actions">${actions}</div>` : ""}
+      </article>
+    `;
+  }
+
   /* ---------------- HELPERS ---------------- */
 
   function splitTags(value) {
@@ -303,6 +393,7 @@
 
   Promise.all([
     loadProjectsFromD1(),
+    loadCaseStudiesFromD1(),
     loadWorkshopFromD1(),
   ]).finally(() => {
     document.dispatchEvent(

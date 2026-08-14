@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Case Study | Jason Leonard</title>
+  <meta name="description" content="Software project case study by Jason Leonard." />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/case-study-detail.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Jason Leonard</a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="case-studies.html" aria-current="page">Case Studies</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <section class="case-study-detail">
+      <div class="container">
+        <a class="case-study-detail__back" href="case-studies.html">
+          ← Back to case studies
+        </a>
+
+        <div
+          class="case-study-detail__status"
+          data-case-study-status
+          role="status"
+          aria-live="polite"
+        >
+          Loading case study…
+        </div>
+
+        <article data-case-study-detail hidden>
+          <header class="case-study-detail__header">
+            <p class="case-study-detail__type" data-case-study-project></p>
+            <h1 data-case-study-title></h1>
+            <p class="case-study-detail__summary" data-case-study-summary></p>
+          </header>
+
+          <ul
+            class="tag-list case-study-detail__technologies"
+            data-case-study-technologies
+            aria-label="Technologies used"
+          ></ul>
+
+          <div class="case-study-detail__sections">
+            <section data-case-study-section="problem">
+              <h2>The Problem</h2>
+              <div data-case-study-content="problem"></div>
+            </section>
+
+            <section data-case-study-section="solution">
+              <h2>The Solution</h2>
+              <div data-case-study-content="solution"></div>
+            </section>
+
+            <section data-case-study-section="key_features">
+              <h2>Key Features</h2>
+              <div data-case-study-content="key_features"></div>
+            </section>
+
+            <section data-case-study-section="technical_details">
+              <h2>Technical Details</h2>
+              <div data-case-study-content="technical_details"></div>
+            </section>
+
+            <section data-case-study-section="challenges">
+              <h2>Challenges</h2>
+              <div data-case-study-content="challenges"></div>
+            </section>
+
+            <section data-case-study-section="learnings">
+              <h2>What I Learned</h2>
+              <div data-case-study-content="learnings"></div>
+            </section>
+          </div>
+
+          <div class="case-study-detail__actions" data-case-study-actions></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© <span id="year"></span> Jason Leonard</small>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/case-study-detail.js"></script>
+</body>
+</html>

@@ -1,8 +1,10 @@
 // js/admin.js
 (() => {
   const ADMIN_PASSWORD_KEY = "portfolioAdminPassword";
+  const caseStudiesById = new Map();
   setupAdminLogin();
   setupAdminLogout();
+  setupAdminCaseStudyForm();
   setupAdminBlogForm();
   setupAdminProjectForm();
   setupAdminWorkshopForm();
@@ -99,6 +101,7 @@
     if (dashboard) dashboard.hidden = false;
 
     loadAdminProjects();
+    loadAdminCaseStudies();
     loadAdminBlogPosts();
     loadAdminWorkshopItems();
   }
@@ -386,6 +389,114 @@
       setText(statusEl, message);
     }
   }
+  /* ---------------- CASE STUDY CREATE / EDIT FORM ---------------- */
+
+  function setupAdminCaseStudyForm() {
+    const form = document.getElementById("adminCaseStudyForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminCaseStudyStatus");
+    const submitBtn = document.getElementById("adminCaseStudySubmitBtn");
+    const cancelEditBtn = document.getElementById(
+      "adminCaseStudyCancelEditBtn"
+    );
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const caseStudyId = form.elements["case_study_id"].value.trim();
+      const title = form.elements["title"].value.trim();
+      const summary = form.elements["summary"].value.trim();
+      const problem = form.elements["problem"].value.trim();
+      const solution = form.elements["solution"].value.trim();
+      const isPublished = form.elements["is_published"].checked;
+
+      if (!title || !summary) {
+        setStatus("Title and summary are required.");
+        return;
+      }
+
+      if (isPublished && (!problem || !solution)) {
+        setStatus("Published case studies require a problem and solution.");
+        return;
+      }
+
+      const isEditing = Boolean(caseStudyId);
+      setStatus(isEditing ? "Updating case study..." : "Creating case study...");
+      setSubmitDisabled(true);
+
+      try {
+        const endpoint = isEditing
+          ? `/api/admin/case-studies/${encodeURIComponent(caseStudyId)}`
+          : "/api/admin/case-studies";
+
+        const response = await adminFetch(endpoint, {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            project_id: form.elements["project_id"].value || null,
+            title,
+            slug: form.elements["slug"].value.trim(),
+            summary,
+            problem,
+            solution,
+            key_features: form.elements["key_features"].value.trim(),
+            technical_details: form.elements["technical_details"].value.trim(),
+            challenges: form.elements["challenges"].value.trim(),
+            learnings: form.elements["learnings"].value.trim(),
+            tech_stack: form.elements["tech_stack"].value.trim(),
+            github_url: form.elements["github_url"].value.trim(),
+            live_url: form.elements["live_url"].value.trim(),
+            image_key: form.elements["image_key"].value.trim(),
+            is_featured: form.elements["is_featured"].checked,
+            is_published: isPublished,
+            display_order: Number(form.elements["display_order"].value || 0),
+          }),
+        });
+
+        const data = await readJsonSafe(response);
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `Request failed: ${response.status}`);
+        }
+
+        resetForm();
+        setStatus(
+          isEditing
+            ? "Case study updated successfully."
+            : "Case study created successfully."
+        );
+        await loadAdminCaseStudies();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Failed to save case study.");
+      } finally {
+        setSubmitDisabled(false);
+      }
+    });
+
+    cancelEditBtn?.addEventListener("click", () => {
+      resetForm();
+      setStatus("Edit cancelled.");
+    });
+
+    function resetForm() {
+      form.reset();
+      form.elements["case_study_id"].value = "";
+      form.elements["display_order"].value = "0";
+
+      if (submitBtn) submitBtn.textContent = "Create Case Study";
+      if (cancelEditBtn) cancelEditBtn.hidden = true;
+    }
+
+    function setSubmitDisabled(isDisabled) {
+      if (submitBtn) submitBtn.disabled = isDisabled;
+    }
+
+    function setStatus(message) {
+      setText(statusEl, message);
+    }
+  }
   /* ---------------- BLOG CREATE / EDIT FORM ---------------- */
 
   function setupAdminBlogForm() {
@@ -514,6 +625,8 @@
         throw new Error("Invalid projects API response");
       }
 
+      populateCaseStudyProjectOptions(data.projects);
+
       if (data.projects.length === 0) {
   container.innerHTML = renderEmptyCard("No projects found.");
   return;
@@ -625,7 +738,173 @@ function setupProjectEditButtons(container) {
       form.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
-}
+  }
+
+  function populateCaseStudyProjectOptions(projects) {
+    const select = document.querySelector(
+      '#adminCaseStudyForm select[name="project_id"]'
+    );
+    if (!select) return;
+
+    const selectedValue = select.value;
+    select.replaceChildren(new Option("No related project", ""));
+
+    for (const project of projects) {
+      select.add(new Option(project.title, String(project.id)));
+    }
+
+    if ([...select.options].some((option) => option.value === selectedValue)) {
+      select.value = selectedValue;
+    }
+  }
+
+  /* ---------------- CASE STUDIES ---------------- */
+
+  async function loadAdminCaseStudies() {
+    const container = document.querySelector("[data-admin-case-studies]");
+    if (!container) return;
+
+    try {
+      const response = await adminFetch("/api/admin/case-studies");
+      const data = await readJsonSafe(response);
+
+      if (!response.ok || !data.ok || !Array.isArray(data.case_studies)) {
+        throw new Error(data.error || "Invalid case studies API response");
+      }
+
+      caseStudiesById.clear();
+      for (const caseStudy of data.case_studies) {
+        caseStudiesById.set(String(caseStudy.id), caseStudy);
+      }
+
+      if (data.case_studies.length === 0) {
+        container.innerHTML = renderEmptyCard("No case studies found.");
+        return;
+      }
+
+      container.innerHTML = data.case_studies
+        .map(renderCaseStudyAdminCard)
+        .join("");
+
+      setupCaseStudyEditButtons(container);
+      setupDeleteButtons(container, {
+        selector: "[data-case-study-delete]",
+        endpoint: "/api/admin/case-studies",
+        itemLabel: "case study",
+        reload: loadAdminCaseStudies,
+      });
+    } catch (error) {
+      console.error(error);
+      container.innerHTML = renderErrorCard("Could not load case studies.");
+    }
+  }
+
+  function renderCaseStudyAdminCard(caseStudy) {
+    return `
+      <article class="card">
+        <header>
+          <h3>${escapeHtml(caseStudy.title)}</h3>
+          <p class="card__meta">
+            ${escapeHtml(caseStudy.project_title || "Standalone case study")}
+          </p>
+        </header>
+
+        <p>${escapeHtml(caseStudy.summary)}</p>
+
+        <ul class="tag-list">
+          <li class="tag">Slug: ${escapeHtml(caseStudy.slug)}</li>
+          <li class="tag">${caseStudy.is_featured ? "Featured" : "Not featured"}</li>
+          <li class="tag">${caseStudy.is_published ? "Published" : "Draft"}</li>
+          <li class="tag">Order: ${Number(caseStudy.display_order)}</li>
+          <li class="tag">ID: ${Number(caseStudy.id)}</li>
+        </ul>
+
+        <div class="card__actions">
+          <button
+            class="btn btn--small btn--primary"
+            type="button"
+            data-case-study-edit
+            data-case-study-id="${Number(caseStudy.id)}"
+          >
+            Edit
+          </button>
+
+          <button
+            class="btn btn--small btn--danger"
+            type="button"
+            data-case-study-delete
+            data-delete-id="${Number(caseStudy.id)}"
+            data-delete-title="${escapeAttr(caseStudy.title)}"
+          >
+            Delete
+          </button>
+
+          ${
+            caseStudy.is_published
+              ? `<a
+                  class="btn btn--small"
+                  href="case-study.html?slug=${encodeURIComponent(caseStudy.slug)}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  View
+                </a>`
+              : ""
+          }
+        </div>
+      </article>
+    `;
+  }
+
+  function setupCaseStudyEditButtons(container) {
+    const form = document.getElementById("adminCaseStudyForm");
+    const submitBtn = document.getElementById("adminCaseStudySubmitBtn");
+    const cancelEditBtn = document.getElementById(
+      "adminCaseStudyCancelEditBtn"
+    );
+    const statusEl = document.getElementById("adminCaseStudyStatus");
+    if (!form) return;
+
+    container.querySelectorAll("[data-case-study-edit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const caseStudy = caseStudiesById.get(button.dataset.caseStudyId || "");
+        if (!caseStudy) return;
+
+        const values = {
+          case_study_id: caseStudy.id,
+          project_id: caseStudy.project_id || "",
+          title: caseStudy.title,
+          slug: caseStudy.slug,
+          summary: caseStudy.summary,
+          problem: caseStudy.problem,
+          solution: caseStudy.solution,
+          key_features: caseStudy.key_features,
+          technical_details: caseStudy.technical_details,
+          challenges: caseStudy.challenges,
+          learnings: caseStudy.learnings,
+          tech_stack: caseStudy.tech_stack,
+          github_url: caseStudy.github_url,
+          live_url: caseStudy.live_url,
+          image_key: caseStudy.image_key,
+          display_order: caseStudy.display_order,
+        };
+
+        for (const [name, value] of Object.entries(values)) {
+          if (form.elements[name]) {
+            form.elements[name].value = value ?? "";
+          }
+        }
+
+        form.elements["is_featured"].checked = Boolean(caseStudy.is_featured);
+        form.elements["is_published"].checked = Boolean(caseStudy.is_published);
+
+        if (submitBtn) submitBtn.textContent = "Update Case Study";
+        if (cancelEditBtn) cancelEditBtn.hidden = false;
+        setText(statusEl, "Editing existing case study.");
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
   /* ---------------- BLOG POSTS ---------------- */
 
   async function loadAdminBlogPosts() {

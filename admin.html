@@ -18,6 +18,7 @@
       <nav class="site-nav" aria-label="Admin navigation">
         <a href="index.html">Public Site</a>
         <a href="projects.html">Projects</a>
+        <a href="case-studies.html">Case Studies</a>
         <a href="blog.html">Blog</a>
         <a href="contact.html">Contact</a>
       </nav>
@@ -71,13 +72,13 @@
             <h1>Admin</h1>
 
             <p>
-              Private dashboard for managing portfolio content, blog posts,
-              workshop entries, and media assets.
+              Private dashboard for managing portfolio projects, case studies,
+              blog posts, workshop entries, and media assets.
             </p>
 
             <p>
-              Projects, blog posts, and workshop entries can be created, edited,
-              published, unpublished, and deleted from this dashboard.
+              Projects, case studies, blog posts, and workshop entries can be created,
+              edited, published, unpublished, and deleted from this dashboard.
             </p>
 
             <div class="about-hero__actions">
@@ -132,6 +133,19 @@
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-projects">
                   View Projects
+                </a>
+              </div>
+            </article>
+
+            <article class="card">
+              <h3>Case Studies</h3>
+              <p>
+                Detailed project stories covering problems, decisions, challenges,
+                and outcomes.
+              </p>
+              <div class="card__actions">
+                <a class="btn btn--small btn--primary" href="#admin-case-studies">
+                  View Case Studies
                 </a>
               </div>
             </article>
@@ -336,6 +350,157 @@
     </div>
   </div>
 </section>
+
+      <!-- Case Studies -->
+      <section id="admin-case-studies">
+        <div class="container">
+          <h2>Case Studies</h2>
+          <p class="section-lead">
+            Create detailed project stories and control when they appear publicly.
+          </p>
+
+          <article class="card" style="margin-bottom: 1.5rem;">
+            <h3>Create Case Study</h3>
+
+            <form id="adminCaseStudyForm">
+              <input name="case_study_id" type="hidden" />
+
+              <div class="admin-form-grid">
+                <div>
+                  <label for="caseStudyProject"><strong>Related Project</strong></label>
+                  <select id="caseStudyProject" name="project_id">
+                    <option value="">No related project</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="caseStudyTitle"><strong>Title</strong></label>
+                  <input id="caseStudyTitle" name="title" type="text" required />
+                </div>
+
+                <div>
+                  <label for="caseStudySlug"><strong>Slug</strong></label>
+                  <input
+                    id="caseStudySlug"
+                    name="slug"
+                    type="text"
+                    placeholder="Generated from the title if left blank"
+                  />
+                </div>
+
+                <div>
+                  <label for="caseStudySummary"><strong>Summary</strong></label>
+                  <textarea id="caseStudySummary" name="summary" rows="3" required></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyProblem"><strong>Problem</strong></label>
+                  <textarea id="caseStudyProblem" name="problem" rows="5"></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudySolution"><strong>Solution</strong></label>
+                  <textarea id="caseStudySolution" name="solution" rows="5"></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyFeatures"><strong>Key Features</strong></label>
+                  <textarea
+                    id="caseStudyFeatures"
+                    name="key_features"
+                    rows="5"
+                    placeholder="One feature per line"
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyTechnical"><strong>Technical Details</strong></label>
+                  <textarea id="caseStudyTechnical" name="technical_details" rows="6"></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyChallenges"><strong>Challenges</strong></label>
+                  <textarea id="caseStudyChallenges" name="challenges" rows="5"></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyLearnings"><strong>Learnings</strong></label>
+                  <textarea id="caseStudyLearnings" name="learnings" rows="5"></textarea>
+                </div>
+
+                <div>
+                  <label for="caseStudyTechStack"><strong>Tech Stack</strong></label>
+                  <input
+                    id="caseStudyTechStack"
+                    name="tech_stack"
+                    type="text"
+                    placeholder="JavaScript, Cloudflare Pages, D1"
+                  />
+                </div>
+
+                <div>
+                  <label for="caseStudyGithubUrl"><strong>GitHub URL</strong></label>
+                  <input id="caseStudyGithubUrl" name="github_url" type="url" />
+                </div>
+
+                <div>
+                  <label for="caseStudyLiveUrl"><strong>Live URL</strong></label>
+                  <input id="caseStudyLiveUrl" name="live_url" type="url" />
+                </div>
+
+                <div>
+                  <label for="caseStudyImageKey"><strong>Image Key</strong></label>
+                  <input
+                    id="caseStudyImageKey"
+                    name="image_key"
+                    type="text"
+                    placeholder="Optional R2 image key"
+                  />
+                </div>
+
+                <div>
+                  <label for="caseStudyDisplayOrder"><strong>Display Order</strong></label>
+                  <input
+                    id="caseStudyDisplayOrder"
+                    name="display_order"
+                    type="number"
+                    value="0"
+                  />
+                </div>
+
+                <div class="admin-form-options">
+                  <label>
+                    <input name="is_featured" type="checkbox" />
+                    Featured case study
+                  </label>
+
+                  <label>
+                    <input name="is_published" type="checkbox" />
+                    Published
+                  </label>
+                </div>
+
+                <p id="adminCaseStudyStatus" class="admin-form-status" role="status"></p>
+
+                <div class="admin-form-actions">
+                  <button id="adminCaseStudySubmitBtn" class="btn btn--primary" type="submit">
+                    Create Case Study
+                  </button>
+                  <button id="adminCaseStudyCancelEditBtn" class="btn" type="button" hidden>
+                    Cancel Edit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </article>
+
+          <div class="cards" data-admin-case-studies>
+            <article class="card">
+              <p>Loading case studies…</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
       <!-- Blog Posts -->
       <section id="admin-blog">

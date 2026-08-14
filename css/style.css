@@ -7,6 +7,48 @@
   box-sizing: border-box;
 }
 
+/* =========================
+   Admin Forms
+========================= */
+
+.admin-form-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.admin-form-grid > div:not(.admin-form-options) > label {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+}
+
+.admin-form-grid input:not([type="checkbox"]),
+.admin-form-grid select,
+.admin-form-grid textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+}
+
+.admin-form-grid textarea {
+  resize: vertical;
+}
+
+.admin-form-options,
+.admin-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.admin-form-status {
+  min-height: 1.5em;
+  margin: 0;
+}
+
 :root {
   --bg: #0b1220;
   --surface: #0f1a2f;
