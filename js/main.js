@@ -8,37 +8,38 @@
   function updateFooterYear() {
     const yearEl = document.getElementById("year");
     if (!yearEl) return;
-
     yearEl.textContent = new Date().getFullYear();
   }
 
-  function showAdminReturnLink() {
+  async function showAdminReturnLink() {
     if (isAdminPage()) return;
 
-    let hasAdminSession = false;
-
     try {
-      hasAdminSession = Boolean(
-        sessionStorage.getItem("portfolioAdminPassword")
-      );
+      const response = await fetch("/api/admin/session", {
+        method: "GET",
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (!data.ok || !data.authenticated) return;
+
+      document.querySelectorAll(".site-nav").forEach((navigation) => {
+        if (navigation.querySelector("[data-admin-return]")) return;
+
+        const link = document.createElement("a");
+        link.href = "admin.html";
+        link.className = "site-nav__admin-return";
+        link.dataset.adminReturn = "";
+        link.textContent = "Admin Dashboard";
+        link.setAttribute("aria-label", "Return to the admin dashboard");
+        navigation.append(link);
+      });
     } catch {
-      return;
+      // Keep public navigation unchanged if session checks are unavailable.
     }
-
-    if (!hasAdminSession) return;
-
-    document.querySelectorAll(".site-nav").forEach((navigation) => {
-      if (navigation.querySelector("[data-admin-return]")) return;
-
-      const link = document.createElement("a");
-      link.href = "admin.html";
-      link.className = "site-nav__admin-return";
-      link.dataset.adminReturn = "";
-      link.textContent = "Admin Dashboard";
-      link.setAttribute("aria-label", "Return to the admin dashboard");
-
-      navigation.append(link);
-    });
   }
 
   function isAdminPage() {

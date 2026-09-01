@@ -1,6 +1,5 @@
 // js/admin.js
 (() => {
-  const ADMIN_PASSWORD_KEY = "portfolioAdminPassword";
   const caseStudiesById = new Map();
   setupAdminLogin();
   setupAdminLogout();
@@ -35,7 +34,6 @@
       try {
         await verifyAdminPassword(password);
 
-        sessionStorage.setItem(ADMIN_PASSWORD_KEY, password);
         form.reset();
         setText(statusEl, "");
 
@@ -53,33 +51,54 @@
     const logoutBtn = document.getElementById("adminLogoutBtn");
     if (!logoutBtn) return;
 
-    logoutBtn.addEventListener("click", () => {
-      clearAdminSession();
-      lockAdminDashboard("You have been logged out.");
+    logoutBtn.addEventListener("click", async () => {
+      logoutBtn.disabled = true;
+
+      try {
+        await logoutAdminSession();
+        lockAdminDashboard("You have been logged out.");
+      } catch (error) {
+        console.error(error);
+        window.alert("Could not log out. Please check your connection and try again.");
+      } finally {
+        logoutBtn.disabled = false;
+      }
     });
   }
 
   async function restoreAdminSession() {
-    const password = getStoredAdminPassword();
-    if (!password) return;
-
     const statusEl = document.getElementById("adminLoginStatus");
     setText(statusEl, "Checking saved admin session...");
 
     try {
-      await verifyAdminPassword(password);
+      const response = await fetch("/api/admin/session", {
+        method: "GET",
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+
+      if (response.status === 401) {
+        setText(statusEl, "");
+        return;
+      }
+
+      const data = await readJsonSafe(response);
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Unable to verify admin session.");
+      }
+
       setText(statusEl, "");
       unlockAdminDashboard();
     } catch (error) {
       console.error(error);
-      clearAdminSession();
-      setText(statusEl, "Your saved admin session has expired. Please log in again.");
+      setText(statusEl, "Unable to check the saved admin session.");
     }
   }
 
   async function verifyAdminPassword(password) {
     const response = await fetch("/api/admin/session", {
       method: "POST",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
       },
@@ -116,34 +135,33 @@
     setText(statusEl, message);
   }
 
-  function clearAdminSession() {
-    sessionStorage.removeItem(ADMIN_PASSWORD_KEY);
-  }
+  async function logoutAdminSession() {
+    const response = await fetch("/api/admin/session", {
+      method: "DELETE",
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+    });
+    const data = await readJsonSafe(response);
 
-  function getStoredAdminPassword() {
-    return sessionStorage.getItem(ADMIN_PASSWORD_KEY) || "";
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Failed to end admin session.");
+    }
   }
 
   async function adminFetch(url, options = {}) {
-    const password = getStoredAdminPassword();
-    if (!password) {
-      lockAdminDashboard("Admin session missing. Please log in again.");
-      throw new Error("Admin session missing. Please log in again.");
-    }
-
-    const headers = new Headers(options.headers || {});
-    headers.set("x-admin-password", password);
-
-    const response = await fetch(url, { ...options, headers });
+    const response = await fetch(url, {
+      ...options,
+      credentials: "same-origin",
+    });
 
     if (response.status === 401) {
-      clearAdminSession();
       lockAdminDashboard("Your admin session has expired. Please log in again.");
       throw new Error("Admin session expired.");
     }
 
     return response;
   }
+
     /* ---------------- WORKSHOP CREATE / EDIT FORM ---------------- */
 
   function setupAdminWorkshopForm() {
@@ -156,8 +174,6 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-
-      const password = getStoredAdminPassword();
       const workshopId = form.elements["workshop_id"].value.trim();
 
       const steamId = form.elements["steam_id"].value.trim();
@@ -167,11 +183,6 @@
       const workshopUrl = form.elements["workshop_url"].value.trim();
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isPublished = form.elements["is_published"].checked;
-
-      if (!password) {
-        setStatus("Admin session missing. Please unlock the admin page again.");
-        return;
-      }
 
       if (!steamId || !title || !game || !description || !workshopUrl) {
         setStatus("Steam ID, title, game, description, and Workshop URL are required.");
@@ -196,7 +207,6 @@
           method,
           headers: {
             "Content-Type": "application/json",
-            "x-admin-password": password,
           },
           body: JSON.stringify({
             steam_id: steamId,
@@ -272,8 +282,6 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-
-      const password = getStoredAdminPassword();
       const projectId = form.elements["project_id"].value.trim();
 
       const title = form.elements["title"].value.trim();
@@ -288,11 +296,6 @@
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isFeatured = form.elements["is_featured"].checked;
       const isPublished = form.elements["is_published"].checked;
-
-      if (!password) {
-        setStatus("Admin session missing. Please unlock the admin page again.");
-        return;
-      }
 
       if (!title || !summary) {
         setStatus("Title and summary are required.");
@@ -315,7 +318,6 @@
           method,
           headers: {
             "Content-Type": "application/json",
-            "x-admin-password": password,
           },
           body: JSON.stringify({
             title,
@@ -664,8 +666,6 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-
-      const password = getStoredAdminPassword();
       const blogId = form.elements["blog_id"].value.trim();
       const title = form.elements["title"].value.trim();
       const slug = form.elements["slug"].value.trim();
@@ -673,11 +673,6 @@
       const content = form.elements["content"].value.trim();
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isPublished = form.elements["is_published"].checked;
-
-      if (!password) {
-        setStatus("Admin session missing. Please unlock the admin page again.");
-        return;
-      }
 
       if (!title || !slug || !excerpt || !content) {
         setStatus("Please fill in all required fields.");
@@ -700,7 +695,6 @@
           method,
           headers: {
             "Content-Type": "application/json",
-            "x-admin-password": password,
           },
           body: JSON.stringify({
             title,

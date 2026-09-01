@@ -28,7 +28,7 @@ jobs:
           while IFS= read -r -d '' file; do
             echo "Checking $file"
             node --input-type=module --check < "$file"
-          done < <(find functions js -type f -name '*.js' -print0)
+          done < <(find functions js lib -type f -name '*.js' -print0)
 
       - name: Validate fresh D1 schema
         shell: bash

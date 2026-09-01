@@ -1,6 +1,8 @@
+import { requireAdmin } from "../../../../lib/admin-auth.js";
+
 export async function onRequestGet(context) {
   try {
-    const authError = checkAdminPassword(context);
+    const authError = await requireAdmin(context);
     if (authError) return authError;
 
     const { results } = await context.env.DB.prepare(
@@ -35,7 +37,7 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   try {
-    const authError = checkAdminPassword(context);
+    const authError = await requireAdmin(context);
     if (authError) return authError;
 
     const db = context.env.DB;
@@ -160,33 +162,6 @@ function slugify(value) {
     .replace(/['"]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-}
-
-function checkAdminPassword(context) {
-  const expectedPassword = context.env.ADMIN_PASSWORD;
-  const providedPassword = context.request.headers.get("x-admin-password");
-
-  if (!expectedPassword) {
-    return json(
-      {
-        ok: false,
-        error: "Admin password is not configured.",
-      },
-      500
-    );
-  }
-
-  if (!providedPassword || providedPassword !== expectedPassword) {
-    return json(
-      {
-        ok: false,
-        error: "Unauthorized.",
-      },
-      401
-    );
-  }
-
-  return null;
 }
 
 function json(body, status = 200) {
