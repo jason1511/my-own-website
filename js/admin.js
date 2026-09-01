@@ -7,7 +7,146 @@
   setupAdminBlogForm();
   setupAdminProjectForm();
   setupAdminWorkshopForm();
+  setupAdminTabs();
   restoreAdminSession();
+
+  /* ---------------- ADMIN TABS ---------------- */
+
+  function setupAdminTabs() {
+    const dashboard = document.getElementById("adminDashboard");
+    const overview = dashboard?.querySelector(".about-hero");
+    if (!dashboard || !overview || dashboard.querySelector("[data-admin-tabs]")) {
+      return;
+    }
+
+    overview.id = "admin-overview";
+
+    const tabs = [
+      { id: "admin-overview", label: "Overview" },
+      { id: "admin-projects", label: "Projects" },
+      { id: "admin-case-studies", label: "Case Studies" },
+      { id: "admin-blog", label: "Blog" },
+      { id: "admin-workshop", label: "Workshop" },
+      { id: "admin-media", label: "Media" },
+    ]
+      .map((tab) => ({
+        ...tab,
+        panel: document.getElementById(tab.id),
+      }))
+      .filter((tab) => tab.panel);
+
+    const navigation = document.createElement("nav");
+    navigation.className = "admin-tabs";
+    navigation.dataset.adminTabs = "";
+    navigation.setAttribute("aria-label", "Admin sections");
+
+    const container = document.createElement("div");
+    container.className = "container admin-tabs__scroll";
+
+    const tabList = document.createElement("div");
+    tabList.className = "admin-tabs__list";
+    tabList.setAttribute("role", "tablist");
+    tabList.setAttribute("aria-label", "Admin workspace");
+
+    for (const tab of tabs) {
+      const button = document.createElement("button");
+      button.id = `admin-tab-${tab.id.replace("admin-", "")}`;
+      button.className = "admin-tabs__button";
+      button.type = "button";
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-controls", tab.id);
+      button.dataset.adminTab = tab.id;
+      button.textContent = tab.label;
+      tabList.append(button);
+
+      tab.panel.classList.add("admin-tab-panel");
+      tab.panel.setAttribute("role", "tabpanel");
+      tab.panel.setAttribute("aria-labelledby", button.id);
+    }
+
+    container.append(tabList);
+    navigation.append(container);
+    overview.after(navigation);
+
+    tabList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-admin-tab]");
+      if (!button) return;
+
+      const id = button.dataset.adminTab;
+      if (window.location.hash !== `#${id}`) {
+        window.history.pushState(null, "", `#${id}`);
+      }
+
+      activateAdminTab(tabs, id);
+      navigation.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    tabList.addEventListener("keydown", (event) => {
+      const buttons = [...tabList.querySelectorAll("[role='tab']")];
+      const currentIndex = buttons.indexOf(document.activeElement);
+      if (currentIndex < 0) return;
+
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % buttons.length;
+      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = buttons.length - 1;
+      if (nextIndex === currentIndex) return;
+
+      event.preventDefault();
+      buttons[nextIndex].focus();
+      buttons[nextIndex].click();
+    });
+
+    const syncFromUrl = () => {
+      const requestedId = window.location.hash.slice(1);
+      const activeId = tabs.some((tab) => tab.id === requestedId)
+        ? requestedId
+        : "admin-overview";
+      activateAdminTab(tabs, activeId);
+    };
+
+    window.addEventListener("hashchange", syncFromUrl);
+    window.addEventListener("popstate", syncFromUrl);
+    syncFromUrl();
+    updateAdminTabsOffset();
+  }
+
+  function activateAdminTab(tabs, activeId) {
+    for (const tab of tabs) {
+      const active = tab.id === activeId;
+      tab.panel.hidden = !active;
+
+      const button = document.querySelector(
+        `[data-admin-tab="${tab.id}"]`
+      );
+      if (!button) continue;
+
+      button.setAttribute("aria-selected", String(active));
+      button.tabIndex = active ? 0 : -1;
+    }
+  }
+
+  function updateAdminTabsOffset() {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+
+    const update = () => {
+      const height = Math.ceil(header.getBoundingClientRect().height);
+      document.documentElement.style.setProperty(
+        "--admin-tabs-offset",
+        `${height}px`
+      );
+    };
+
+    update();
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(update).observe(header);
+    } else {
+      window.addEventListener("resize", update);
+    }
+  }
 
   /* ---------------- ADMIN LOGIN ---------------- */
 
