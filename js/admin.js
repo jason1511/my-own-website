@@ -1,6 +1,10 @@
 // js/admin.js
 (() => {
   const caseStudiesById = new Map();
+  let adminAppState = null;
+  let currentAdminRoute = "";
+  const dirtyAdminForms = new Set();
+
   setupAdminLogin();
   setupAdminLogout();
   setupAdminCaseStudyForm();
@@ -11,10 +15,6 @@
   restoreAdminSession();
 
   /* ---------------- ADMIN APP SHELL ---------------- */
-
-  let adminAppState = null;
-  let currentAdminRoute = "";
-  const dirtyAdminForms = new Set();
 
   function setupAdminApp() {
     const dashboard = document.getElementById("adminDashboard");
