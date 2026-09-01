@@ -203,7 +203,9 @@
     dashboard.replaceChildren(app);
 
     for (const link of dashboardPage.querySelectorAll('a[href^="#admin-"]')) {
-      link.href = "#" + link.getAttribute("href").replace("#admin-", "");
+      const route = link.getAttribute("href").replace("#admin-", "");
+      link.href = "#" + route;
+      link.dataset.adminRouteLink = route;
     }
 
     app.addEventListener("click", (event) => {
