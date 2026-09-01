@@ -1,180 +1,139 @@
-# Jason Leonard – Personal Portfolio Website
+# Jason Leonard — Personal Portfolio
 
-A responsive personal portfolio website showcasing my software and web development projects, including real-world backend integrations and live production data.
+A responsive portfolio and lightweight content-management system for my software, web and modding projects.
 
-🔗 **Live site:** https://jasonportofolio.pages.dev/
-🔗 **Source code:** https://github.com/jason1511/my-own-website
-
----
+**Live site:** https://jasonportofolio.pages.dev/  
+**Repository:** https://github.com/jason1511/my-own-website
 
 ## Overview
 
-This website was designed and built from scratch using semantic HTML, modern CSS, and vanilla JavaScript.
+The site began as a static HTML, CSS and JavaScript portfolio and now includes a serverless backend built with Cloudflare Pages Functions and D1.
 
-The project evolved from a static portfolio into a production-style web application featuring:
+It demonstrates end-to-end development across responsive interfaces, REST-style APIs, database-backed content, external integrations, administration workflows and Git-based deployment.
 
-- Serverless backend functions
-- External API integrations
-- Dynamic live statistics
-- Production deployment via Cloudflare Pages
+## Current features
 
-The goal of this project is to demonstrate practical, end-to-end web development skills including frontend implementation, backend logic, deployment, and API integration.
+### Public portfolio
 
----
-
-## Features
-
-### Frontend
-- Semantic and accessible HTML structure
 - Responsive multi-page layout
-- Reusable CSS components
-- Vanilla JavaScript interactivity
-- Mobile-friendly navigation and layouts
+- Dynamic project listings and featured projects
+- Reusable project and case-study detail pages
+- Published blog and Steam Workshop content
+- GitHub repository statistics
+- Steam Workshop statistics
+- Contact form backend
+- Graceful fallbacks when an API or database request is unavailable
 
-### Backend (Serverless Functions)
-- Contact form backend using Cloudflare Functions
-- Live GitHub repository statistics
-- Live Steam Workshop statistics
-- External API integration and response handling
-- Graceful fallback handling when APIs are unavailable
+### Admin content management
 
-### Dynamic Integrations
+The protected admin page supports creating, editing and deleting:
 
-#### GitHub REST API
-- Repository stars
-- Fork counts
-- Last updated dates
+- Portfolio projects
+- Project case studies
+- Blog posts
+- Steam Workshop items
 
-#### Steam Workshop API
-- Subscribers
-- Favorites
-- Views
+Content can be published or kept as a draft, featured and arranged using display order.
 
----
+### Visual case-study builder
 
-## Tech Stack
+Case studies support:
 
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Cloudflare Pages Functions
-- **Hosting:** Cloudflare Pages
-- **APIs:** GitHub REST API, Steam Web API
-- **Version Control:** GitHub
+- A linked portfolio project
+- Summary and technology fields
+- Role, project type, intended users, platform, status and timeline
+- Cover image paths or URLs with required alt text
+- Ordered content sections
+- Paragraphs, bullet points, screenshots, captions and alt text
+- Move-up, move-down and remove controls
+- Automatically generated table of contents
+- Legacy problem, solution, features, technical details, challenges and learnings fields
 
----
+### Backend and data
 
-## Project Structure
+- Cloudflare Pages Functions
+- Cloudflare D1 database
+- Public and protected admin API routes
+- Header-based admin authentication
+- Server-side input validation
+- Published-content filtering
+- GitHub REST API and Steam Web API integrations
+- Optional Resend-backed contact delivery
 
-```text
+## Tech stack
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Cloudflare Pages
+- Cloudflare Pages Functions
+- Cloudflare D1
+- Wrangler
+- GitHub REST API
+- Steam Web API
+
+## Project structure
+
+~~~text
 my-own-website/
 ├── css/
-│   └── style.css
-├── js/
-│   └── main.js
 ├── functions/
-│   ├── github-repo-stats.js
-│   ├── workshop-stats.js
 │   └── api/
+│       ├── admin/
+│       ├── case-studies/
 │       └── contact.js
+├── js/
+├── migrations/
+│   ├── 0001_case_studies.sql
+│   └── 0002_expand_case_studies.sql
+├── admin.html
+├── case-study.html
 ├── index.html
 ├── projects.html
-├── about.html
-├── contact.html
-├── bike-store.html
-└── README.md
-```
+├── schema.sql
+└── wrangler.toml
+~~~
 
----
+## Local development
 
-## Backend Architecture
+Install Node.js, then run the site through Wrangler:
 
-```text
-Browser
-  ↓
-Cloudflare Pages Functions
-  ↓
-GitHub API / Steam API
-```
+~~~bash
+npx wrangler pages dev .
+~~~
 
-External API requests are handled server-side through Cloudflare Functions.
+Running HTML files directly is sufficient for static layout work, but API routes and D1-backed content require Wrangler.
 
-This approach:
-- avoids CORS issues
-- keeps implementation maintainable
-- allows lightweight backend logic without managing a traditional server
+## D1 setup
 
----
+The D1 binding is named **DB** and is configured in wrangler.toml.
 
-## Featured Project Sections
+For a new local database, initialise it from schema.sql. Existing databases should receive migrations in numerical order. Migration 0002 adds the expanded visual case-study fields to databases created before those fields were introduced.
 
-### Bike Store Inventory & Sales Management App
+Before deploying an API change that depends on a migration, apply that migration to the remote D1 database and smoke-test both the admin and public pages.
 
-A desktop application built using C#, .NET WinForms, and SQLite to support inventory tracking, transactions, and operational workflows for a small electric bike retailer.
+## Environment variables
 
-### Steam Workshop Projects
+Configure these through Cloudflare rather than committing secrets:
 
-Published Transport Fever 2 and Arma 3 Workshop content featuring:
-- Indonesian railway liveries
-- Asset modifications
-- Compatibility addons
-- Team-based mod contributions
-
-Live Workshop statistics are fetched dynamically from Steam.
-
----
-
-## Running Locally
-
-### Frontend only
-
-Open the HTML files directly in a browser.
-
-### Full local development
-
-Cloudflare Pages Functions can be tested locally using Wrangler.
-
-```bash
-npm install -g wrangler
-wrangler pages dev .
-```
-
----
-
-## Environment Variables
-
-Optional environment variables:
-
-```text
-GITHUB_TOKEN=your_github_token
-RESEND_API_KEY=your_resend_api_key
-CONTACT_TO_EMAIL=your_email@example.com
-```
-
-These are configured through the Cloudflare dashboard.
-
----
+- **ADMIN_PASSWORD** — protects admin API routes
+- **GITHUB_TOKEN** — optional authenticated GitHub API access
+- **RESEND_API_KEY** — optional contact-email delivery
+- **CONTACT_TO_EMAIL** — contact-form destination
 
 ## Deployment
 
-This project is deployed using:
-- GitHub for version control
-- Cloudflare Pages for hosting and serverless backend functions
+The repository's default branch is **main**. Pushes to main are deployed through the connected Cloudflare Pages project.
 
-Pushes to the repository automatically trigger deployment updates.
+Database migrations are separate from the Git deployment and must be applied to the target D1 database when required.
 
----
-
-## Related Projects
+## Related project
 
 ### Bike Store Inventory & Sales Management App
 
-Desktop application built with:
-- C#
-- .NET WinForms
-- SQLite
+A C#/.NET 8 WinForms and SQLite application for inventory, FIFO stock lots, sales, service records, user management and reporting.
 
-🔗 https://github.com/jason1511/Bike-STore-Project
-
----
+https://github.com/jason1511/Bike-STore-Project
 
 ## Author
 
@@ -183,8 +142,6 @@ Desktop application built with:
 - GitHub: https://github.com/jason1511
 - LinkedIn: https://www.linkedin.com/in/jason-leonard-197230163/
 
----
-
 ## License
 
-This project is licensed under the GPL-3.0 License.
+Licensed under the GNU General Public License v3.0. See LICENSE.
