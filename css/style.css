@@ -249,6 +249,18 @@ h3 {
   background: rgba(79, 140, 255, 0.12);
 }
 
+.site-nav a.site-nav__admin-return {
+  color: #dbe8ff;
+  border-color: rgba(79, 140, 255, 0.72);
+  background: rgba(79, 140, 255, 0.18);
+  font-weight: 700;
+}
+
+.site-nav a.site-nav__admin-return:hover {
+  border-color: rgba(79, 140, 255, 0.95);
+  background: rgba(79, 140, 255, 0.28);
+}
+
 /* =========================
    Buttons
 ========================= */
