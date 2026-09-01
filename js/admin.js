@@ -7,135 +7,561 @@
   setupAdminBlogForm();
   setupAdminProjectForm();
   setupAdminWorkshopForm();
-  setupAdminTabs();
+  setupAdminApp();
   restoreAdminSession();
 
-  /* ---------------- ADMIN TABS ---------------- */
+  /* ---------------- ADMIN APP SHELL ---------------- */
 
-  function setupAdminTabs() {
+  let adminAppState = null;
+  let currentAdminRoute = "";
+  const dirtyAdminForms = new Set();
+
+  function setupAdminApp() {
     const dashboard = document.getElementById("adminDashboard");
-    const overview = dashboard?.querySelector(".about-hero");
-    if (!dashboard || !overview || dashboard.querySelector("[data-admin-tabs]")) {
+    const hero = dashboard?.querySelector(".about-hero");
+    const overview = hero?.nextElementSibling;
+    if (!dashboard || !hero || !overview || dashboard.querySelector("[data-admin-app]")) {
       return;
     }
 
-    overview.id = "admin-overview";
+    const sectionDefinitions = [
+      {
+        key: "projects",
+        label: "Projects",
+        singular: "Project",
+        panel: document.getElementById("admin-projects"),
+        formId: "adminProjectForm",
+        listSelector: "[data-admin-projects]",
+        editSelector: "[data-project-edit]",
+        idField: "project_id",
+        submitId: "adminProjectSubmitBtn",
+        cancelId: "adminProjectCancelEditBtn",
+      },
+      {
+        key: "case-studies",
+        label: "Case Studies",
+        singular: "Case Study",
+        panel: document.getElementById("admin-case-studies"),
+        formId: "adminCaseStudyForm",
+        listSelector: "[data-admin-case-studies]",
+        editSelector: "[data-case-study-edit]",
+        idField: "case_study_id",
+        submitId: "adminCaseStudySubmitBtn",
+        cancelId: "adminCaseStudyCancelEditBtn",
+      },
+      {
+        key: "blog",
+        label: "Blog",
+        singular: "Blog Post",
+        panel: document.getElementById("admin-blog"),
+        formId: "adminBlogForm",
+        listSelector: "[data-admin-blog]",
+        editSelector: "[data-blog-edit]",
+        idField: "blog_id",
+        submitId: "adminBlogSubmitBtn",
+        cancelId: "adminBlogCancelEditBtn",
+      },
+      {
+        key: "workshop",
+        label: "Workshop",
+        singular: "Workshop Item",
+        panel: document.getElementById("admin-workshop"),
+        formId: "adminWorkshopForm",
+        listSelector: "[data-admin-workshop]",
+        editSelector: "[data-workshop-edit]",
+        idField: "workshop_id",
+        submitId: "adminWorkshopSubmitBtn",
+        cancelId: "adminWorkshopCancelEditBtn",
+      },
+      {
+        key: "media",
+        label: "Media",
+        singular: "Media Asset",
+        panel: document.getElementById("admin-media"),
+        listSelector: "[data-admin-media]",
+      },
+    ].filter((section) => section.panel);
 
-    const tabs = [
-      { id: "admin-overview", label: "Overview" },
-      { id: "admin-projects", label: "Projects" },
-      { id: "admin-case-studies", label: "Case Studies" },
-      { id: "admin-blog", label: "Blog" },
-      { id: "admin-workshop", label: "Workshop" },
-      { id: "admin-media", label: "Media" },
-    ]
-      .map((tab) => ({
-        ...tab,
-        panel: document.getElementById(tab.id),
-      }))
-      .filter((tab) => tab.panel);
+    const dashboardPage = document.createElement("section");
+    dashboardPage.className = "admin-app__page";
+    dashboardPage.dataset.adminPage = "dashboard";
+    dashboardPage.append(hero, overview);
+
+    const app = document.createElement("div");
+    app.className = "admin-app";
+    app.dataset.adminApp = "";
+
+    const sidebar = document.createElement("aside");
+    sidebar.className = "admin-app__sidebar";
+    sidebar.setAttribute("aria-label", "Admin navigation");
+
+    const sidebarHeader = document.createElement("div");
+    sidebarHeader.className = "admin-app__sidebar-header";
+    sidebarHeader.innerHTML =
+      '<p class="admin-app__eyebrow">Portfolio CMS</p>' +
+      '<p class="admin-app__brand">Admin Workspace</p>';
 
     const navigation = document.createElement("nav");
-    navigation.className = "admin-tabs";
-    navigation.dataset.adminTabs = "";
-    navigation.setAttribute("aria-label", "Admin sections");
+    navigation.className = "admin-app__nav";
 
-    const container = document.createElement("div");
-    container.className = "container admin-tabs__scroll";
+    const navigationItems = [
+      { route: "dashboard", label: "Dashboard" },
+      ...sectionDefinitions.map((section) => ({
+        route: section.key,
+        label: section.label,
+      })),
+    ];
 
-    const tabList = document.createElement("div");
-    tabList.className = "admin-tabs__list";
-    tabList.setAttribute("role", "tablist");
-    tabList.setAttribute("aria-label", "Admin workspace");
-
-    for (const tab of tabs) {
-      const button = document.createElement("button");
-      button.id = `admin-tab-${tab.id.replace("admin-", "")}`;
-      button.className = "admin-tabs__button";
-      button.type = "button";
-      button.setAttribute("role", "tab");
-      button.setAttribute("aria-controls", tab.id);
-      button.dataset.adminTab = tab.id;
-      button.textContent = tab.label;
-      tabList.append(button);
-
-      tab.panel.classList.add("admin-tab-panel");
-      tab.panel.setAttribute("role", "tabpanel");
-      tab.panel.setAttribute("aria-labelledby", button.id);
+    for (const item of navigationItems) {
+      const link = document.createElement("a");
+      link.className = "admin-app__nav-link";
+      link.href = "#" + item.route;
+      link.dataset.adminRouteLink = item.route;
+      link.textContent = item.label;
+      navigation.append(link);
     }
 
-    container.append(tabList);
-    navigation.append(container);
-    overview.after(navigation);
+    const sidebarFooter = document.createElement("div");
+    sidebarFooter.className = "admin-app__sidebar-footer";
+    sidebarFooter.innerHTML =
+      '<a class="btn btn--small" href="index.html">View Public Site</a>' +
+      '<span class="admin-app__session">Secure 8-hour session</span>';
 
-    tabList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-admin-tab]");
-      if (!button) return;
+    sidebar.append(sidebarHeader, navigation, sidebarFooter);
 
-      const id = button.dataset.adminTab;
-      if (window.location.hash !== `#${id}`) {
-        window.history.pushState(null, "", `#${id}`);
+    const workspace = document.createElement("div");
+    workspace.className = "admin-app__workspace";
+
+    const topbar = document.createElement("header");
+    topbar.className = "admin-app__topbar";
+
+    const menuButton = document.createElement("button");
+    menuButton.className = "admin-app__menu-button";
+    menuButton.type = "button";
+    menuButton.setAttribute("aria-label", "Open admin navigation");
+    menuButton.setAttribute("aria-expanded", "false");
+    menuButton.textContent = "Sections";
+
+    const titleGroup = document.createElement("div");
+    titleGroup.className = "admin-app__title-group";
+    titleGroup.innerHTML =
+      '<p class="admin-app__eyebrow" data-admin-breadcrumb>Dashboard</p>' +
+      '<h1 class="admin-app__title" data-admin-page-title>Dashboard</h1>' +
+      '<span class="admin-app__dirty" data-admin-dirty hidden>Unsaved changes</span>';
+
+    const topbarActions = document.createElement("div");
+    topbarActions.className = "admin-app__topbar-actions";
+
+    const pageAction = document.createElement("a");
+    pageAction.className = "btn btn--small btn--primary";
+    pageAction.href = "#dashboard";
+    pageAction.dataset.adminPageAction = "";
+    pageAction.hidden = true;
+
+    const publicLink = document.createElement("a");
+    publicLink.className = "btn btn--small";
+    publicLink.href = "index.html";
+    publicLink.textContent = "View Site";
+
+    const logoutButton = document.getElementById("adminLogoutBtn");
+    if (logoutButton) {
+      logoutButton.classList.add("btn--small");
+      topbarActions.append(pageAction, publicLink, logoutButton);
+    } else {
+      topbarActions.append(pageAction, publicLink);
+    }
+
+    topbar.append(menuButton, titleGroup, topbarActions);
+
+    const content = document.createElement("div");
+    content.className = "admin-app__content";
+    content.append(dashboardPage);
+
+    for (const section of sectionDefinitions) {
+      section.panel.classList.add("admin-app__page");
+      section.panel.dataset.adminPage = section.key;
+      content.append(section.panel);
+
+      const container = section.panel.querySelector(":scope > .container");
+      section.heading = container?.querySelector(":scope > h2") || null;
+      section.lead = container?.querySelector(":scope > .section-lead") || null;
+      section.defaultHeading = section.heading?.textContent || section.label;
+      section.defaultLead = section.lead?.textContent || "";
+      section.form = section.formId
+        ? document.getElementById(section.formId)
+        : null;
+      section.editor = section.form?.closest("article.card") || null;
+      section.editorHeading = section.editor?.querySelector(":scope > h3") || null;
+      section.list = section.panel.querySelector(section.listSelector);
+
+      if (section.form) setupAdminFormTracking(section);
+      if (section.list) observeAdminList(section);
+    }
+
+    workspace.append(topbar, content);
+    app.append(sidebar, workspace);
+    dashboard.replaceChildren(app);
+
+    for (const link of dashboardPage.querySelectorAll('a[href^="#admin-"]')) {
+      link.href = "#" + link.getAttribute("href").replace("#admin-", "");
+    }
+
+    app.addEventListener("click", (event) => {
+      const routeLink = event.target.closest("[data-admin-route-link]");
+      if (routeLink) {
+        event.preventDefault();
+        navigateAdminRoute(routeLink.dataset.adminRouteLink || "dashboard");
+        return;
       }
 
-      activateAdminTab(tabs, id);
-      navigation.scrollIntoView({ behavior: "smooth", block: "start" });
+      const actionLink = event.target.closest("[data-admin-page-action]");
+      if (actionLink) {
+        event.preventDefault();
+        navigateAdminRoute(actionLink.dataset.route || "dashboard");
+        return;
+      }
+
+      const editButton = event.target.closest(
+        "[data-project-edit], [data-case-study-edit], [data-blog-edit], [data-workshop-edit]"
+      );
+      if (editButton) {
+        const match = findSectionForEditButton(sectionDefinitions, editButton);
+        if (match) {
+          const id = readEditButtonId(match, editButton);
+          if (id) navigateAdminRoute(match.key + "/edit/" + id, { skipGuard: true });
+        }
+      }
     });
 
-    tabList.addEventListener("keydown", (event) => {
-      const buttons = [...tabList.querySelectorAll("[role='tab']")];
-      const currentIndex = buttons.indexOf(document.activeElement);
-      if (currentIndex < 0) return;
+    menuButton.addEventListener("click", () => {
+      const open = app.classList.toggle("admin-app--nav-open");
+      menuButton.setAttribute("aria-expanded", String(open));
+    });
 
-      let nextIndex = currentIndex;
-      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % buttons.length;
-      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = buttons.length - 1;
-      if (nextIndex === currentIndex) return;
+    window.addEventListener("popstate", () => {
+      const nextRoute = readAdminRoute();
+      if (!canLeaveCurrentAdminRoute(nextRoute)) {
+        window.history.pushState(null, "", "#" + currentAdminRoute);
+        return;
+      }
+      applyAdminRoute(nextRoute);
+    });
 
+    window.addEventListener("beforeunload", (event) => {
+      if (!dirtyAdminForms.size) return;
       event.preventDefault();
-      buttons[nextIndex].focus();
-      buttons[nextIndex].click();
+      event.returnValue = "";
     });
 
-    const syncFromUrl = () => {
-      const requestedId = window.location.hash.slice(1);
-      const activeId = tabs.some((tab) => tab.id === requestedId)
-        ? requestedId
-        : "admin-overview";
-      activateAdminTab(tabs, activeId);
+    adminAppState = {
+      app,
+      sidebar,
+      menuButton,
+      dashboardPage,
+      sectionDefinitions,
+      title: titleGroup.querySelector("[data-admin-page-title]"),
+      breadcrumb: titleGroup.querySelector("[data-admin-breadcrumb]"),
+      dirty: titleGroup.querySelector("[data-admin-dirty]"),
+      pageAction,
+      content,
     };
 
-    window.addEventListener("hashchange", syncFromUrl);
-    window.addEventListener("popstate", syncFromUrl);
-    syncFromUrl();
-    updateAdminTabsOffset();
+    updateAdminAppOffset();
+    applyAdminRoute(readAdminRoute());
   }
 
-  function activateAdminTab(tabs, activeId) {
-    for (const tab of tabs) {
-      const active = tab.id === activeId;
-      tab.panel.hidden = !active;
+  function setupAdminFormTracking(section) {
+    const form = section.form;
 
-      const button = document.querySelector(
-        `[data-admin-tab="${tab.id}"]`
+    const markDirty = () => {
+      dirtyAdminForms.add(form);
+      updateAdminDirtyIndicator();
+    };
+
+    form.addEventListener("input", markDirty);
+    form.addEventListener("change", markDirty);
+
+    form.addEventListener("reset", () => {
+      dirtyAdminForms.delete(form);
+      updateAdminDirtyIndicator();
+
+      if (form.dataset.adminRouterReset === "true") {
+        delete form.dataset.adminRouterReset;
+        return;
+      }
+
+      window.setTimeout(() => {
+        navigateAdminRoute(section.key, {
+          replace: true,
+          skipGuard: true,
+        });
+      }, 0);
+    });
+  }
+
+  function observeAdminList(section) {
+    const observer = new MutationObserver(() => {
+      if (currentAdminRoute.startsWith(section.key + "/edit/")) {
+        hydrateAdminEditRoute(section, currentAdminRoute);
+      }
+    });
+    observer.observe(section.list, { childList: true });
+  }
+
+  function findSectionForEditButton(sections, button) {
+    return sections.find((section) =>
+      section.editSelector && button.matches(section.editSelector)
+    );
+  }
+
+  function readEditButtonId(section, button) {
+    const names = {
+      projects: "projectId",
+      "case-studies": "caseStudyId",
+      blog: "blogId",
+      workshop: "workshopId",
+    };
+    return button.dataset[names[section.key]] || "";
+  }
+
+  function readAdminRoute() {
+    const raw = window.location.hash.slice(1).replace(/^admin-/, "");
+    if (!raw) return "dashboard";
+
+    const parts = raw.split("/").filter(Boolean);
+    const validRoots = new Set([
+      "dashboard",
+      "projects",
+      "case-studies",
+      "blog",
+      "workshop",
+      "media",
+    ]);
+
+    if (!validRoots.has(parts[0])) return "dashboard";
+    if (parts.length === 1) return parts[0];
+    if (parts[1] === "new") return parts[0] + "/new";
+    if (parts[1] === "edit" && /^[1-9][0-9]*$/.test(parts[2] || "")) {
+      return parts[0] + "/edit/" + parts[2];
+    }
+
+    return parts[0];
+  }
+
+  function navigateAdminRoute(route, options = {}) {
+    const normalized = normalizeAdminRoute(route);
+    if (
+      !options.skipGuard &&
+      normalized !== currentAdminRoute &&
+      !canLeaveCurrentAdminRoute(normalized)
+    ) {
+      return false;
+    }
+
+    const method = options.replace ? "replaceState" : "pushState";
+    if (window.location.hash !== "#" + normalized) {
+      window.history[method](null, "", "#" + normalized);
+    }
+
+    applyAdminRoute(normalized);
+    return true;
+  }
+
+  function normalizeAdminRoute(route) {
+    const value = String(route || "dashboard").replace(/^#/, "");
+    const parts = value.split("/").filter(Boolean);
+    const validRoots = [
+      "dashboard",
+      "projects",
+      "case-studies",
+      "blog",
+      "workshop",
+      "media",
+    ];
+
+    if (!validRoots.includes(parts[0])) return "dashboard";
+    if (parts[1] === "new") return parts[0] + "/new";
+    if (parts[1] === "edit" && /^[1-9][0-9]*$/.test(parts[2] || "")) {
+      return parts[0] + "/edit/" + parts[2];
+    }
+    return parts[0];
+  }
+
+  function canLeaveCurrentAdminRoute(nextRoute) {
+    const currentSection = getAdminSectionForRoute(currentAdminRoute);
+    if (!currentSection?.form || !dirtyAdminForms.has(currentSection.form)) {
+      return true;
+    }
+
+    return window.confirm(
+      "You have unsaved changes. Leave this editor and discard them?"
+    );
+  }
+
+  function applyAdminRoute(route) {
+    if (!adminAppState) return;
+
+    const normalized = normalizeAdminRoute(route);
+    const parts = normalized.split("/");
+    const root = parts[0];
+    const mode = parts[1] || "list";
+    const itemId = parts[2] || "";
+    const activePage =
+      root === "dashboard"
+        ? adminAppState.dashboardPage
+        : adminAppState.sectionDefinitions.find((section) => section.key === root)?.panel;
+
+    for (const page of adminAppState.content.querySelectorAll("[data-admin-page]")) {
+      page.hidden = page !== activePage;
+    }
+
+    for (const link of adminAppState.sidebar.querySelectorAll("[data-admin-route-link]")) {
+      const active = link.dataset.adminRouteLink === root;
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    }
+
+    const section = getAdminSectionForRoute(normalized);
+    if (section) {
+      applyAdminContentMode(section, mode, itemId, normalized);
+    } else {
+      setAdminPageChrome("Dashboard", "Overview", "", "");
+    }
+
+    currentAdminRoute = normalized;
+    adminAppState.app.classList.remove("admin-app--nav-open");
+    adminAppState.menuButton.setAttribute("aria-expanded", "false");
+    updateAdminDirtyIndicator();
+
+    window.requestAnimationFrame(() => {
+      adminAppState.content.scrollIntoView({ block: "start" });
+    });
+  }
+
+  function applyAdminContentMode(section, mode, itemId, route) {
+    const hasEditor = Boolean(section.form && section.editor);
+    const editorMode = hasEditor && (mode === "new" || mode === "edit");
+
+    if (section.editor) section.editor.hidden = !editorMode;
+    if (section.list) section.list.hidden = editorMode;
+
+    if (mode === "new" && hasEditor && currentAdminRoute !== route) {
+      prepareNewAdminEditor(section);
+    }
+
+    if (mode === "edit" && hasEditor) {
+      hydrateAdminEditRoute(section, route);
+    }
+
+    if (section.heading) {
+      section.heading.textContent = editorMode
+        ? (mode === "edit" ? "Edit " : "New ") + section.singular
+        : section.defaultHeading;
+    }
+
+    if (section.lead) {
+      section.lead.textContent = editorMode
+        ? "Complete the fields below, then save your changes."
+        : section.defaultLead;
+    }
+
+    if (section.editorHeading && editorMode) {
+      section.editorHeading.textContent =
+        (mode === "edit" ? "Edit " : "Create ") + section.singular;
+    }
+
+    if (!hasEditor) {
+      setAdminPageChrome(section.label, section.label, "", "");
+      return;
+    }
+
+    if (editorMode) {
+      setAdminPageChrome(
+        mode === "edit" ? "Edit " + section.singular : "New " + section.singular,
+        section.label,
+        section.key,
+        "Back to " + section.label
       );
-      if (!button) continue;
-
-      button.setAttribute("aria-selected", String(active));
-      button.tabIndex = active ? 0 : -1;
+    } else {
+      setAdminPageChrome(
+        section.label,
+        section.label,
+        section.key + "/new",
+        "New " + section.singular
+      );
     }
   }
 
-  function updateAdminTabsOffset() {
+  function prepareNewAdminEditor(section) {
+    const form = section.form;
+    form.dataset.adminRouterReset = "true";
+    form.reset();
+
+    if (form.elements[section.idField]) {
+      form.elements[section.idField].value = "";
+    }
+
+    const submit = document.getElementById(section.submitId);
+    const cancel = document.getElementById(section.cancelId);
+    if (submit) submit.textContent = "Create " + section.singular;
+    if (cancel) cancel.hidden = true;
+
+    if (section.key === "case-studies") {
+      renderCaseStudySectionEditors([]);
+    }
+
+    dirtyAdminForms.delete(form);
+  }
+
+  function hydrateAdminEditRoute(section, route) {
+    const itemId = route.split("/")[2] || "";
+    if (!itemId || !section.form || !section.editSelector) return;
+
+    const currentId = section.form.elements[section.idField]?.value || "";
+    if (String(currentId) === String(itemId)) return;
+
+    const button = [...section.list.querySelectorAll(section.editSelector)].find(
+      (candidate) => String(readEditButtonId(section, candidate)) === String(itemId)
+    );
+    button?.click();
+  }
+
+  function getAdminSectionForRoute(route) {
+    const root = String(route || "").split("/")[0];
+    return adminAppState?.sectionDefinitions.find((section) => section.key === root) || null;
+  }
+
+  function setAdminPageChrome(title, breadcrumb, actionRoute, actionLabel) {
+    if (!adminAppState) return;
+
+    adminAppState.title.textContent = title;
+    adminAppState.breadcrumb.textContent = breadcrumb;
+
+    if (actionRoute && actionLabel) {
+      adminAppState.pageAction.hidden = false;
+      adminAppState.pageAction.dataset.route = actionRoute;
+      adminAppState.pageAction.href = "#" + actionRoute;
+      adminAppState.pageAction.textContent = actionLabel;
+    } else {
+      adminAppState.pageAction.hidden = true;
+      adminAppState.pageAction.dataset.route = "";
+    }
+  }
+
+  function updateAdminDirtyIndicator() {
+    if (!adminAppState?.dirty) return;
+    const section = getAdminSectionForRoute(currentAdminRoute);
+    adminAppState.dirty.hidden = !section?.form || !dirtyAdminForms.has(section.form);
+  }
+
+  function updateAdminAppOffset() {
     const header = document.querySelector(".site-header");
     if (!header) return;
 
     const update = () => {
-      const height = Math.ceil(header.getBoundingClientRect().height);
       document.documentElement.style.setProperty(
-        "--admin-tabs-offset",
-        `${height}px`
+        "--admin-app-offset",
+        Math.ceil(header.getBoundingClientRect().height) + "px"
       );
     };
 

@@ -8,67 +8,254 @@
 }
 
 /* =========================
-   Admin Workspace Tabs
+   Admin App Shell
 ========================= */
 
-.admin-tabs {
+#adminDashboard {
+  min-height: calc(100vh - var(--admin-app-offset, 0px));
+}
+
+.admin-app {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: calc(100vh - var(--admin-app-offset, 0px));
+  background: var(--bg);
+}
+
+.admin-app__sidebar {
   position: sticky;
-  top: var(--admin-tabs-offset, 0);
-  z-index: 18;
-  padding: 0.7rem 0;
-  border-top: 1px solid var(--border);
+  top: var(--admin-app-offset, 0);
+  height: calc(100vh - var(--admin-app-offset, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  background: rgba(10, 17, 31, 0.98);
+}
+
+.admin-app__sidebar-header {
+  padding: 0.4rem 0.5rem 1rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(11, 18, 32, 0.92);
+}
+
+.admin-app__eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-app__brand {
+  margin: 0.3rem 0 0;
+  color: var(--text);
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.admin-app__nav {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.admin-app__nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.admin-app__nav-link:hover {
+  color: var(--text);
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.admin-app__nav-link[aria-current="page"] {
+  color: #eef4ff;
+  border-color: rgba(79, 140, 255, 0.65);
+  background: rgba(79, 140, 255, 0.18);
+}
+
+.admin-app__sidebar-footer {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.admin-app__session {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.admin-app__workspace {
+  min-width: 0;
+}
+
+.admin-app__topbar {
+  position: sticky;
+  top: var(--admin-app-offset, 0);
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 76px;
+  padding: 0.85rem clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--border);
+  background: rgba(11, 18, 32, 0.94);
   backdrop-filter: blur(12px);
 }
 
-.admin-tabs__scroll {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
+.admin-app__title-group {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  min-width: 0;
+  margin-right: auto;
 }
 
-.admin-tabs__list {
+.admin-app__title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+}
+
+.admin-app__dirty {
+  padding: 0.25rem 0.55rem;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd68a;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-app__topbar-actions {
   display: flex;
-  width: max-content;
-  min-width: 100%;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.5rem;
 }
 
-.admin-tabs__button {
-  flex: 0 0 auto;
-  padding: 0.65rem 1rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
+.admin-app__menu-button {
+  display: none;
+  min-height: 42px;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
   font: inherit;
   font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
 }
 
-.admin-tabs__button:hover {
-  color: var(--text);
-  border-color: var(--border);
-  background: rgba(255, 255, 255, 0.05);
+.admin-app__content {
+  min-width: 0;
 }
 
-.admin-tabs__button[aria-selected="true"] {
-  color: #eef4ff;
-  border-color: rgba(79, 140, 255, 0.72);
-  background: rgba(79, 140, 255, 0.2);
+.admin-app__page {
+  min-width: 0;
 }
 
-.admin-tabs__button:focus-visible {
-  outline: 3px solid rgba(79, 140, 255, 0.45);
-  outline-offset: 2px;
+.admin-app__page[hidden],
+.admin-app__page [hidden] {
+  display: none !important;
 }
 
-.admin-tab-panel {
-  scroll-margin-top: calc(var(--admin-tabs-offset, 0px) + 5rem);
+.admin-app__page > .container {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
 }
 
+.admin-app__page .about-hero {
+  padding-top: 2rem;
+}
+
+@media (max-width: 900px) {
+  .admin-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-app__sidebar {
+    position: fixed;
+    top: var(--admin-app-offset, 0);
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    width: min(290px, 86vw);
+    height: auto;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+    box-shadow: 18px 0 45px rgba(0, 0, 0, 0.38);
+  }
+
+  .admin-app--nav-open .admin-app__sidebar {
+    transform: translateX(0);
+  }
+
+  .admin-app__menu-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-app__topbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-app__title-group {
+    flex: 1 1 180px;
+  }
+
+  .admin-app__topbar-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-app__topbar-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-app__topbar {
+    min-height: 0;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .admin-app__eyebrow {
+    display: none;
+  }
+
+  .admin-app__topbar-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-app__topbar-actions .btn:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-app__page > .container {
+    padding-top: 1.25rem;
+  }
+}
+
+/* =========================
+   Admin Forms
+========================= */
 /* =========================
    Admin Forms
 ========================= */
