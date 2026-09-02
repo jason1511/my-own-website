@@ -27,7 +27,9 @@
 
       const renderProject = container.hasAttribute("data-home-projects")
         ? renderPortfolioProject
-        : renderProjectCard;
+        : container.hasAttribute("data-project-archive")
+          ? renderArchiveProject
+          : renderProjectCard;
 
       container.innerHTML = projects.length
         ? projects.map(renderProject).join("")
@@ -231,6 +233,41 @@
     `;
   }
 
+  function renderArchiveProject(project) {
+    const githubUrl = safeExternalUrl(project.github_url);
+    const liveUrl = safeExternalUrl(project.live_url);
+    const projectSlug = safeProjectSlug(project.slug);
+    const detailUrl = projectSlug
+      ? "project.html?slug=" + encodeURIComponent(projectSlug)
+      : "";
+    const tags = splitTags(project.tech_stack).slice(0, 8);
+    const links = [
+      detailUrl
+        ? `<a href="${escapeAttr(detailUrl)}">Details <span aria-hidden="true">→</span></a>`
+        : "",
+      liveUrl
+        ? `<a href="${escapeAttr(liveUrl)}" target="_blank" rel="noopener">Live <span aria-hidden="true">↗</span></a>`
+        : "",
+      githubUrl
+        ? `<a href="${escapeAttr(githubUrl)}" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>`
+        : "",
+    ].filter(Boolean).join("");
+
+    return `
+      <article class="archive-row">
+        <div class="archive-row__project">
+          <h3>${escapeHtml(project.title)}</h3>
+          <p>${escapeHtml(project.summary)}</p>
+        </div>
+        <p class="archive-row__category">${escapeHtml(formatProjectType(project.type))}</p>
+        <ul class="archive-tags" aria-label="Built with">
+          ${tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("")}
+        </ul>
+        <div class="archive-row__links">${links}</div>
+      </article>
+    `;
+  }
+
   /* ---------------- D1 WORKSHOP RENDERING ---------------- */
 
   async function loadWorkshopFromD1() {
@@ -250,13 +287,44 @@
         throw new Error("Invalid workshop API response");
       }
 
+      const renderWorkshop = container.hasAttribute("data-workshop-archive")
+        ? renderArchiveWorkshop
+        : renderWorkshopCard;
+
       container.innerHTML = data.workshop_items.length
-        ? data.workshop_items.map(renderWorkshopCard).join("")
+        ? data.workshop_items.map(renderWorkshop).join("")
         : renderEmptyCard("No workshop items are available yet.");
     } catch (error) {
       console.warn("D1 workshop unavailable:", error);
       // Keep the existing hardcoded content if the API fails.
     }
+  }
+
+  function renderArchiveWorkshop(item) {
+    const workshopUrl = safeExternalUrl(item.workshop_url);
+
+    return `
+      <article
+        class="archive-row workshop-card"
+        data-workshop-id="${escapeAttr(item.steam_id)}"
+      >
+        <div class="archive-row__project">
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.description)}</p>
+        </div>
+        <p class="archive-row__category">${escapeHtml(item.game)}</p>
+        <ul class="archive-stats" aria-label="Workshop activity">
+          <li data-stat="views">— views</li>
+          <li data-stat="subs">— subscribers</li>
+          <li data-stat="favs">— favorites</li>
+        </ul>
+        <div class="archive-row__links">
+          ${workshopUrl
+            ? `<a href="${escapeAttr(workshopUrl)}" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a>`
+            : ""}
+        </div>
+      </article>
+    `;
   }
 
   function renderWorkshopCard(item) {

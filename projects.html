@@ -4,378 +4,223 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Projects | Jason Leonard</title>
+  <title>All Projects | Jason Leonard</title>
   <meta
     name="description"
-    content="Projects by Jason Leonard — software, web development, and selected hobby experience."
+    content="The complete project archive of Jason Leonard — software, web, data, AI-assisted, and creative technical work."
   />
+  <meta name="theme-color" content="#0a1322" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body>
-  <!-- Header / Nav -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
+<body class="portfolio-archive">
+  <a class="portfolio-skip-link" href="#archive-content">Skip to content</a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="index.html">Home</a>
-        <a href="projects.html" aria-current="page">Projects</a>
-        <a href="case-studies.html">Case Studies</a>
-        <a href="blog.html">Blog</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+  <main class="archive-shell" id="archive-content">
+    <header class="archive-hero">
+      <a class="archive-back" href="index.html">
+        <span aria-hidden="true">←</span> Jason Leonard
+      </a>
+      <p class="archive-eyebrow">Complete archive</p>
+      <h1>All Projects</h1>
+      <p>
+        Software, websites, data tools, experiments, and ongoing builds.
+        Everything is listed here, not only polished or featured work.
+      </p>
+    </header>
 
-  <main class="site-main">
-    <!-- Projects Hero -->
-    <section class="about-hero">
-      <div class="container about-hero__grid">
-        <div class="about-hero__content">
-          <h1>Projects</h1>
+    <section class="archive-section" aria-labelledby="software-projects-title">
+      <div class="archive-section__heading">
+        <div>
+          <p class="archive-eyebrow">Software &amp; web</p>
+          <h2 id="software-projects-title">Project archive</h2>
+        </div>
+        <a
+          class="archive-profile-link"
+          href="https://github.com/jason1511"
+          target="_blank"
+          rel="noopener"
+        >
+          GitHub profile <span aria-hidden="true">↗</span>
+        </a>
+      </div>
 
-          <p>
-  A selection of full-stack systems, desktop applications, data tools,
-  and AI-assisted projects built to solve practical problems.
-</p>
-
-          <div class="about-hero__actions">
-            <a class="btn btn--primary" href="#featured">View Projects</a>
-            <a class="btn" href="#hobby">Additional Experience</a>
-            <a
-              class="btn"
-              href="https://github.com/jason1511"
-              target="_blank"
-              rel="noopener"
-            >
-              GitHub Profile
-            </a>
-          </div>
+      <div class="archive-table">
+        <div class="archive-table__head" aria-hidden="true">
+          <span>Project</span>
+          <span>Category</span>
+          <span>Built with</span>
+          <span>Links</span>
         </div>
 
-        <aside class="profile-card" aria-label="Quick view">
-          <div class="profile-card__header">
-            <div>
-              <p class="profile-card__name">Quick View</p>
-              <p class="profile-card__role">Public work & highlights</p>
+        <div class="archive-table__body" data-projects-list data-project-archive>
+          <article class="archive-row">
+            <div class="archive-row__project">
+              <h3>E-Bike Showroom &amp; Management System</h3>
+              <p>Commissioned product showroom and management website for Niaga Bersama Abadi.</p>
             </div>
-          </div>
-
-          <dl class="profile-card__list">
-  <div class="profile-card__item">
-    <dt>Focus</dt>
-    <dd>Business systems, analytics, and AI tools</dd>
-  </div>
-
-  <div class="profile-card__item">
-    <dt>Backend</dt>
-    <dd>Cloudflare Pages Functions, D1, and R2</dd>
-  </div>
-
-  <div class="profile-card__item">
-    <dt>Additional</dt>
-    <dd>Steam Workshop projects and game prototypes</dd>
-  </div>
-</dl>
-
-          <div class="profile-card__links">
-            <a href="#featured">Featured</a>
-            <a href="#hobby">Additional Experience</a>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- Featured Projects -->
-    <section id="featured">
-      <div class="container">
-        <h2>Featured Projects</h2>
-        <p class="section-lead">
-          Published projects demonstrating practical software delivery across
-      web, desktop, data, and AI-assisted applications.
-        </p>
-
-        <div class="cards" data-projects-list>
-          <!-- Bike Store App -->
-          <article class="card repo-card" data-gh-repo="jason1511/Bike-STore-Project">
-            <header>
-              <h3>Bike Store Inventory &amp; Sales Management App</h3>
-              <p class="card__meta">C#, .NET WinForms, SQLite</p>
-            </header>
-
-            <p>
-              A desktop application built for a small electric bike retailer to manage
-              inventory, sales transactions, and reporting. Designed for daily operations
-              with a focus on reliability and usability.
-            </p>
-
-            <ul class="tag-list">
-              <li class="tag">Offline-first</li>
-              <li class="tag">Inventory</li>
-              <li class="tag">Transactions</li>
-              <li class="tag">Reporting</li>
+            <p class="archive-row__category">Production website</p>
+            <ul class="archive-tags" aria-label="Built with">
+              <li>HTML</li><li>CSS</li><li>JavaScript</li><li>Cloudflare</li>
             </ul>
-
-            <!-- GitHub live stats -->
-            <ul class="tag-list repo-stats" aria-label="GitHub stats">
-              <li class="tag" data-gh="stars">— stars</li>
-              <li class="tag" data-gh="forks">— forks</li>
-              <li class="tag" data-gh="updated">— updated</li>
-            </ul>
-
-            <div class="card__actions">
-              <a class="btn btn--small btn--primary" href="bike-store.html">Case Study</a>
-              <a
-                class="btn btn--small"
-                href="https://github.com/jason1511/Bike-STore-Project"
-                target="_blank"
-                rel="noopener"
-              >
-                GitHub
-              </a>
+            <div class="archive-row__links">
+              <a href="https://niagabersama.com/" target="_blank" rel="noopener" aria-label="Open E-Bike Showroom live website">Live <span aria-hidden="true">↗</span></a>
             </div>
           </article>
 
-          <!-- Portfolio Website -->
-          <article class="card repo-card" data-gh-repo="jason1511/my-own-website">
-            <header>
-              <h3>Personal Portfolio Website</h3>
-              <p class="card__meta">HTML, CSS, JavaScript</p>
-            </header>
-
-            <p>
-              A responsive portfolio website built from scratch using semantic HTML,
-              reusable layouts, and vanilla JavaScript, with serverless backend features.
-            </p>
-
-            <ul class="tag-list">
-              <li class="tag">Semantic HTML</li>
-              <li class="tag">Responsive layout</li>
-              <li class="tag">Vanilla JavaScript</li>
+          <article class="archive-row">
+            <div class="archive-row__project">
+              <h3>Bike Store Inventory &amp; Sales System</h3>
+              <p>Desktop operations system for stock, sales, service, FIFO lots, users, and reporting.</p>
+            </div>
+            <p class="archive-row__category">Desktop application</p>
+            <ul class="archive-tags" aria-label="Built with">
+              <li>C#</li><li>.NET 8</li><li>WinForms</li><li>SQLite</li>
             </ul>
+            <div class="archive-row__links">
+              <a href="bike-store.html">Case study <span aria-hidden="true">→</span></a>
+              <a href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
 
-            <!-- GitHub live stats -->
-            <ul class="tag-list repo-stats" aria-label="GitHub stats">
-              <li class="tag" data-gh="stars">— stars</li>
-              <li class="tag" data-gh="forks">— forks</li>
-              <li class="tag" data-gh="updated">— updated</li>
+          <article class="archive-row">
+            <div class="archive-row__project">
+              <h3>SlabWorth</h3>
+              <p>Trading-card identification, condition analysis, pricing research, and saved history.</p>
+            </div>
+            <p class="archive-row__category">AI-assisted web app</p>
+            <ul class="archive-tags" aria-label="Built with">
+              <li>React</li><li>Cloudflare Workers</li><li>D1</li><li>R2</li>
             </ul>
+            <div class="archive-row__links"></div>
+          </article>
 
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://github.com/jason1511/my-own-website"
-                target="_blank"
-                rel="noopener"
-              >
-                GitHub
-              </a>
+          <article class="archive-row">
+            <div class="archive-row__project">
+              <h3>React Analytics Dashboard</h3>
+              <p>Browser-based data profiling and visual exploration for uploaded datasets.</p>
+            </div>
+            <p class="archive-row__category">Data application</p>
+            <ul class="archive-tags" aria-label="Built with">
+              <li>React</li><li>Vite</li><li>D3</li><li>Cloudflare</li>
+            </ul>
+            <div class="archive-row__links">
+              <a href="https://react-analytics-dashboard.pages.dev/dashboard" target="_blank" rel="noopener">Live <span aria-hidden="true">↗</span></a>
+              <a href="https://github.com/jason1511/react-analytics-dashboard" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+
+          <article class="archive-row">
+            <div class="archive-row__project">
+              <h3>Developer Portfolio &amp; Content Platform</h3>
+              <p>This responsive portfolio, D1-backed content APIs, and secure administration tools.</p>
+            </div>
+            <p class="archive-row__category">Web platform</p>
+            <ul class="archive-tags" aria-label="Built with">
+              <li>HTML</li><li>CSS</li><li>JavaScript</li><li>D1</li>
+            </ul>
+            <div class="archive-row__links">
+              <a href="index.html">Live <span aria-hidden="true">→</span></a>
+              <a href="https://github.com/jason1511/my-own-website" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
             </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- Additional Experience (Hobby) -->
-    <section id="hobby">
-      <div class="container">
-        <h2>Additional Experience (Hobby)</h2>
-        <p class="section-lead">
-          Creative projects that demonstrate iteration and working within existing systems.
-        </p>
-
-        <div style="margin-bottom: 1.5rem;">
-          <a
-            class="btn btn--primary"
-            href="https://steamcommunity.com/id/jason0977/myworkshopfiles/"
-            target="_blank"
-            rel="noopener"
-          >
-            View Steam Workshop Profile
-          </a>
+    <section class="archive-section archive-section--secondary" id="hobby" aria-labelledby="additional-work-title">
+      <div class="archive-section__heading">
+        <div>
+          <p class="archive-eyebrow">Creative technical work</p>
+          <h2 id="additional-work-title">Additional projects</h2>
         </div>
-
-        <div class="cards" data-workshop-list>
-          <!-- Transport Fever 2 -->
-          <article class="card workshop-card" data-workshop-id="3492276585">
-            <header>
-              <h3>KAI CC 206 Re(Logo) Indonesia</h3>
-              <p class="card__meta">Transport Fever 2 · Reskin/Livery</p>
-            </header>
-
-            <p>Indonesian locomotive reskin/livery work for Transport Fever 2.</p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=3492276585"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-
-          <article class="card workshop-card" data-workshop-id="3621865519">
-            <header>
-              <h3>Kereta Mild Steel Livery 2014–2025 (Narrow Gauge 1067)</h3>
-              <p class="card__meta">Transport Fever 2 · Livery pack</p>
-            </header>
-
-            <p>1067mm version for KAI mild steel repaint pack.</p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=3621865519"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-
-          <article class="card workshop-card" data-workshop-id="3649155955">
-            <header>
-              <h3>KAI Kereta Stainless Steel 2018</h3>
-              <p class="card__meta">Transport Fever 2 · Livery/asset</p>
-            </header>
-
-            <p>2018 Logo version for KAI stainless steel rolling stock.</p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=3649155955"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-          <article class="card workshop-card" data-workshop-id="3654483140">
-            <header>
-              <h3>K3 MFR Quality of Life</h3>
-              <p class="card__meta">Transport Fever 2 · Asset / Livery</p>
-            </header>
-
-            <p>
-              Additional Transport Fever 2 workshop asset by expanding K3 MFR by Daffa Rifky railway
-              content, focused on consistency, compatibility, and visual accuracy.
-            </p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=3654483140"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-
-          <!-- Arma 3 -->
-          <article class="card workshop-card" data-workshop-id="2271009083">
-            <header>
-              <h3>Pindad SS2 temp RHS compat</h3>
-              <p class="card__meta">Arma 3 · Compatibility addon</p>
-            </header>
-
-            <p>Compatibility addon enabling RHS magazines and scopes for the BWI SS2 rifle mod.</p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=2271009083"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-
-          <!-- Contributor -->
-          <article class="card workshop-card" data-workshop-id="1687587803">
-            <header>
-              <h3>JOS Tentara Nasional Indonesia (Contributor)</h3>
-              <p class="card__meta">Arma 3 · Team mod contribution</p>
-            </header>
-
-            <p>Contributed as part of the JOS team mod project representing Indonesia’s armed forces.</p>
-
-            <ul class="tag-list workshop-stats">
-              <li class="tag" data-stat="views">— views</li>
-              <li class="tag" data-stat="subs">— subscribers</li>
-              <li class="tag" data-stat="favs">— favorites</li>
-            </ul>
-
-            <div class="card__actions">
-              <a
-                class="btn btn--small btn--primary"
-                href="https://steamcommunity.com/sharedfiles/filedetails/?id=1687587803"
-                target="_blank"
-                rel="noopener"
-              >
-                View on Steam
-              </a>
-            </div>
-          </article>
-        </div>
-
-        <p style="font-size:0.9rem; opacity:0.75; margin-top:1rem;">
-          Workshop statistics are fetched live from Steam and cached for performance.
-        </p>
+        <a
+          class="archive-profile-link"
+          href="https://steamcommunity.com/id/jason0977/myworkshopfiles/"
+          target="_blank"
+          rel="noopener"
+        >
+          Steam Workshop <span aria-hidden="true">↗</span>
+        </a>
       </div>
+
+      <div class="archive-table archive-table--workshop">
+        <div class="archive-table__head" aria-hidden="true">
+          <span>Project</span>
+          <span>Platform</span>
+          <span>Activity</span>
+          <span>Link</span>
+        </div>
+
+        <div class="archive-table__body" data-workshop-list data-workshop-archive>
+          <article class="archive-row workshop-card" data-workshop-id="3492276585">
+            <div class="archive-row__project"><h3>KAI CC 206 Re(Logo) Indonesia</h3><p>Indonesian locomotive livery work.</p></div>
+            <p class="archive-row__category">Transport Fever 2</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3492276585" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="archive-row workshop-card" data-workshop-id="3621865519">
+            <div class="archive-row__project"><h3>Kereta Mild Steel Livery 2014–2025</h3><p>Narrow-gauge 1067 mm rolling-stock livery pack.</p></div>
+            <p class="archive-row__category">Transport Fever 2</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3621865519" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="archive-row workshop-card" data-workshop-id="3649155955">
+            <div class="archive-row__project"><h3>KAI Kereta Stainless Steel 2018</h3><p>2018-logo livery for Indonesian stainless-steel rolling stock.</p></div>
+            <p class="archive-row__category">Transport Fever 2</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3649155955" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="archive-row workshop-card" data-workshop-id="3654483140">
+            <div class="archive-row__project"><h3>K3 MFR Quality of Life</h3><p>Compatibility and visual consistency improvements.</p></div>
+            <p class="archive-row__category">Transport Fever 2</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3654483140" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="archive-row workshop-card" data-workshop-id="2271009083">
+            <div class="archive-row__project"><h3>Pindad SS2 Temporary RHS Compatibility</h3><p>Magazine and optic compatibility addon.</p></div>
+            <p class="archive-row__category">Arma 3</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2271009083" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+
+          <article class="archive-row workshop-card" data-workshop-id="1687587803">
+            <div class="archive-row__project"><h3>JOS Tentara Nasional Indonesia</h3><p>Contributor to an Indonesian armed-forces team mod.</p></div>
+            <p class="archive-row__category">Arma 3</p>
+            <ul class="archive-stats" aria-label="Workshop activity">
+              <li data-stat="views">— views</li><li data-stat="subs">— subscribers</li>
+            </ul>
+            <div class="archive-row__links"><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1687587803" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a></div>
+          </article>
+        </div>
+      </div>
+
+      <p class="archive-note">Workshop activity is loaded live and cached for performance.</p>
     </section>
+
+    <footer class="archive-footer">
+      <a href="index.html"><span aria-hidden="true">←</span> Back to portfolio</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
-
-<script src="js/main.js"></script>
-<script src="js/stats.js"></script>
-<script src="js/content-api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/content-api.js"></script>
 </body>
 </html>

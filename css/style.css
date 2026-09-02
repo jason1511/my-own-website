@@ -1560,3 +1560,319 @@ h3 {
     margin-top: 1.4rem;
   }
 }
+
+
+/* =========================
+   Project archive
+========================= */
+.portfolio-archive {
+  --archive-bg: #0a1322;
+  --archive-panel: #0d192a;
+  --archive-text: #e9f0fb;
+  --archive-muted: #93a4bc;
+  --archive-dim: #6f829d;
+  --archive-accent: #7aa2ff;
+  --archive-accent-bright: #74e8d4;
+  --archive-line: rgba(148, 163, 184, 0.16);
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 78% -10%, rgba(50, 80, 145, 0.14), transparent 31rem),
+    var(--archive-bg);
+  color: var(--archive-muted);
+}
+
+.archive-shell {
+  width: min(1480px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: clamp(4rem, 9vw, 8rem) 0 2rem;
+}
+
+.archive-hero {
+  max-width: 760px;
+  margin-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.archive-back,
+.archive-profile-link,
+.archive-row__links a,
+.archive-footer a {
+  color: var(--archive-muted);
+  font-weight: 700;
+  transition: color 150ms ease;
+}
+
+.archive-back {
+  display: inline-flex;
+  gap: 0.55rem;
+  margin-bottom: 2.1rem;
+  color: var(--archive-accent-bright);
+}
+
+.archive-back:hover,
+.archive-profile-link:hover,
+.archive-row__links a:hover,
+.archive-footer a:hover {
+  color: var(--archive-accent-bright);
+}
+
+.archive-eyebrow {
+  margin: 0 0 0.65rem;
+  color: var(--archive-accent-bright) !important;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.archive-hero h1 {
+  margin: 0;
+  color: var(--archive-text);
+  font-size: clamp(3.3rem, 7vw, 6rem);
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+.archive-hero > p:last-child {
+  max-width: 58ch;
+  margin: 1.4rem 0 0;
+  font-size: clamp(1rem, 1.5vw, 1.12rem);
+}
+
+.archive-section + .archive-section {
+  margin-top: clamp(5rem, 10vw, 9rem);
+}
+
+.archive-section__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.archive-section__heading h2 {
+  margin: 0;
+  color: var(--archive-text);
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  letter-spacing: -0.035em;
+}
+
+.archive-profile-link {
+  flex: 0 0 auto;
+  padding-bottom: 0.25rem;
+  font-size: 0.88rem;
+}
+
+.archive-table {
+  border-top: 1px solid var(--archive-line);
+}
+
+.archive-table__head,
+.archive-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.4fr) minmax(150px, 0.62fr) minmax(310px, 1.18fr) minmax(150px, 0.6fr);
+  gap: clamp(1.25rem, 3vw, 3rem);
+}
+
+.archive-table__head {
+  padding: 1rem 0;
+  color: var(--archive-text);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.archive-row {
+  position: relative;
+  align-items: start;
+  padding: 1.45rem 0;
+  border-top: 1px solid var(--archive-line);
+  transition: background 150ms ease, padding 150ms ease;
+}
+
+.archive-table__head + .archive-table__body .archive-row:first-child {
+  border-top: 0;
+}
+
+.archive-row::before {
+  position: absolute;
+  inset: 0 -1rem;
+  z-index: -1;
+  content: "";
+  border-radius: 6px;
+  background: transparent;
+  transition: background 150ms ease;
+}
+
+.archive-row:hover::before,
+.archive-row:focus-within::before {
+  background: rgba(122, 162, 255, 0.065);
+}
+
+.archive-row__project h3 {
+  margin: 0;
+  color: var(--archive-text);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.archive-row__project p,
+.archive-row__category {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.archive-row__category {
+  margin-top: 0.1rem;
+  color: var(--archive-muted);
+}
+
+.archive-tags,
+.archive-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archive-tags li,
+.archive-stats li {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.09);
+  color: var(--archive-accent-bright);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.69rem;
+  white-space: nowrap;
+}
+
+.archive-stats li {
+  background: rgba(122, 162, 255, 0.09);
+  color: var(--archive-accent);
+}
+
+.archive-row__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+}
+
+.archive-row__links a {
+  font-size: 0.79rem;
+  white-space: nowrap;
+}
+
+.archive-note {
+  margin: 1rem 0 0;
+  color: var(--archive-dim) !important;
+  font-size: 0.76rem;
+}
+
+.archive-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: clamp(5rem, 10vw, 9rem);
+  padding: 1.5rem 0 0;
+  border-top: 1px solid var(--archive-line);
+}
+
+.archive-footer p {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+@media (max-width: 1080px) {
+  .archive-table__head,
+  .archive-row {
+    grid-template-columns: minmax(230px, 1.2fr) minmax(135px, 0.55fr) minmax(230px, 1fr) minmax(120px, 0.5fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 780px) {
+  .archive-shell {
+    width: min(100% - 2rem, 680px);
+    padding-top: 2.5rem;
+  }
+
+  .archive-hero {
+    margin-bottom: 4rem;
+  }
+
+  .archive-section__heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .archive-table__head {
+    display: none;
+  }
+
+  .archive-table__body {
+    display: grid;
+  }
+
+  .archive-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0;
+  }
+
+  .archive-row__category {
+    margin: 0;
+    color: var(--archive-accent);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .archive-row__project {
+    order: -2;
+  }
+
+  .archive-row__category {
+    order: -1;
+  }
+
+  .archive-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .archive-shell {
+    width: min(100% - 1.25rem, 680px);
+  }
+
+  .archive-hero h1 {
+    font-size: clamp(3rem, 17vw, 4.25rem);
+  }
+
+  .archive-tags,
+  .archive-stats {
+    gap: 0.35rem;
+  }
+
+  .archive-tags li,
+  .archive-stats li {
+    padding: 0.3rem 0.58rem;
+    font-size: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-archive *,
+  .portfolio-archive *::before,
+  .portfolio-archive *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
