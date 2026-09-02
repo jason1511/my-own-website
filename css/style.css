@@ -358,6 +358,15 @@
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: 0.7rem;
+  padding: 0.55rem;
+  border: 1px dashed transparent;
+  border-radius: 10px;
+}
+
+.admin-media-picker:focus-within,
+.admin-media-picker:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 .admin-media-picker input[type="file"] {
@@ -370,6 +379,32 @@
 .admin-media-picker [data-media-upload-status] {
   color: var(--muted);
   font-size: 0.78rem;
+}
+
+.admin-media-picker small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.admin-media-paste-zone {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: text;
+}
+
+.admin-media-paste-zone:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(79, 140, 255, 0.18);
+  outline-offset: 2px;
+}
+
+.admin-media-paste-zone span {
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 .admin-media-upload-card {

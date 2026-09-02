@@ -128,7 +128,7 @@ Configure these through Cloudflare rather than committing secrets:
 
 Create an R2 bucket in Cloudflare and bind it to the Pages project using the variable name **MEDIA_BUCKET**. The binding must be available to both preview and production if image uploads should work in both environments. Redeploy the Pages project after adding or changing the binding.
 
-The Admin Media page accepts JPG, PNG, WebP, GIF and AVIF images up to 10 MB. Uploaded files are delivered through `/media/:key`, so the R2 bucket itself does not need public access or a custom R2 domain.
+The Admin Media page accepts uploaded or clipboard-pasted JPG, PNG, WebP, GIF and AVIF images up to 5 MB. Uploaded files are delivered through `/media/:key`, so the R2 bucket itself does not need public access or a custom R2 domain.
 
 ## Deployment
 

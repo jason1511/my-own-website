@@ -222,6 +222,7 @@
       if (imageUrl) {
         const figure = document.createElement("figure");
         const image = document.createElement("img");
+        figure.className = "article-media";
         image.src = imageUrl;
         image.alt = String(section.image_alt || "").trim();
         image.loading = "lazy";

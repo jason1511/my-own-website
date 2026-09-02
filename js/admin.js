@@ -4,6 +4,14 @@
   let adminAppState = null;
   let currentAdminRoute = "";
   const dirtyAdminForms = new Set();
+  const MAX_MEDIA_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_MEDIA_TYPES = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/avif",
+  ]);
 
   setupAdminLogin();
   setupAdminLogout();
@@ -1176,9 +1184,10 @@
         <div>
           <label><strong>Screenshot Path or URL</strong></label>
           <input data-section-field="image_url" type="text" value="${escapeAttr(section.image_url || "")}" placeholder="/media/example.webp or https://..." />
-          <div class="admin-media-picker" data-media-picker>
+          <div class="admin-media-picker" data-media-picker tabindex="0">
             <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
             <button class="btn btn--small" type="button" data-media-upload>Upload Screenshot</button>
+            <small>or focus here and press Ctrl+V to paste an image</small>
             <span data-media-upload-status></span>
           </div>
         </div>
@@ -1961,9 +1970,61 @@ function setupWorkshopEditButtons(container) {
         button.disabled = false;
       }
     });
+
+    document.addEventListener("paste", (event) => {
+      const zone = event.target.closest(
+        "[data-media-picker], [data-media-paste-zone]"
+      );
+      if (!zone) return;
+
+      const clipboardItems = [...(event.clipboardData?.items || [])];
+      const imageItem = clipboardItems.find((item) =>
+        item.type.startsWith("image/")
+      );
+      const file = imageItem?.getAsFile();
+      const statusEl = zone.matches("[data-media-picker]")
+        ? zone.querySelector("[data-media-upload-status]")
+        : document.getElementById("adminMediaStatus");
+
+      if (!file) {
+        setText(statusEl, "The clipboard does not contain an image.");
+        return;
+      }
+
+      event.preventDefault();
+
+      try {
+        validateMediaFile(file);
+        const fileInput = zone.matches("[data-media-picker]")
+          ? zone.querySelector("[data-media-file]")
+          : document.getElementById("adminMediaFile");
+
+        if (!fileInput || typeof DataTransfer === "undefined") {
+          throw new Error("This browser cannot attach the pasted image.");
+        }
+
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        fileInput.files = transfer.files;
+
+        if (zone.matches("[data-media-picker]")) {
+          setText(statusEl, "Pasted image detected. Uploading...");
+          zone.querySelector("[data-media-upload]")?.click();
+        } else {
+          setText(
+            statusEl,
+            `Pasted ${file.name || "clipboard image"}. Add alt text, then select Upload Image.`
+          );
+        }
+      } catch (error) {
+        setText(statusEl, error.message || "Could not use the pasted image.");
+      }
+    });
   }
 
   async function uploadMediaFile(file, altText) {
+    validateMediaFile(file);
+
     const body = new FormData();
     body.append("file", file);
     body.append("alt_text", altText || "");
@@ -1979,6 +2040,16 @@ function setupWorkshopEditButtons(container) {
     }
 
     return data.asset;
+  }
+
+  function validateMediaFile(file) {
+    if (!file || !ALLOWED_MEDIA_TYPES.has(file.type)) {
+      throw new Error("Use a JPG, PNG, WebP, GIF, or AVIF image.");
+    }
+
+    if (!file.size || file.size > MAX_MEDIA_SIZE) {
+      throw new Error("Images must be 5 MB or smaller.");
+    }
   }
 
   async function loadAdminMedia() {

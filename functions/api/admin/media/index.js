@@ -1,6 +1,6 @@
 import { requireAdmin } from "../../../../lib/admin-auth.js";
 
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
@@ -66,7 +66,7 @@ export async function onRequestPost(context) {
     }
 
     if (!file.size || file.size > MAX_IMAGE_SIZE) {
-      return json({ ok: false, error: "Images must be 10 MB or smaller." }, 413);
+      return json({ ok: false, error: "Images must be 5 MB or smaller." }, 413);
     }
 
     const originalName = cleanFilename(file.name || `image.${extension}`);
