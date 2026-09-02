@@ -19,9 +19,12 @@
       fetchCollection("/api/blog", "blog_posts"),
     ]);
 
-    const caseStudies = caseStudiesResult.status === "fulfilled"
+    const loadedCaseStudies = caseStudiesResult.status === "fulfilled"
       ? caseStudiesResult.value.map(normalizeCaseStudy)
       : [];
+    const caseStudies = loadedCaseStudies.length
+      ? loadedCaseStudies
+      : [fallbackBikeStoreCaseStudy()];
     const notes = notesResult.status === "fulfilled"
       ? notesResult.value.map(normalizeNote)
       : [];
@@ -58,6 +61,17 @@
     }
 
     return data[key];
+  }
+
+  function fallbackBikeStoreCaseStudy() {
+    return {
+      type: "case-study",
+      label: "Case study",
+      title: "Building inventory and FIFO workflows around a real business",
+      summary: "How a C# desktop application grew around the day-to-day needs of an electric-bike retailer.",
+      date: "",
+      url: "bike-store.html",
+    };
   }
 
   function normalizeCaseStudy(item) {
