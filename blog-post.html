@@ -4,53 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Blog Post | Jason Leonard</title>
-  <meta
-    name="description"
-    content="Blog post by Jason Leonard."
-  />
+  <title>Development Note | Jason Leonard</title>
+  <meta name="description" content="Development note by Jason Leonard." />
+  <meta name="theme-color" content="#0a1322" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body>
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
+<body class="portfolio-archive article-page">
+  <a class="portfolio-skip-link" href="#article-content">Skip to article</a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-  <a href="index.html">Home</a>
-  <a href="projects.html">Projects</a>
-  <a href="case-studies.html">Case Studies</a>
-  <a href="blog.html" aria-current="page">Blog</a>
-  <a href="about.html">About</a>
-  <a href="contact.html">Contact</a>
-</nav>
-    </div>
-  </header>
+  <main class="article-shell" id="article-content">
+    <a class="article-back" href="writing.html">
+      <span aria-hidden="true">←</span> All writing
+    </a>
 
-  <main class="site-main">
-    <section class="about-hero">
-      <div class="container">
-        <article class="about-hero__content" data-blog-post>
-          <h1>Loading post…</h1>
-          <p>Please wait while the post loads.</p>
-        </article>
-      </div>
-    </section>
+    <article class="article-document article-document--note" data-blog-post>
+      <header class="article-header">
+        <p class="article-eyebrow">Development note</p>
+        <h1>Loading post…</h1>
+        <p class="article-lead">Please wait while the post loads.</p>
+      </header>
+    </article>
 
-    <section>
-      <div class="container">
-        <a class="btn" href="blog.html">Back to Blog</a>
-      </div>
-    </section>
+    <footer class="article-footer">
+      <a href="writing.html"><span aria-hidden="true">←</span> Back to writing</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
   </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
 
   <script src="js/main.js"></script>
   <script src="js/blog-post.js"></script>

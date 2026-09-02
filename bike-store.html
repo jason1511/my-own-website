@@ -7,245 +7,194 @@
   <title>Case Study | Bike Store Inventory &amp; Sales App</title>
   <meta
     name="description"
-    content="Case study: Bike Store Inventory & Sales Management App built with C# WinForms and SQLite."
+    content="Case study: Bike Store Inventory and Sales Management App built with C# WinForms and SQLite."
   />
+  <meta name="theme-color" content="#0a1322" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<body>
-  <!-- Header / Nav -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
+<body class="portfolio-archive article-page">
+  <a class="portfolio-skip-link" href="#article-content">Skip to article</a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-  <a href="index.html">Home</a>
-  <a href="projects.html">Projects</a>
-  <a href="case-studies.html" aria-current="page">Case Studies</a>
-  <a href="blog.html">Blog</a>
-  <a href="about.html">About</a>
-  <a href="contact.html">Contact</a>
-</nav>
-    </div>
-  </header>
+  <main class="article-shell article-shell--wide" id="article-content">
+    <a class="article-back" href="writing.html?type=case-study">
+      <span aria-hidden="true">←</span> All case studies
+    </a>
 
-  <main class="site-main">
-    <!-- Hero -->
-    <section class="about-hero">
-      <div class="container about-hero__grid">
-        <div class="about-hero__content">
-          <h1>Bike Store Inventory &amp; Sales App</h1>
-          <p class="card__meta">Case Study · C#, .NET WinForms, SQLite</p>
+    <article class="article-document case-study-detail">
+      <header class="article-header">
+        <p class="article-eyebrow">Case study · Desktop business application</p>
+        <h1>Bike Store Inventory &amp; Sales App</h1>
+        <p class="article-lead">
+          A desktop application built for a small electric-bike retailer to
+          manage inventory, sales, service records, FIFO stock, users, and
+          operational reporting.
+        </p>
+      </header>
 
+      <!--
+        Future cover image:
+        <figure class="article-cover">
+          <img src="..." alt="Bike Store application dashboard" />
+          <figcaption>Application overview.</figcaption>
+        </figure>
+      -->
+
+      <dl class="article-facts" aria-label="Project facts">
+        <div><dt>Role</dt><dd>Designer &amp; developer</dd></div>
+        <div><dt>Users</dt><dd>Small retail staff</dd></div>
+        <div><dt>Platform</dt><dd>Windows desktop</dd></div>
+        <div><dt>Status</dt><dd>Ongoing</dd></div>
+      </dl>
+
+      <ul class="article-tags" aria-label="Technologies used">
+        <li>C#</li>
+        <li>.NET 8</li>
+        <li>WinForms</li>
+        <li>SQLite</li>
+        <li>MSTest</li>
+      </ul>
+
+      <nav class="article-toc" aria-label="Case study contents">
+        <p class="article-eyebrow">On this page</p>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#features">Key features</a></li>
+          <li><a href="#implementation">Implementation</a></li>
+          <li><a href="#learnings">Learnings</a></li>
+        </ol>
+      </nav>
+
+      <div class="article-body">
+        <section id="overview">
+          <p class="article-section-number">01</p>
+          <h2>Overview</h2>
           <p>
-            A desktop application built for a small electric bike retailer to manage inventory, sales transactions,
-            and service records. Designed to support daily operations with a focus on usability, accuracy, and
-            reliability.
+            The project replaces inconsistent manual tracking with one system
+            for recording stock, transactions, service activity, users, and
+            reports. The interface is organised around the work staff actually
+            perform rather than around database tables.
           </p>
 
-          <div class="about-hero__actions">
-            <a class="btn btn--primary" href="projects.html">Back to Projects</a>
-            <a class="btn" href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">
-              View on GitHub
-            </a>
-          </div>
-        </div>
-
-        <aside class="profile-card" aria-label="Project summary">
-          <div class="profile-card__header">
+          <div class="article-split">
             <div>
-              <p class="profile-card__name">Project Summary</p>
-              <p class="profile-card__role">At a glance</p>
+              <h3>Problem</h3>
+              <p>
+                Handwritten and disconnected records made it difficult to check
+                stock quickly, review sales history, and understand the true
+                cost of inventory received at different times.
+              </p>
+            </div>
+            <div>
+              <h3>Solution</h3>
+              <p>
+                A local-first desktop application with structured workflows,
+                reliable SQLite storage, and FIFO stock-lot accounting designed
+                for daily retail operations.
+              </p>
             </div>
           </div>
+        </section>
 
-          <dl class="profile-card__list">
-            <div class="profile-card__item">
-              <dt>Type</dt>
-              <dd>Desktop business application</dd>
-            </div>
-            <div class="profile-card__item">
-              <dt>Users</dt>
-              <dd>Small retail staff</dd>
-            </div>
-            <div class="profile-card__item">
-              <dt>Stack</dt>
-              <dd>C#, WinForms, SQLite</dd>
-            </div>
-            <div class="profile-card__item">
-              <dt>Focus</dt>
-              <dd>Usability, accuracy, reliability</dd>
-            </div>
-          </dl>
-
-          <div class="profile-card__links">
-            <a href="#overview">Overview</a>
-            <a href="#features">Features</a>
-            <a href="#tech">Tech</a>
-            <a href="#learnings">Learnings</a>
+        <section id="features">
+          <p class="article-section-number">02</p>
+          <h2>Key features</h2>
+          <div class="article-feature-list">
+            <article>
+              <h3>Inventory &amp; FIFO stock</h3>
+              <p>
+                Products, colours, received stock lots, unit costs, remaining
+                quantities, and FIFO consumption are kept together.
+              </p>
+            </article>
+            <article>
+              <h3>Sales &amp; invoices</h3>
+              <p>
+                Staff can record multi-item sales, payment methods, frame
+                numbers, customer details, and print compact invoices.
+              </p>
+            </article>
+            <article>
+              <h3>Service records</h3>
+              <p>
+                Service work is tracked alongside sales with printable records
+                and a searchable operational history.
+              </p>
+            </article>
+            <article>
+              <h3>Users &amp; reporting</h3>
+              <p>
+                Role-aware access, activity tracking, date-range reports, and
+                stock movement summaries support safer daily use.
+              </p>
+            </article>
           </div>
-        </aside>
+        </section>
+
+        <section id="implementation">
+          <p class="article-section-number">03</p>
+          <h2>Implementation</h2>
+          <p>
+            C# and .NET 8 provide the desktop application layer, while SQLite
+            keeps deployment lightweight and the store operational without an
+            internet connection. Database changes are handled through
+            migrations and important stock behaviour is covered by tests.
+          </p>
+
+          <ul>
+            <li>Workflow-oriented WinForms screens for non-technical users</li>
+            <li>FIFO consumption ordered by received date and stock-lot ID</li>
+            <li>Local SQLite persistence with migration support</li>
+            <li>Printable sales, service, and reporting documents</li>
+            <li>Iterative improvements based on real store feedback</li>
+          </ul>
+
+          <!--
+            Future screenshot or gallery:
+            <figure class="article-media">
+              <img src="..." alt="Inventory screen showing FIFO stock lots" />
+              <figcaption>Inventory and received-stock workflow.</figcaption>
+            </figure>
+
+            <div class="article-gallery">
+              <figure class="article-media">...</figure>
+              <figure class="article-media">...</figure>
+            </div>
+          -->
+        </section>
+
+        <section id="learnings">
+          <p class="article-section-number">04</p>
+          <h2>Challenges &amp; learnings</h2>
+          <p>
+            The most important lesson was that operational software has to
+            reflect real exceptions, not only the ideal path. Stock corrections,
+            split quantities, printable paperwork, permissions, and recovery
+            behaviour became as important as the first version of each feature.
+          </p>
+
+          <blockquote>
+            Reliable business software is built by repeatedly comparing the
+            interface with the work people actually do.
+          </blockquote>
+        </section>
       </div>
-    </section>
 
-    <!-- Overview -->
-    <section id="overview">
-      <div class="container">
-        <h2>Overview</h2>
-        <p class="section-lead">
-          This project was built to replace manual tracking methods with a consistent system for recording stock,
-          transactions, and service activity.
-        </p>
-
-        <div class="cards">
-          <article class="card">
-            <h3>Problem</h3>
-            <p>
-              Inventory and transaction tracking handled manually can become inconsistent over time, making it difficult
-              to check stock status quickly, review history, or create summaries without extra effort.
-            </p>
-          </article>
-
-          <article class="card">
-            <h3>Solution</h3>
-            <p>
-              A lightweight desktop application with structured data storage and a simple workflow-based UI to manage
-              daily operations reliably.
-            </p>
-          </article>
-        </div>
+      <div class="article-actions">
+        <a href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">
+          View on GitHub <span aria-hidden="true">↗</span>
+        </a>
+        <a href="projects.html">View all projects <span aria-hidden="true">→</span></a>
       </div>
-    </section>
+    </article>
 
-    <!-- Features -->
-    <section id="features">
-      <div class="container">
-        <h2>Key Features</h2>
-        <p class="section-lead">
-          Designed around the core workflows a small bike store needs: manage stock, record transactions, and review
-          history.
-        </p>
-
-        <div class="cards">
-          <article class="card">
-            <h3>Inventory Management</h3>
-            <ul>
-              <li>Create and update product records</li>
-              <li>Track stock quantities and item details</li>
-              <li>Support quick lookup and consistent data entry</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Sales &amp; Transaction Logging</h3>
-            <ul>
-              <li>Record sales transactions consistently</li>
-              <li>Maintain a transaction log for review and auditing</li>
-              <li>Support structured history for store operations</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Service Records</h3>
-            <ul>
-              <li>Track service activity alongside sales</li>
-              <li>Store basic details to support follow-ups</li>
-              <li>Keep customer-facing work organised</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Offline-First Storage</h3>
-            <ul>
-              <li>Local SQLite database for reliable storage</li>
-              <li>Works without internet access</li>
-              <li>Designed to be maintainable and extendable</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tech -->
-    <section id="tech">
-      <div class="container">
-        <h2>Tech Stack &amp; Implementation</h2>
-        <p class="section-lead">
-          Built with a straightforward structure to keep the codebase maintainable and easy to extend.
-        </p>
-
-        <div class="cards">
-          <article class="card">
-            <h3>Stack</h3>
-            <ul>
-              <li><strong>C# / .NET WinForms</strong> for the desktop UI</li>
-              <li><strong>SQLite</strong> for local structured storage</li>
-              <li><strong>Git &amp; GitHub</strong> for version control</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Approach</h3>
-            <ul>
-              <li>Designed screens around real workflows</li>
-              <li>Improved features based on feedback and iteration</li>
-              <li>Kept the UI clean and consistent for non-technical users</li>
-              <li>Prioritised accuracy and reliability of records</li>
-            </ul>
-          </article>
-        </div>
-
-        <div style="margin-top: 1.25rem;">
-          <a class="btn btn--primary" href="https://github.com/jason1511/Bike-STore-Project" target="_blank" rel="noopener">
-            View Source on GitHub
-          </a>
-          <a class="btn" href="projects.html">Back to Projects</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Learnings -->
-    <section id="learnings">
-      <div class="container">
-        <h2>Challenges &amp; Learnings</h2>
-        <p class="section-lead">
-          This project strengthened my ability to translate user needs into software features and deliver a usable
-          system through iteration.
-        </p>
-
-        <div class="cards">
-          <article class="card">
-            <h3>What I Learned</h3>
-            <ul>
-              <li>Turning requirements into clear workflows and UI design</li>
-              <li>Working with structured data using SQLite</li>
-              <li>Building maintainable code that supports future improvements</li>
-              <li>Iterating quickly while keeping changes stable</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>What I’m Proud Of</h3>
-            <ul>
-              <li>End-to-end ownership: plan → build → test → refine</li>
-              <li>A practical solution designed for real store operations</li>
-              <li>Clear structure that can be extended over time</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
+    <footer class="article-footer">
+      <a href="writing.html?type=case-study"><span aria-hidden="true">←</span> Back to case studies</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
-
-
   <script src="js/main.js"></script>
-
 </body>
 </html>

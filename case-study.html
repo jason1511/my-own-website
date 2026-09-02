@@ -6,110 +6,92 @@
 
   <title>Case Study | Jason Leonard</title>
   <meta name="description" content="Software project case study by Jason Leonard." />
+  <meta name="theme-color" content="#0a1322" />
 
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/case-study-detail.css" />
 </head>
 
-<body>
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
+<body class="portfolio-archive article-page">
+  <a class="portfolio-skip-link" href="#article-content">Skip to article</a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="index.html">Home</a>
-        <a href="projects.html">Projects</a>
-        <a href="case-studies.html" aria-current="page">Case Studies</a>
-        <a href="blog.html">Blog</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
+  <main class="article-shell article-shell--wide" id="article-content">
+    <a class="article-back" href="writing.html?type=case-study">
+      <span aria-hidden="true">←</span> All case studies
+    </a>
+
+    <div
+      class="article-status"
+      data-case-study-status
+      role="status"
+      aria-live="polite"
+    >
+      Loading case study…
+    </div>
+
+    <article class="article-document case-study-detail" data-case-study-detail hidden>
+      <header class="article-header case-study-detail__header">
+        <p class="article-eyebrow case-study-detail__type" data-case-study-project></p>
+        <h1 data-case-study-title></h1>
+        <p class="article-lead case-study-detail__summary" data-case-study-summary></p>
+      </header>
+
+      <figure class="article-cover case-study-detail__cover" data-case-study-cover hidden>
+        <img data-case-study-cover-image alt="" />
+      </figure>
+
+      <dl class="article-facts case-study-detail__facts" data-case-study-facts hidden></dl>
+
+      <ul
+        class="article-tags case-study-detail__technologies"
+        data-case-study-technologies
+        aria-label="Technologies used"
+      ></ul>
+
+      <nav class="article-toc case-study-detail__toc" data-case-study-toc hidden aria-label="Case study contents">
+        <p class="article-eyebrow">On this page</p>
+        <ol data-case-study-toc-list></ol>
       </nav>
-    </div>
-  </header>
 
-  <main class="site-main">
-    <section class="case-study-detail">
-      <div class="container">
-        <a class="case-study-detail__back" href="case-studies.html">
-          ← Back to case studies
-        </a>
+      <div class="article-body case-study-detail__sections" data-case-study-sections-container>
+        <section data-case-study-section="problem">
+          <h2>The Problem</h2>
+          <div data-case-study-content="problem"></div>
+        </section>
 
-        <div
-          class="case-study-detail__status"
-          data-case-study-status
-          role="status"
-          aria-live="polite"
-        >
-          Loading case study…
-        </div>
+        <section data-case-study-section="solution">
+          <h2>The Solution</h2>
+          <div data-case-study-content="solution"></div>
+        </section>
 
-        <article data-case-study-detail hidden>
-          <header class="case-study-detail__header">
-            <p class="case-study-detail__type" data-case-study-project></p>
-            <h1 data-case-study-title></h1>
-            <p class="case-study-detail__summary" data-case-study-summary></p>
-          </header>
+        <section data-case-study-section="key_features">
+          <h2>Key Features</h2>
+          <div data-case-study-content="key_features"></div>
+        </section>
 
-          <figure class="case-study-detail__cover" data-case-study-cover hidden>
-            <img data-case-study-cover-image alt="" />
-          </figure>
+        <section data-case-study-section="technical_details">
+          <h2>Technical Details</h2>
+          <div data-case-study-content="technical_details"></div>
+        </section>
 
-          <dl class="case-study-detail__facts" data-case-study-facts hidden></dl>
+        <section data-case-study-section="challenges">
+          <h2>Challenges</h2>
+          <div data-case-study-content="challenges"></div>
+        </section>
 
-          <ul
-            class="tag-list case-study-detail__technologies"
-            data-case-study-technologies
-            aria-label="Technologies used"
-          ></ul>
-
-          <nav class="case-study-detail__toc" data-case-study-toc hidden aria-label="Case study contents">
-            <h2>On this page</h2>
-            <ol data-case-study-toc-list></ol>
-          </nav>
-
-          <div class="case-study-detail__sections" data-case-study-sections-container>
-            <section data-case-study-section="problem">
-              <h2>The Problem</h2>
-              <div data-case-study-content="problem"></div>
-            </section>
-
-            <section data-case-study-section="solution">
-              <h2>The Solution</h2>
-              <div data-case-study-content="solution"></div>
-            </section>
-
-            <section data-case-study-section="key_features">
-              <h2>Key Features</h2>
-              <div data-case-study-content="key_features"></div>
-            </section>
-
-            <section data-case-study-section="technical_details">
-              <h2>Technical Details</h2>
-              <div data-case-study-content="technical_details"></div>
-            </section>
-
-            <section data-case-study-section="challenges">
-              <h2>Challenges</h2>
-              <div data-case-study-content="challenges"></div>
-            </section>
-
-            <section data-case-study-section="learnings">
-              <h2>What I Learned</h2>
-              <div data-case-study-content="learnings"></div>
-            </section>
-          </div>
-
-          <div class="case-study-detail__actions" data-case-study-actions></div>
-        </article>
+        <section data-case-study-section="learnings">
+          <h2>What I Learned</h2>
+          <div data-case-study-content="learnings"></div>
+        </section>
       </div>
-    </section>
-  </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
+      <div class="article-actions case-study-detail__actions" data-case-study-actions></div>
+    </article>
+
+    <footer class="article-footer">
+      <a href="writing.html?type=case-study"><span aria-hidden="true">←</span> Back to case studies</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
+  </main>
 
   <script src="js/main.js"></script>
   <script src="js/case-study-detail.js"></script>

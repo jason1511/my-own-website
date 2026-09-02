@@ -11,6 +11,7 @@
 
   let entries = [];
 
+  const requestedFilter = new URLSearchParams(window.location.search).get("type");
   loadWriting();
 
   async function loadWriting() {
@@ -40,8 +41,19 @@
     }
 
     if (archiveList) {
-      renderArchive("all");
       setupFilters();
+      const initialFilter = ["case-study", "note"].includes(requestedFilter)
+        ? requestedFilter
+        : "all";
+      const initialButton = filterButtons.find(
+        (button) => button.dataset.writingFilter === initialFilter
+      );
+      if (initialButton) {
+        filterButtons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(button === initialButton));
+        });
+      }
+      renderArchive(initialFilter);
     }
   }
 
@@ -86,6 +98,7 @@
       title: String(item.title || item.project_title || "").trim(),
       summary: String(item.summary || "").trim(),
       date: item.updated_at || item.created_at || "",
+      image: safeImageUrl(item.image_key || item.cover_image_url || item.thumbnail_url),
       url: slug
         ? `case-study.html?slug=${encodeURIComponent(slug)}`
         : bikeStore
@@ -103,6 +116,7 @@
       title: String(item.title || "").trim(),
       summary: String(item.excerpt || "").trim(),
       date: item.updated_at || item.created_at || "",
+      image: safeImageUrl(item.image_key || item.cover_image_url || item.thumbnail_url),
       url: slug ? `blog-post.html?slug=${encodeURIComponent(slug)}` : "",
     };
   }
@@ -132,8 +146,11 @@
     return `
       <article class="writing-row" data-writing-type="${escapeAttr(entry.type)}">
         <p class="writing-row__type">${escapeHtml(entry.label)}${formatDate(entry.date) ? `<span>${escapeHtml(formatDate(entry.date))}</span>` : ""}</p>
-        <a class="writing-row__main" href="${escapeAttr(entry.url)}">
-          <span>
+        <a class="writing-row__main${entry.image ? " writing-row__main--with-image" : ""}" href="${escapeAttr(entry.url)}">
+          ${entry.image
+            ? `<span class="writing-row__thumbnail"><img src="${escapeAttr(entry.image)}" alt="" loading="lazy" /></span>`
+            : ""}
+          <span class="writing-row__copy">
             <strong>${escapeHtml(entry.title)}</strong>
             ${entry.summary ? `<small>${escapeHtml(entry.summary)}</small>` : ""}
           </span>
@@ -158,6 +175,17 @@
         renderArchive(filter);
       });
     });
+  }
+
+  function safeImageUrl(value) {
+    if (!value) return "";
+
+    try {
+      const parsed = new URL(String(value).trim(), window.location.origin);
+      return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+    } catch {
+      return "";
+    }
   }
 
   function safeSlug(value) {
