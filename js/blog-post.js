@@ -105,8 +105,7 @@
     return `
       <section>
         ${title
-          ? `<p class="article-section-number">${String(index + 1).padStart(2, "0")}</p>
-             <h2>${escapeHtml(title)}</h2>`
+          ? `<h2>${escapeHtml(title)}</h2>`
           : ""}
         ${renderParagraphs(body)}
         ${bullets.length

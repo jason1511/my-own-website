@@ -2462,3 +2462,10 @@ h3 {
 .article-status.project-detail__status--error {
   color: #ffb4b4;
 }
+
+
+/* Number-free section labels */
+.portfolio-section__header {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}

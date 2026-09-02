@@ -162,13 +162,9 @@
   function renderOverviewSection(content, index) {
     const section = document.createElement("section");
     const heading = document.createElement("h2");
-    const number = document.createElement("p");
-
-    number.className = "article-section-number";
-    number.textContent = String(index + 1).padStart(2, "0");
     heading.id = "project-overview";
     heading.textContent = "Overview";
-    section.append(number, heading);
+    section.append(heading);
 
     const paragraphs = splitParagraphs(content);
     if (!paragraphs.length) {
@@ -198,14 +194,11 @@
 
     const sectionElement = document.createElement("section");
     const heading = document.createElement("h2");
-    const number = document.createElement("p");
     const headingText = title || `Project section ${index + 1}`;
 
-    number.className = "article-section-number";
-    number.textContent = String(index + 1).padStart(2, "0");
     heading.id = createHeadingId(headingText, index);
     heading.textContent = headingText;
-    sectionElement.append(number, heading);
+    sectionElement.append(heading);
 
     for (const paragraphText of splitParagraphs(body)) {
       const paragraph = document.createElement("p");
@@ -254,12 +247,9 @@
 
   function renderScreenshotSection(screenshots, index) {
     const section = document.createElement("section");
-    const number = document.createElement("p");
     const heading = document.createElement("h2");
     const gallery = document.createElement("div");
 
-    number.className = "article-section-number";
-    number.textContent = String(index + 1).padStart(2, "0");
     heading.id = "project-screenshots";
     heading.textContent = "Screenshots";
     gallery.className = screenshots.length > 1
@@ -276,7 +266,7 @@
       );
     }
 
-    section.append(number, heading, gallery);
+    section.append(heading, gallery);
     return section;
   }
 
