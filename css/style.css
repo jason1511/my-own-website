@@ -1525,3 +1525,38 @@ h3 {
     aspect-ratio: 16 / 9;
   }
 }
+
+
+/* Compact profile icon links */
+.portfolio-icon-links {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  margin-top: 1.6rem;
+}
+
+.portfolio-icon-links a {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--portfolio-muted);
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.portfolio-icon-links a:hover {
+  color: var(--portfolio-accent);
+  transform: translateY(-2px);
+}
+
+.portfolio-icon-links svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+@media (max-width: 960px) {
+  .portfolio-icon-links {
+    margin-top: 1.4rem;
+  }
+}
