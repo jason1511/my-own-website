@@ -177,7 +177,7 @@
             <article class="card">
               <h3>Media Assets</h3>
               <p>
-                Future R2 image uploads and asset references.
+                Upload and reuse project covers, case-study screenshots, and blog images.
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-media">
@@ -297,14 +297,19 @@
           </div>
 
           <div>
-            <label for="projectImageKey"><strong>Image Key</strong></label><br />
+            <label for="projectImageKey"><strong>Cover Image Path or URL</strong></label><br />
             <input
               id="projectImageKey"
               name="image_key"
               type="text"
-              placeholder="R2 image key later"
+              placeholder="/media/example.webp or https://..."
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             />
+            <div class="admin-media-picker" data-media-picker>
+              <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+              <button class="btn btn--small" type="button" data-media-upload data-media-target="projectImageKey">Upload Cover</button>
+              <span data-media-upload-status></span>
+            </div>
           </div>
 
           <div>
@@ -495,8 +500,13 @@
                     id="caseStudyImageKey"
                     name="image_key"
                     type="text"
-                    placeholder="images/projects/bike-store-dashboard.jpg or https://..."
+                    placeholder="/media/example.webp or https://..."
                   />
+                  <div class="admin-media-picker" data-media-picker>
+                    <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+                    <button class="btn btn--small" type="button" data-media-upload data-media-target="caseStudyImageKey">Upload Cover</button>
+                    <span data-media-upload-status></span>
+                  </div>
                 </div>
 
                 <div>
@@ -632,6 +642,22 @@
                     placeholder="Write the full blog post here..."
                     style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
                   ></textarea>
+                </div>
+
+                <div>
+                  <label for="blogCoverImageKey"><strong>Cover Image Path or URL</strong></label><br />
+                  <input
+                    id="blogCoverImageKey"
+                    name="cover_image_key"
+                    type="text"
+                    placeholder="/media/example.webp or https://..."
+                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+                  />
+                  <div class="admin-media-picker" data-media-picker>
+                    <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+                    <button class="btn btn--small" type="button" data-media-upload data-media-target="blogCoverImageKey">Upload Cover</button>
+                    <span data-media-upload-status></span>
+                  </div>
                 </div>
 
                 <div>
@@ -792,11 +818,42 @@
       <section id="admin-media">
         <div class="container">
           <h2>Media Assets</h2>
-          <p class="section-lead">R2 media management will be added later.</p>
+          <p class="section-lead">Upload images once, then reuse their paths in projects, notes, and case studies.</p>
 
-          <div class="cards" data-admin-media>
+          <article class="card admin-media-upload-card">
+            <h3>Upload Image</h3>
+            <form id="adminMediaForm" class="admin-form-grid">
+              <div>
+                <label for="adminMediaFile"><strong>Image</strong></label>
+                <input
+                  id="adminMediaFile"
+                  name="file"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  required
+                />
+              </div>
+              <div>
+                <label for="adminMediaAlt"><strong>Default Alt Text</strong></label>
+                <input
+                  id="adminMediaAlt"
+                  name="alt_text"
+                  type="text"
+                  maxlength="300"
+                  placeholder="Describe what is visible in the image"
+                />
+              </div>
+              <p class="admin-form-help">JPG, PNG, WebP, GIF, or AVIF. Maximum 10 MB.</p>
+              <p id="adminMediaStatus" class="admin-form-status" role="status"></p>
+              <div class="admin-form-actions">
+                <button class="btn btn--primary" type="submit">Upload Image</button>
+              </div>
+            </form>
+          </article>
+
+          <div class="admin-media-grid" data-admin-media>
             <article class="card">
-              <p>No media assets loaded yet.</p>
+              <p>Loading media assets…</p>
             </article>
           </div>
         </div>

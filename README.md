@@ -32,6 +32,7 @@ The protected admin page supports creating, editing and deleting:
 - Project case studies
 - Blog posts
 - Steam Workshop items
+- R2-hosted images through a reusable media library
 
 Content can be published or kept as a draft, featured and arranged using display order.
 
@@ -53,8 +54,9 @@ Case studies support:
 
 - Cloudflare Pages Functions
 - Cloudflare D1 database
+- Cloudflare R2 object storage
 - Public and protected admin API routes
-- Header-based admin authentication
+- Signed, HTTP-only admin sessions
 - Server-side input validation
 - Published-content filtering
 - GitHub REST API and Steam Web API integrations
@@ -68,6 +70,7 @@ Case studies support:
 - Cloudflare Pages
 - Cloudflare Pages Functions
 - Cloudflare D1
+- Cloudflare R2
 - Wrangler
 - GitHub REST API
 - Steam Web API
@@ -120,6 +123,12 @@ Configure these through Cloudflare rather than committing secrets:
 - **GITHUB_TOKEN** — optional authenticated GitHub API access
 - **RESEND_API_KEY** — optional contact-email delivery
 - **CONTACT_TO_EMAIL** — contact-form destination
+
+## R2 media setup
+
+Create an R2 bucket in Cloudflare and bind it to the Pages project using the variable name **MEDIA_BUCKET**. The binding must be available to both preview and production if image uploads should work in both environments. Redeploy the Pages project after adding or changing the binding.
+
+The Admin Media page accepts JPG, PNG, WebP, GIF and AVIF images up to 10 MB. Uploaded files are delivered through `/media/:key`, so the R2 bucket itself does not need public access or a custom R2 domain.
 
 ## Deployment
 

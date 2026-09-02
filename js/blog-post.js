@@ -47,7 +47,7 @@
     updateDescription(post.excerpt);
 
     const coverUrl = safeImageUrl(
-      post.image_key || post.cover_image_url || post.thumbnail_url
+      post.cover_image_key || post.image_key || post.cover_image_url || post.thumbnail_url
     );
 
     postContainer.innerHTML = `

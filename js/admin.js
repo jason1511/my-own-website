@@ -11,6 +11,8 @@
   setupAdminBlogForm();
   setupAdminProjectForm();
   setupAdminWorkshopForm();
+  setupAdminMedia();
+  setupInlineMediaUploads();
   setupAdminApp();
   restoreAdminSession();
 
@@ -690,6 +692,7 @@
     loadAdminCaseStudies();
     loadAdminBlogPosts();
     loadAdminWorkshopItems();
+    loadAdminMedia();
   }
 
   function lockAdminDashboard(message = "Please log in to continue.") {
@@ -1172,7 +1175,12 @@
 
         <div>
           <label><strong>Screenshot Path or URL</strong></label>
-          <input data-section-field="image_url" type="text" value="${escapeAttr(section.image_url || "")}" placeholder="images/projects/example.jpg or https://..." />
+          <input data-section-field="image_url" type="text" value="${escapeAttr(section.image_url || "")}" placeholder="/media/example.webp or https://..." />
+          <div class="admin-media-picker" data-media-picker>
+            <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+            <button class="btn btn--small" type="button" data-media-upload>Upload Screenshot</button>
+            <span data-media-upload-status></span>
+          </div>
         </div>
 
         <div>
@@ -1238,6 +1246,7 @@
       const slug = form.elements["slug"].value.trim();
       const excerpt = form.elements["excerpt"].value.trim();
       const content = form.elements["content"].value.trim();
+      const coverImageKey = form.elements["cover_image_key"].value.trim();
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isPublished = form.elements["is_published"].checked;
 
@@ -1268,7 +1277,7 @@
             slug,
             excerpt,
             content,
-            cover_image_key: "",
+            cover_image_key: coverImageKey,
             is_published: isPublished,
             display_order: displayOrder,
           }),
@@ -1309,6 +1318,7 @@
       form.elements["slug"].value = "";
       form.elements["excerpt"].value = "";
       form.elements["content"].value = "";
+      form.elements["cover_image_key"].value = "";
       form.elements["display_order"].value = "0";
       form.elements["is_published"].checked = true;
 
@@ -1691,6 +1701,7 @@ function setupProjectEditButtons(container) {
             data-blog-slug="${escapeAttr(post.slug)}"
             data-blog-excerpt="${escapeAttr(post.excerpt)}"
             data-blog-content="${escapeAttr(post.content)}"
+            data-blog-cover-image-key="${escapeAttr(post.cover_image_key || "")}"
             data-blog-order="${Number(post.display_order)}"
             data-blog-published="${post.is_published ? "1" : "0"}"
           >
@@ -1740,6 +1751,8 @@ function setupProjectEditButtons(container) {
         form.elements["slug"].value = button.dataset.blogSlug || "";
         form.elements["excerpt"].value = button.dataset.blogExcerpt || "";
         form.elements["content"].value = button.dataset.blogContent || "";
+        form.elements["cover_image_key"].value =
+          button.dataset.blogCoverImageKey || "";
         form.elements["display_order"].value = button.dataset.blogOrder || "0";
         form.elements["is_published"].checked =
           button.dataset.blogPublished === "1";
@@ -1869,6 +1882,195 @@ function setupWorkshopEditButtons(container) {
     });
   });
 }
+
+  /* ---------------- R2 MEDIA ---------------- */
+
+  function setupAdminMedia() {
+    const form = document.getElementById("adminMediaForm");
+    if (!form) return;
+
+    const statusEl = document.getElementById("adminMediaStatus");
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const file = form.elements["file"].files?.[0];
+      const altText = form.elements["alt_text"].value.trim();
+
+      if (!file) {
+        setText(statusEl, "Choose an image first.");
+        return;
+      }
+
+      if (submitBtn) submitBtn.disabled = true;
+      setText(statusEl, "Uploading image...");
+
+      try {
+        const asset = await uploadMediaFile(file, altText);
+        form.reset();
+        setText(statusEl, `Uploaded ${asset.filename}. Path: ${asset.url}`);
+        await loadAdminMedia();
+      } catch (error) {
+        console.error(error);
+        setText(statusEl, error.message || "Failed to upload image.");
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  function setupInlineMediaUploads() {
+    document.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-media-upload]");
+      if (!button) return;
+
+      const picker = button.closest("[data-media-picker]");
+      const fileInput = picker?.querySelector("[data-media-file]");
+      const statusEl = picker?.querySelector("[data-media-upload-status]");
+      const file = fileInput?.files?.[0];
+
+      if (!file) {
+        setText(statusEl, "Choose an image first.");
+        return;
+      }
+
+      const target = button.dataset.mediaTarget
+        ? document.getElementById(button.dataset.mediaTarget)
+        : button.closest("[data-case-study-section-editor]")
+            ?.querySelector('[data-section-field="image_url"]');
+
+      if (!target) {
+        setText(statusEl, "Could not find the image field.");
+        return;
+      }
+
+      button.disabled = true;
+      setText(statusEl, "Uploading...");
+
+      try {
+        const asset = await uploadMediaFile(file, "");
+        target.value = asset.url;
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        fileInput.value = "";
+        setText(statusEl, "Uploaded and inserted.");
+        await loadAdminMedia();
+      } catch (error) {
+        console.error(error);
+        setText(statusEl, error.message || "Upload failed.");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
+  async function uploadMediaFile(file, altText) {
+    const body = new FormData();
+    body.append("file", file);
+    body.append("alt_text", altText || "");
+
+    const response = await adminFetch("/api/admin/media", {
+      method: "POST",
+      body,
+    });
+    const data = await readJsonSafe(response);
+
+    if (!response.ok || !data.ok || !data.asset) {
+      throw new Error(data.error || `Upload failed: ${response.status}`);
+    }
+
+    return data.asset;
+  }
+
+  async function loadAdminMedia() {
+    const container = document.querySelector("[data-admin-media]");
+    if (!container) return;
+
+    try {
+      const response = await adminFetch("/api/admin/media", {
+        headers: { Accept: "application/json" },
+      });
+      const data = await readJsonSafe(response);
+
+      if (!response.ok || !data.ok || !Array.isArray(data.assets)) {
+        throw new Error(data.error || "Invalid media API response.");
+      }
+
+      if (!data.assets.length) {
+        container.innerHTML = renderEmptyCard("No images uploaded yet.");
+        return;
+      }
+
+      container.innerHTML = data.assets.map(renderMediaCard).join("");
+      setupMediaCardButtons(container);
+    } catch (error) {
+      console.error(error);
+      container.innerHTML = renderErrorCard(
+        error.message || "Could not load media assets."
+      );
+    }
+  }
+
+  function renderMediaCard(asset) {
+    return `
+      <article class="card admin-media-card">
+        <img src="${escapeAttr(asset.url)}" alt="${escapeAttr(asset.alt_text || "")}" loading="lazy" />
+        <div class="admin-media-card__body">
+          <h3>${escapeHtml(asset.filename)}</h3>
+          <p class="card__meta">${escapeHtml(formatBytes(asset.size_bytes))} · ${escapeHtml(asset.content_type)}</p>
+          ${asset.alt_text ? `<p>${escapeHtml(asset.alt_text)}</p>` : ""}
+          <code>${escapeHtml(asset.url)}</code>
+          <div class="card__actions">
+            <button class="btn btn--small btn--primary" type="button" data-media-copy data-media-url="${escapeAttr(asset.url)}">Copy Path</button>
+            <button class="btn btn--small btn--danger" type="button" data-media-delete data-media-key="${escapeAttr(asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Delete</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function setupMediaCardButtons(container) {
+    container.querySelectorAll("[data-media-copy]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const value = button.dataset.mediaUrl || "";
+        try {
+          await navigator.clipboard.writeText(value);
+          button.textContent = "Copied";
+        } catch {
+          window.prompt("Copy this image path:", value);
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-media-delete]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const key = button.dataset.mediaKey || "";
+        const name = button.dataset.mediaName || "this image";
+        if (!key || !window.confirm(`Delete “${name}” from R2? Existing pages using it will lose the image.`)) return;
+
+        button.disabled = true;
+        try {
+          const response = await adminFetch(`/api/admin/media/${encodeURIComponent(key)}`, { method: "DELETE" });
+          const data = await readJsonSafe(response);
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || `Delete failed: ${response.status}`);
+          }
+          await loadAdminMedia();
+        } catch (error) {
+          console.error(error);
+          window.alert(error.message || "Failed to delete image.");
+          button.disabled = false;
+        }
+      });
+    });
+  }
+
+  function formatBytes(value) {
+    const bytes = Number(value) || 0;
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
   /* ---------------- HELPERS ---------------- */
 
   function setupDeleteButtons(

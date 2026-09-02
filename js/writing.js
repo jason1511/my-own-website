@@ -98,7 +98,9 @@
       title: String(item.title || item.project_title || "").trim(),
       summary: String(item.summary || "").trim(),
       date: item.updated_at || item.created_at || "",
-      image: safeImageUrl(item.image_key || item.cover_image_url || item.thumbnail_url),
+      image: safeImageUrl(
+        item.cover_image_key || item.image_key || item.cover_image_url || item.thumbnail_url
+      ),
       url: slug
         ? `case-study.html?slug=${encodeURIComponent(slug)}`
         : bikeStore
@@ -116,7 +118,9 @@
       title: String(item.title || "").trim(),
       summary: String(item.excerpt || "").trim(),
       date: item.updated_at || item.created_at || "",
-      image: safeImageUrl(item.image_key || item.cover_image_url || item.thumbnail_url),
+      image: safeImageUrl(
+        item.cover_image_key || item.image_key || item.cover_image_url || item.thumbnail_url
+      ),
       url: slug ? `blog-post.html?slug=${encodeURIComponent(slug)}` : "",
     };
   }
