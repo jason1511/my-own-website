@@ -45,11 +45,15 @@
     const projectSlug = safeProjectSlug(project.slug);
     const projectCode = "JL–" + String(index + 1).padStart(3, "0");
     const projectType = formatProjectType(project.type);
-    const tags = splitTags(project.tech_stack).slice(0, 5);
+    const tags = splitTags(project.tech_stack).slice(0, 6);
+    const detailUrl = projectSlug
+      ? "project.html?slug=" + encodeURIComponent(projectSlug)
+      : "";
+    const primaryUrl = detailUrl || liveUrl || githubUrl;
 
     const links = [
-      projectSlug
-        ? `<a href="project.html?slug=${encodeURIComponent(projectSlug)}">
+      detailUrl
+        ? `<a href="${escapeAttr(detailUrl)}">
             Project details <span aria-hidden="true">→</span>
           </a>`
         : "",
@@ -65,40 +69,52 @@
         : "",
     ].filter(Boolean).join("");
 
-    const image = imageUrl
+    const media = imageUrl && primaryUrl
       ? `<a
-          class="portfolio-project__image-link"
-          href="${projectSlug
-            ? "project.html?slug=" + encodeURIComponent(projectSlug)
-            : escapeAttr(liveUrl || githubUrl || "#")}"
-          ${!projectSlug && (liveUrl || githubUrl)
-            ? 'target="_blank" rel="noopener"'
-            : ""}
+          class="portfolio-project__media"
+          href="${escapeAttr(primaryUrl)}"
+          ${!detailUrl ? 'target="_blank" rel="noopener"' : ""}
         >
           <img
             class="portfolio-project__image"
             src="${escapeAttr(imageUrl)}"
-            alt=""
+            alt="${escapeAttr(project.title + " project thumbnail")}"
             loading="lazy"
           />
         </a>`
-      : "";
+      : imageUrl
+        ? `<div class="portfolio-project__media">
+            <img
+              class="portfolio-project__image"
+              src="${escapeAttr(imageUrl)}"
+              alt="${escapeAttr(project.title + " project thumbnail")}"
+              loading="lazy"
+            />
+          </div>`
+        : `<div
+            class="portfolio-project__media portfolio-project__media--empty"
+            aria-hidden="true"
+          >
+            <span>${projectCode}</span>
+          </div>`;
 
     return `
       <article class="portfolio-project">
-        ${image}
-        <div class="portfolio-project__topline">
-          <span>${projectCode}</span>
-          <span>Featured · ${escapeHtml(projectType)}</span>
+        ${media}
+        <div class="portfolio-project__body">
+          <div class="portfolio-project__topline">
+            <span>${projectCode}</span>
+            <span>${escapeHtml(projectType)}</span>
+          </div>
+          <h3>${escapeHtml(project.title)}</h3>
+          <p>${escapeHtml(project.summary)}</p>
+          ${tags.length
+            ? `<ul class="portfolio-stack" aria-label="Technology">
+                ${tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("")}
+              </ul>`
+            : ""}
+          ${links ? `<div class="portfolio-project__links">${links}</div>` : ""}
         </div>
-        <h3>${escapeHtml(project.title)}</h3>
-        <p>${escapeHtml(project.summary)}</p>
-        ${tags.length
-          ? `<ul class="portfolio-stack" aria-label="Technology">
-              ${tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("")}
-            </ul>`
-          : ""}
-        ${links ? `<div class="portfolio-project__links">${links}</div>` : ""}
       </article>
     `;
   }
