@@ -1,0 +1,2 @@
+ALTER TABLE projects
+ADD COLUMN screenshots TEXT NOT NULL DEFAULT '[]';

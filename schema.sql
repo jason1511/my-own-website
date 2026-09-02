@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS projects (
   github_url TEXT,
   live_url TEXT,
   image_key TEXT,
+  screenshots TEXT NOT NULL DEFAULT '[]',
   is_featured INTEGER NOT NULL DEFAULT 0,
   is_published INTEGER NOT NULL DEFAULT 1,
   display_order INTEGER NOT NULL DEFAULT 0,

@@ -5,7 +5,17 @@ export async function onRequestGet(context) {
     const authError = await requireAdmin(context);
     if (authError) return authError;
 
-    const { results } = await context.env.DB.prepare(
+    const results = await loadProjects(context.env.DB);
+
+    return json({ ok: true, projects: results.map(parseProject) });
+  } catch (error) {
+    console.error(error);
+    return json({ ok: false, error: "Failed to load admin projects." }, 500);
+  }
+}
+
+async function loadProjects(db) {
+  const select = (includeScreenshots) => db.prepare(
       `
       SELECT
         id,
@@ -18,6 +28,7 @@ export async function onRequestGet(context) {
         github_url,
         live_url,
         image_key,
+        ${includeScreenshots ? "screenshots," : ""}
         is_featured,
         is_published,
         display_order,
@@ -28,10 +39,11 @@ export async function onRequestGet(context) {
       `
     ).all();
 
-    return json({ ok: true, projects: results });
+  try {
+    return (await select(true)).results;
   } catch (error) {
-    console.error(error);
-    return json({ ok: false, error: "Failed to load admin projects." }, 500);
+    if (!isMissingScreenshotsColumn(error)) throw error;
+    return (await select(false)).results;
   }
 }
 
@@ -52,6 +64,8 @@ export async function onRequestPost(context) {
     const githubUrl = String(data.github_url || "").trim();
     const liveUrl = String(data.live_url || "").trim();
     const imageKey = String(data.image_key || "").trim();
+    const screenshots = normalizeScreenshots(data.screenshots);
+    const screenshotsJson = JSON.stringify(screenshots);
     const isFeatured = data.is_featured ? 1 : 0;
     const isPublished = data.is_published ? 1 : 0;
     const displayOrder = Number.isFinite(Number(data.display_order))
@@ -70,8 +84,9 @@ export async function onRequestPost(context) {
 
     const slug = await createUniqueSlug(db, requestedSlug || title);
 
-    const result = await db
-      .prepare(
+    let result;
+    try {
+      result = await db.prepare(
         `
         INSERT INTO projects (
           title,
@@ -83,11 +98,12 @@ export async function onRequestPost(context) {
           github_url,
           live_url,
           image_key,
+          screenshots,
           is_featured,
           is_published,
           display_order
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -100,11 +116,29 @@ export async function onRequestPost(context) {
         githubUrl,
         liveUrl,
         imageKey,
+        screenshotsJson,
         isFeatured,
         isPublished,
         displayOrder
       )
       .run();
+    } catch (error) {
+      if (!isMissingScreenshotsColumn(error)) throw error;
+      if (screenshots.length) return migrationRequired();
+
+      result = await db.prepare(
+        `
+        INSERT INTO projects (
+          title, slug, summary, body, type, tech_stack, github_url, live_url,
+          image_key, is_featured, is_published, display_order
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `
+      ).bind(
+        title, slug, summary, body, type, techStack, githubUrl, liveUrl,
+        imageKey, isFeatured, isPublished, displayOrder
+      ).run();
+    }
 
     return json({
       ok: true,
@@ -124,6 +158,40 @@ export async function onRequestPost(context) {
       500
     );
   }
+}
+
+function normalizeScreenshots(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 30).map((item) => ({
+    image_url: String(item?.image_url || item?.url || "").trim().slice(0, 2048),
+    image_alt: String(item?.image_alt || item?.alt || "").trim().slice(0, 300),
+    image_caption: String(item?.image_caption || item?.caption || "").trim().slice(0, 500),
+  })).filter((item) => item.image_url);
+}
+
+function parseProject(project) {
+  return { ...project, screenshots: parseJsonArray(project.screenshots) };
+}
+
+function parseJsonArray(value) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function isMissingScreenshotsColumn(error) {
+  return /no such column:\s*screenshots/i.test(String(error?.message || error));
+}
+
+function migrationRequired() {
+  return json({
+    ok: false,
+    code: "PROJECT_GALLERY_MIGRATION_REQUIRED",
+    error: "Project galleries need migration 0003_add_project_gallery.sql applied to D1.",
+  }, 409);
 }
 
 async function createUniqueSlug(db, value) {

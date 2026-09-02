@@ -304,7 +304,8 @@
 }
 
 .admin-case-study-facts,
-.admin-case-study-builder {
+.admin-case-study-builder,
+.admin-project-gallery {
   min-width: 0;
   margin: 0;
   padding: 1rem;
@@ -313,7 +314,8 @@
 }
 
 .admin-case-study-facts legend,
-.admin-case-study-builder legend {
+.admin-case-study-builder legend,
+.admin-project-gallery legend {
   padding: 0 0.4rem;
   color: var(--text);
   font-weight: 800;
@@ -350,6 +352,33 @@
   display: grid;
   gap: 0.8rem;
   margin: 1rem 0;
+}
+
+.admin-project-gallery-item {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-project-gallery-item__header,
+.admin-project-gallery-item__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-project-gallery-item__header h4 {
+  margin: 0;
+}
+
+.admin-project-gallery-item__fields {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
 }
 
 .admin-media-picker {
@@ -445,6 +474,80 @@
   overflow-wrap: anywhere;
   color: var(--muted);
   font-size: 0.72rem;
+}
+
+.admin-media-dialog {
+  width: min(960px, calc(100% - 2rem));
+  max-height: min(82vh, 820px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.admin-media-dialog::backdrop {
+  background: rgba(3, 8, 18, 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.admin-media-dialog__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.admin-media-dialog__header h2,
+.admin-media-dialog__header p {
+  margin: 0;
+}
+
+.admin-media-dialog__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.8rem;
+  padding: 1rem;
+}
+
+.admin-media-choice {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-media-choice:hover,
+.admin-media-choice:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.admin-media-choice img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.admin-media-choice span {
+  overflow: hidden;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 700px) {

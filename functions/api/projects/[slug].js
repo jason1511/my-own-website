@@ -13,32 +13,7 @@ export async function onRequestGet(context) {
       );
     }
 
-    const project = await db
-      .prepare(
-        `
-        SELECT
-          id,
-          title,
-          slug,
-          summary,
-          body,
-          type,
-          tech_stack,
-          github_url,
-          live_url,
-          image_key,
-          is_featured,
-          display_order,
-          created_at,
-          updated_at
-        FROM projects
-        WHERE slug = ?
-          AND is_published = 1
-        LIMIT 1
-        `
-      )
-      .bind(slug)
-      .first();
+    const project = await loadProject(db, slug);
 
     if (!project) {
       return json(
@@ -52,7 +27,10 @@ export async function onRequestGet(context) {
 
     return json({
       ok: true,
-      project,
+      project: {
+        ...project,
+        screenshots: parseJsonArray(project.screenshots),
+      },
     });
   } catch (error) {
     console.error("Failed to load project:", error);
@@ -64,6 +42,52 @@ export async function onRequestGet(context) {
       },
       500
     );
+  }
+}
+
+async function loadProject(db, slug) {
+  const select = (includeScreenshots) => db.prepare(
+      `
+        SELECT
+          id,
+          title,
+          slug,
+          summary,
+          body,
+          type,
+          tech_stack,
+          github_url,
+          live_url,
+          image_key,
+          ${includeScreenshots ? "screenshots," : ""}
+          is_featured,
+          display_order,
+          created_at,
+          updated_at
+        FROM projects
+        WHERE slug = ?
+          AND is_published = 1
+        LIMIT 1
+        `
+      )
+      .bind(slug).first();
+
+  try {
+    return await select(true);
+  } catch (error) {
+    if (!/no such column:\s*screenshots/i.test(String(error?.message || error))) {
+      throw error;
+    }
+    return select(false);
+  }
+}
+
+function parseJsonArray(value) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
 }
 

@@ -29,6 +29,8 @@ export async function onRequestPut(context) {
     const githubUrl = String(data.github_url || "").trim();
     const liveUrl = String(data.live_url || "").trim();
     const imageKey = String(data.image_key || "").trim();
+    const screenshots = normalizeScreenshots(data.screenshots);
+    const screenshotsJson = JSON.stringify(screenshots);
     const isFeatured = data.is_featured ? 1 : 0;
     const isPublished = data.is_published ? 1 : 0;
     const displayOrder = Number.isFinite(Number(data.display_order))
@@ -73,8 +75,8 @@ export async function onRequestPut(context) {
       id
     );
 
-    await db
-      .prepare(
+    try {
+      await db.prepare(
         `
         UPDATE projects
         SET
@@ -87,6 +89,7 @@ export async function onRequestPut(context) {
           github_url = ?,
           live_url = ?,
           image_key = ?,
+          screenshots = ?,
           is_featured = ?,
           is_published = ?,
           display_order = ?,
@@ -104,45 +107,39 @@ export async function onRequestPut(context) {
         githubUrl,
         liveUrl,
         imageKey,
+        screenshotsJson,
         isFeatured,
         isPublished,
         displayOrder,
         id
       )
       .run();
+    } catch (error) {
+      if (!isMissingScreenshotsColumn(error)) throw error;
+      if (screenshots.length) return migrationRequired();
 
-    const updatedProject = await db
-      .prepare(
+      await db.prepare(
         `
-        SELECT
-          id,
-          title,
-          slug,
-          summary,
-          body,
-          type,
-          tech_stack,
-          github_url,
-          live_url,
-          image_key,
-          is_featured,
-          is_published,
-          display_order,
-          created_at,
-          updated_at
-        FROM projects
+        UPDATE projects
+        SET title = ?, slug = ?, summary = ?, body = ?, type = ?,
+            tech_stack = ?, github_url = ?, live_url = ?, image_key = ?,
+            is_featured = ?, is_published = ?, display_order = ?,
+            updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-        LIMIT 1
         `
-      )
-      .bind(id)
-      .first();
+      ).bind(
+        title, slug, summary, body, type, techStack, githubUrl, liveUrl,
+        imageKey, isFeatured, isPublished, displayOrder, id
+      ).run();
+    }
+
+    const updatedProject = await loadProjectById(db, id);
 
     return json({
       ok: true,
       message: "Project updated.",
       slug,
-      project: updatedProject,
+      project: parseProject(updatedProject),
     });
   } catch (error) {
     console.error(error);
@@ -155,6 +152,41 @@ export async function onRequestPut(context) {
       },
       500
     );
+  }
+}
+
+async function loadProjectById(db, id) {
+  const select = (includeScreenshots) => db.prepare(
+      `
+        SELECT
+          id,
+          title,
+          slug,
+          summary,
+          body,
+          type,
+          tech_stack,
+          github_url,
+          live_url,
+          image_key,
+          ${includeScreenshots ? "screenshots," : ""}
+          is_featured,
+          is_published,
+          display_order,
+          created_at,
+          updated_at
+        FROM projects
+        WHERE id = ?
+        LIMIT 1
+        `
+      )
+      .bind(id).first();
+
+  try {
+    return await select(true);
+  } catch (error) {
+    if (!isMissingScreenshotsColumn(error)) throw error;
+    return select(false);
   }
 }
 
@@ -186,6 +218,40 @@ export async function onRequestDelete(context) {
     console.error(error);
     return json({ ok: false, error: "Failed to delete project." }, 500);
   }
+}
+
+function normalizeScreenshots(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 30).map((item) => ({
+    image_url: String(item?.image_url || item?.url || "").trim().slice(0, 2048),
+    image_alt: String(item?.image_alt || item?.alt || "").trim().slice(0, 300),
+    image_caption: String(item?.image_caption || item?.caption || "").trim().slice(0, 500),
+  })).filter((item) => item.image_url);
+}
+
+function parseProject(project) {
+  return { ...project, screenshots: parseJsonArray(project?.screenshots) };
+}
+
+function parseJsonArray(value) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function isMissingScreenshotsColumn(error) {
+  return /no such column:\s*screenshots/i.test(String(error?.message || error));
+}
+
+function migrationRequired() {
+  return json({
+    ok: false,
+    code: "PROJECT_GALLERY_MIGRATION_REQUIRED",
+    error: "Project galleries need migration 0003_add_project_gallery.sql applied to D1.",
+  }, 409);
 }
 
 async function createUniqueSlug(db, value, currentProjectId) {

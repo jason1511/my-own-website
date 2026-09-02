@@ -3,6 +3,8 @@
   const caseStudiesById = new Map();
   let adminAppState = null;
   let currentAdminRoute = "";
+  let mediaLibraryDialog = null;
+  let mediaLibraryTarget = null;
   const dirtyAdminForms = new Set();
   const MAX_MEDIA_SIZE = 5 * 1024 * 1024;
   const ALLOWED_MEDIA_TYPES = new Set([
@@ -522,6 +524,10 @@
       renderCaseStudySectionEditors([]);
     }
 
+    if (section.key === "projects") {
+      renderProjectGalleryEditors([]);
+    }
+
     dirtyAdminForms.delete(form);
   }
 
@@ -857,6 +863,10 @@
     const statusEl = document.getElementById("adminProjectStatus");
     const submitBtn = document.getElementById("adminProjectSubmitBtn");
     const cancelEditBtn = document.getElementById("adminProjectCancelEditBtn");
+    const addGalleryImageBtn = form.querySelector("[data-add-project-image]");
+
+    renderProjectGalleryEditors([]);
+    addGalleryImageBtn?.addEventListener("click", () => addProjectGalleryEditor());
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -871,6 +881,7 @@
       const githubUrl = form.elements["github_url"].value.trim();
       const liveUrl = form.elements["live_url"].value.trim();
       const imageKey = form.elements["image_key"].value.trim();
+      const screenshots = collectProjectScreenshots();
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isFeatured = form.elements["is_featured"].checked;
       const isPublished = form.elements["is_published"].checked;
@@ -907,6 +918,7 @@
             github_url: githubUrl,
             live_url: liveUrl,
             image_key: imageKey,
+            screenshots,
             is_featured: isFeatured,
             is_published: isPublished,
             display_order: displayOrder,
@@ -953,6 +965,7 @@
       form.elements["github_url"].value = "";
       form.elements["live_url"].value = "";
       form.elements["image_key"].value = "";
+      renderProjectGalleryEditors([]);
       form.elements["display_order"].value = "0";
       form.elements["is_featured"].checked = false;
       form.elements["is_published"].checked = true;
@@ -968,6 +981,104 @@
     function setStatus(message) {
       setText(statusEl, message);
     }
+  }
+
+  function collectProjectScreenshots() {
+    const container = document.querySelector("[data-project-gallery]");
+    if (!container) return [];
+
+    return [...container.querySelectorAll("[data-project-gallery-item]")]
+      .map((editor) => {
+        const read = (name) =>
+          editor.querySelector(`[data-project-image-field="${name}"]`)
+            ?.value.trim() || "";
+
+        return {
+          image_url: read("image_url"),
+          image_alt: read("image_alt"),
+          image_caption: read("image_caption"),
+        };
+      })
+      .filter((image) => image.image_url);
+  }
+
+  function renderProjectGalleryEditors(screenshots) {
+    const container = document.querySelector("[data-project-gallery]");
+    if (!container) return;
+
+    container.replaceChildren();
+    const entries = Array.isArray(screenshots) ? screenshots : [];
+    for (const screenshot of entries) addProjectGalleryEditor(screenshot);
+  }
+
+  function addProjectGalleryEditor(screenshot = {}) {
+    const container = document.querySelector("[data-project-gallery]");
+    if (!container) return;
+
+    const editor = document.createElement("article");
+    editor.className = "admin-project-gallery-item";
+    editor.dataset.projectGalleryItem = "";
+    editor.innerHTML = `
+      <div class="admin-project-gallery-item__header">
+        <h4 data-project-image-number>Gallery Image</h4>
+        <div class="admin-project-gallery-item__actions">
+          <button class="btn btn--small" type="button" data-project-image-up>Move Up</button>
+          <button class="btn btn--small" type="button" data-project-image-down>Move Down</button>
+          <button class="btn btn--small btn--danger" type="button" data-project-image-remove>Remove</button>
+        </div>
+      </div>
+      <div class="admin-project-gallery-item__fields">
+        <div>
+          <label><strong>Image Path or URL</strong></label>
+          <input data-project-image-field="image_url" type="text" value="${escapeAttr(screenshot.image_url || screenshot.url || "")}" placeholder="/media/example.webp or https://..." />
+          <div class="admin-media-picker" data-media-picker tabindex="0">
+            <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+            <button class="btn btn--small" type="button" data-media-upload>Upload Screenshot</button>
+            <small>or focus here and press Ctrl+V to paste an image</small>
+            <span data-media-upload-status></span>
+          </div>
+        </div>
+        <div>
+          <label><strong>Alt Text</strong></label>
+          <input data-project-image-field="image_alt" type="text" value="${escapeAttr(screenshot.image_alt || screenshot.alt || "")}" placeholder="Describe what the screenshot shows" />
+        </div>
+        <div>
+          <label><strong>Caption</strong></label>
+          <input data-project-image-field="image_caption" type="text" value="${escapeAttr(screenshot.image_caption || screenshot.caption || "")}" placeholder="Optional explanation beneath the screenshot" />
+        </div>
+      </div>
+    `;
+
+    editor.querySelector("[data-project-image-up]")?.addEventListener("click", () => {
+      const previous = editor.previousElementSibling;
+      if (previous) container.insertBefore(editor, previous);
+      updateProjectGalleryNumbers();
+    });
+    editor.querySelector("[data-project-image-down]")?.addEventListener("click", () => {
+      const next = editor.nextElementSibling;
+      if (next) container.insertBefore(next, editor);
+      updateProjectGalleryNumbers();
+    });
+    editor.querySelector("[data-project-image-remove]")?.addEventListener("click", () => {
+      editor.remove();
+      updateProjectGalleryNumbers();
+    });
+
+    container.append(editor);
+    enhanceMediaPicker(editor.querySelector("[data-media-picker]"));
+    updateProjectGalleryNumbers();
+  }
+
+  function updateProjectGalleryNumbers() {
+    const editors = [...document.querySelectorAll("[data-project-gallery-item]")];
+    editors.forEach((editor, index) => {
+      const label = editor.querySelector("[data-project-image-number]");
+      const up = editor.querySelector("[data-project-image-up]");
+      const down = editor.querySelector("[data-project-image-down]");
+      if (label) label.textContent = `Gallery Image ${index + 1}`;
+      if (up) up.disabled = index === 0;
+      if (down) down.disabled = index === editors.length - 1;
+    });
   }
   /* ---------------- CASE STUDY CREATE / EDIT FORM ---------------- */
 
@@ -1223,6 +1334,7 @@
     });
 
     container.append(editor);
+    enhanceMediaPicker(editor.querySelector("[data-media-picker]"));
     updateCaseStudySectionNumbers();
   }
 
@@ -1397,6 +1509,7 @@ function renderProjectCard(project) {
         <li class="tag">Slug: ${escapeHtml(project.slug)}</li>
         <li class="tag">${project.is_featured ? "Featured" : "Not featured"}</li>
         <li class="tag">${project.is_published ? "Published" : "Draft"}</li>
+        <li class="tag">${Array.isArray(project.screenshots) ? project.screenshots.length : 0} gallery images</li>
         <li class="tag">Order: ${Number(project.display_order)}</li>
         <li class="tag">ID: ${Number(project.id)}</li>
       </ul>
@@ -1416,6 +1529,7 @@ function renderProjectCard(project) {
           data-project-github-url="${escapeAttr(project.github_url || "")}"
           data-project-live-url="${escapeAttr(project.live_url || "")}"
           data-project-image-key="${escapeAttr(project.image_key || "")}"
+          data-project-screenshots="${escapeAttr(JSON.stringify(project.screenshots || []))}"
           data-project-order="${Number(project.display_order)}"
           data-project-featured="${project.is_featured ? "1" : "0"}"
           data-project-published="${project.is_published ? "1" : "0"}"
@@ -1460,6 +1574,7 @@ function setupProjectEditButtons(container) {
       form.elements["github_url"].value = button.dataset.projectGithubUrl || "";
       form.elements["live_url"].value = button.dataset.projectLiveUrl || "";
       form.elements["image_key"].value = button.dataset.projectImageKey || "";
+      renderProjectGalleryEditors(parseJsonArray(button.dataset.projectScreenshots));
       form.elements["display_order"].value = button.dataset.projectOrder || "0";
       form.elements["is_featured"].checked =
         button.dataset.projectFeatured === "1";
@@ -1929,7 +2044,18 @@ function setupWorkshopEditButtons(container) {
   }
 
   function setupInlineMediaUploads() {
+    document.querySelectorAll("[data-media-picker]").forEach(enhanceMediaPicker);
+
     document.addEventListener("click", async (event) => {
+      const chooseButton = event.target.closest("[data-media-choose]");
+      if (chooseButton) {
+        const target = resolveMediaPickerTarget(
+          chooseButton.closest("[data-media-picker]")
+        );
+        if (target) openMediaLibrary(target);
+        return;
+      }
+
       const button = event.target.closest("[data-media-upload]");
       if (!button) return;
 
@@ -1943,10 +2069,7 @@ function setupWorkshopEditButtons(container) {
         return;
       }
 
-      const target = button.dataset.mediaTarget
-        ? document.getElementById(button.dataset.mediaTarget)
-        : button.closest("[data-case-study-section-editor]")
-            ?.querySelector('[data-section-field="image_url"]');
+      const target = resolveMediaPickerTarget(picker);
 
       if (!target) {
         setText(statusEl, "Could not find the image field.");
@@ -2020,6 +2143,144 @@ function setupWorkshopEditButtons(container) {
         setText(statusEl, error.message || "Could not use the pasted image.");
       }
     });
+  }
+
+  function enhanceMediaPicker(picker) {
+    if (!picker || picker.querySelector("[data-media-choose]")) return;
+
+    const button = document.createElement("button");
+    button.className = "btn btn--small";
+    button.type = "button";
+    button.dataset.mediaChoose = "";
+    button.textContent = "Choose from Media";
+
+    const hint = picker.querySelector("small");
+    picker.insertBefore(button, hint || picker.lastElementChild);
+  }
+
+  function resolveMediaPickerTarget(picker) {
+    if (!picker) return null;
+
+    const uploadButton = picker.querySelector("[data-media-upload]");
+    if (uploadButton?.dataset.mediaTarget) {
+      return document.getElementById(uploadButton.dataset.mediaTarget);
+    }
+
+    return (
+      picker.closest("[data-case-study-section-editor]")
+        ?.querySelector('[data-section-field="image_url"]') ||
+      picker.closest("[data-project-gallery-item]")
+        ?.querySelector('[data-project-image-field="image_url"]') ||
+      null
+    );
+  }
+
+  async function openMediaLibrary(target) {
+    mediaLibraryTarget = target;
+    const dialog = getMediaLibraryDialog();
+    const list = dialog.querySelector("[data-media-library-list]");
+    list.innerHTML = '<p class="admin-form-status">Loading images…</p>';
+
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else dialog.setAttribute("open", "");
+
+    try {
+      const response = await adminFetch("/api/admin/media", {
+        headers: { Accept: "application/json" },
+      });
+      const data = await readJsonSafe(response);
+      if (!response.ok || !data.ok || !Array.isArray(data.assets)) {
+        throw new Error(data.error || "Could not load Media.");
+      }
+
+      list.innerHTML = data.assets.length
+        ? data.assets.map(renderMediaChoice).join("")
+        : renderEmptyCard("No images have been uploaded yet.");
+    } catch (error) {
+      list.innerHTML = renderErrorCard(error.message || "Could not load Media.");
+    }
+  }
+
+  function getMediaLibraryDialog() {
+    if (mediaLibraryDialog) return mediaLibraryDialog;
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "admin-media-dialog";
+    dialog.innerHTML = `
+      <div class="admin-media-dialog__header">
+        <div>
+          <p class="admin-app__eyebrow">R2 Media Library</p>
+          <h2>Choose an Image</h2>
+        </div>
+        <button class="btn btn--small" type="button" data-media-dialog-close>Close</button>
+      </div>
+      <div class="admin-media-dialog__grid" data-media-library-list></div>
+    `;
+
+    dialog.querySelector("[data-media-dialog-close]")?.addEventListener(
+      "click",
+      () => closeMediaLibrary(dialog)
+    );
+    dialog.addEventListener("close", () => {
+      mediaLibraryTarget = null;
+    });
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) closeMediaLibrary(dialog);
+
+      const choice = event.target.closest("[data-media-select]");
+      if (!choice || !mediaLibraryTarget) return;
+
+      applyMediaChoice(
+        mediaLibraryTarget,
+        choice.dataset.mediaUrl || "",
+        choice.dataset.mediaAlt || ""
+      );
+      closeMediaLibrary(dialog);
+    });
+
+    document.body.append(dialog);
+    mediaLibraryDialog = dialog;
+    return dialog;
+  }
+
+  function renderMediaChoice(asset) {
+    return `
+      <button
+        class="admin-media-choice"
+        type="button"
+        data-media-select
+        data-media-url="${escapeAttr(asset.url)}"
+        data-media-alt="${escapeAttr(asset.alt_text || "")}"
+      >
+        <img src="${escapeAttr(asset.url)}" alt="" loading="lazy" />
+        <span>${escapeHtml(asset.filename)}</span>
+      </button>
+    `;
+  }
+
+  function applyMediaChoice(target, url, altText) {
+    target.value = url;
+    target.dispatchEvent(new Event("input", { bubbles: true }));
+
+    const altTarget =
+      target.closest("[data-project-gallery-item]")
+        ?.querySelector('[data-project-image-field="image_alt"]') ||
+      target.closest("[data-case-study-section-editor]")
+        ?.querySelector('[data-section-field="image_alt"]') ||
+      (target.id === "caseStudyImageKey"
+        ? document.getElementById("caseStudyCoverAlt")
+        : null);
+
+    if (altTarget && !altTarget.value.trim() && altText) {
+      altTarget.value = altText;
+      altTarget.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  }
+
+  function closeMediaLibrary(dialog) {
+    mediaLibraryTarget = null;
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
   }
 
   async function uploadMediaFile(file, altText) {
@@ -2188,6 +2449,15 @@ function setupWorkshopEditButtons(container) {
   async function readJsonSafe(response) {
     const text = await response.text();
     return text ? JSON.parse(text) : {};
+  }
+
+  function parseJsonArray(value) {
+    try {
+      const parsed = JSON.parse(String(value || "[]"));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 
   function setText(element, message) {

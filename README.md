@@ -50,6 +50,8 @@ Case studies support:
 - Automatically generated table of contents
 - Legacy problem, solution, features, technical details, challenges and learnings fields
 
+Projects also support an ordered screenshot gallery. Every image field can upload a new image, accept a pasted screenshot, or choose an existing asset from the R2 Media library.
+
 ### Backend and data
 
 - Cloudflare Pages Functions
@@ -111,7 +113,7 @@ Running HTML files directly is sufficient for static layout work, but API routes
 
 The D1 binding is named **DB** and is configured in wrangler.toml.
 
-For a new local database, initialise it from schema.sql. Existing databases should receive migrations in numerical order. Migration 0002 adds the expanded visual case-study fields to databases created before those fields were introduced.
+For a new local database, initialise it from schema.sql. Existing databases should receive migrations in numerical order. Migration 0002 adds the expanded visual case-study fields, and migration 0003 adds ordered project screenshot galleries.
 
 Before deploying an API change that depends on a migration, apply that migration to the remote D1 database and smoke-test both the admin and public pages.
 
