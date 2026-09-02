@@ -2440,3 +2440,25 @@ h3 {
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
+
+
+/* Project detail additions */
+.project-detail__facts {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.project-detail__facts > div:first-child {
+  border-left: 0;
+}
+
+.article-gallery--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.article-gallery--single .article-media {
+  max-width: 820px;
+}
+
+.article-status.project-detail__status--error {
+  color: #ffb4b4;
+}

@@ -5,76 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Project | Jason Leonard</title>
-  <meta
-    name="description"
-    content="Software project by Jason Leonard."
-  />
+  <meta name="description" content="Software project by Jason Leonard." />
+  <meta name="theme-color" content="#0a1322" />
 
   <link rel="stylesheet" href="css/style.css" />
-<link rel="stylesheet" href="css/project-detail.css" />
 </head>
 
-<body>
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
+<body class="portfolio-archive article-page project-page">
+  <a class="portfolio-skip-link" href="#project-content">Skip to project</a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="index.html">Home</a>
-        <a href="projects.html" aria-current="page">Projects</a>
-        <a href="case-studies.html">Case Studies</a>
-        <a href="blog.html">Blog</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
+  <main class="article-shell article-shell--wide" id="project-content">
+    <a class="article-back" href="projects.html">
+      <span aria-hidden="true">←</span> All projects
+    </a>
+
+    <div
+      class="article-status"
+      data-project-status
+      role="status"
+      aria-live="polite"
+    >
+      Loading project…
+    </div>
+
+    <article class="article-document project-detail" data-project-detail hidden>
+      <header class="article-header project-detail__header">
+        <p class="article-eyebrow project-detail__type" data-project-type></p>
+        <h1 data-project-title></h1>
+        <p class="article-lead project-detail__summary" data-project-summary></p>
+      </header>
+
+      <figure class="article-cover project-detail__cover" data-project-cover hidden>
+        <img data-project-cover-image alt="" />
+        <figcaption data-project-cover-caption hidden></figcaption>
+      </figure>
+
+      <dl class="article-facts project-detail__facts" data-project-facts hidden></dl>
+
+      <ul
+        class="article-tags project-detail__technologies"
+        data-project-technologies
+        aria-label="Technologies used"
+      ></ul>
+
+      <nav class="article-toc project-detail__toc" data-project-toc hidden aria-label="Project contents">
+        <p class="article-eyebrow">On this page</p>
+        <ol data-project-toc-list></ol>
       </nav>
-    </div>
-  </header>
 
-  <main class="site-main">
-    <section class="project-detail">
-      <div class="container">
-        <a class="project-detail__back" href="projects.html">
-          ← Back to projects
-        </a>
+      <div class="article-body project-detail__body" data-project-body></div>
 
-        <div
-          class="project-detail__status"
-          data-project-status
-          role="status"
-          aria-live="polite"
-        >
-          Loading project…
-        </div>
+      <div class="article-actions project-detail__actions" data-project-actions></div>
+    </article>
 
-        <article data-project-detail hidden>
-          <header class="project-detail__header">
-            <p class="project-detail__type" data-project-type></p>
-            <h1 data-project-title></h1>
-            <p class="project-detail__summary" data-project-summary></p>
-          </header>
-
-          <ul
-            class="tag-list project-detail__technologies"
-            data-project-technologies
-            aria-label="Technologies used"
-          ></ul>
-
-          <div class="project-detail__body" data-project-body></div>
-
-          <div
-            class="project-detail__actions"
-            data-project-actions
-          ></div>
-        </article>
-      </div>
-    </section>
+    <footer class="article-footer">
+      <a href="projects.html"><span aria-hidden="true">←</span> Back to projects</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
   </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
 
   <script src="js/main.js"></script>
   <script src="js/project-detail.js"></script>
