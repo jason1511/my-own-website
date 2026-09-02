@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Writing | Jason Leonard</title>
+  <meta
+    name="description"
+    content="Case studies and development notes by Jason Leonard about practical software, web projects, and technical decisions."
+  />
+  <meta name="theme-color" content="#0a1322" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="portfolio-archive writing-archive">
+  <a class="portfolio-skip-link" href="#writing-content">Skip to content</a>
+
+  <main class="archive-shell" id="writing-content">
+    <header class="archive-hero writing-hero">
+      <a class="archive-back" href="index.html">
+        <span aria-hidden="true">←</span> Jason Leonard
+      </a>
+      <p class="archive-eyebrow">Thinking through the work</p>
+      <h1>Writing</h1>
+      <p>
+        Case studies and development notes about the problems behind my
+        projects, the decisions I made, and what changed through iteration.
+      </p>
+    </header>
+
+    <section class="archive-section" aria-labelledby="writing-list-title">
+      <div class="archive-section__heading writing-heading">
+        <div>
+          <p class="archive-eyebrow">All entries</p>
+          <h2 id="writing-list-title">Notes &amp; case studies</h2>
+        </div>
+
+        <div class="writing-filters" aria-label="Filter writing">
+          <button type="button" data-writing-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-writing-filter="case-study" aria-pressed="false">Case studies</button>
+          <button type="button" data-writing-filter="note" aria-pressed="false">Development notes</button>
+        </div>
+      </div>
+
+      <div class="writing-list" data-writing-archive aria-live="polite">
+        <article class="writing-row" data-writing-type="case-study">
+          <p class="writing-row__type">Case study</p>
+          <a class="writing-row__main" href="bike-store.html">
+            <span>
+              <strong>Building inventory and FIFO workflows around a real business</strong>
+              <small>
+                How a C# desktop application grew around the day-to-day needs
+                of an electric-bike retailer.
+              </small>
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      </div>
+
+      <p class="writing-empty" data-writing-empty hidden>
+        No entries match this filter yet.
+      </p>
+    </section>
+
+    <footer class="archive-footer">
+      <a href="index.html"><span aria-hidden="true">←</span> Back to portfolio</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script src="js/writing.js"></script>
+</body>
+</html>
