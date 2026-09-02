@@ -25,13 +25,88 @@
           )
         : data.projects;
 
+      const renderProject = container.hasAttribute("data-home-projects")
+        ? renderPortfolioProject
+        : renderProjectCard;
+
       container.innerHTML = projects.length
-        ? projects.map(renderProjectCard).join("")
+        ? projects.map(renderProject).join("")
         : renderEmptyCard("No projects are available yet.");
     } catch (error) {
       console.warn("D1 projects unavailable:", error);
       // Keep the existing hardcoded content if the API fails.
     }
+  }
+
+  function renderPortfolioProject(project, index) {
+    const githubUrl = safeExternalUrl(project.github_url);
+    const liveUrl = safeExternalUrl(project.live_url);
+    const imageUrl = safeImageUrl(project.image_key);
+    const projectSlug = safeProjectSlug(project.slug);
+    const projectCode = "JL–" + String(index + 1).padStart(3, "0");
+    const projectType = formatProjectType(project.type);
+    const tags = splitTags(project.tech_stack).slice(0, 5);
+
+    const links = [
+      projectSlug
+        ? `<a href="project.html?slug=${encodeURIComponent(projectSlug)}">
+            Project details <span aria-hidden="true">→</span>
+          </a>`
+        : "",
+      liveUrl
+        ? `<a href="${escapeAttr(liveUrl)}" target="_blank" rel="noopener">
+            Live project <span aria-hidden="true">↗</span>
+          </a>`
+        : "",
+      githubUrl
+        ? `<a href="${escapeAttr(githubUrl)}" target="_blank" rel="noopener">
+            GitHub <span aria-hidden="true">↗</span>
+          </a>`
+        : "",
+    ].filter(Boolean).join("");
+
+    const image = imageUrl
+      ? `<a
+          class="portfolio-project__image-link"
+          href="${projectSlug
+            ? "project.html?slug=" + encodeURIComponent(projectSlug)
+            : escapeAttr(liveUrl || githubUrl || "#")}"
+          ${!projectSlug && (liveUrl || githubUrl)
+            ? 'target="_blank" rel="noopener"'
+            : ""}
+        >
+          <img
+            class="portfolio-project__image"
+            src="${escapeAttr(imageUrl)}"
+            alt=""
+            loading="lazy"
+          />
+        </a>`
+      : "";
+
+    return `
+      <article class="portfolio-project">
+        ${image}
+        <div class="portfolio-project__topline">
+          <span>${projectCode}</span>
+          <span>Featured · ${escapeHtml(projectType)}</span>
+        </div>
+        <h3>${escapeHtml(project.title)}</h3>
+        <p>${escapeHtml(project.summary)}</p>
+        ${tags.length
+          ? `<ul class="portfolio-stack" aria-label="Technology">
+              ${tags.map((tag) => `<li>${escapeHtml(tag)}</li>`).join("")}
+            </ul>`
+          : ""}
+        ${links ? `<div class="portfolio-project__links">${links}</div>` : ""}
+      </article>
+    `;
+  }
+
+  function formatProjectType(value) {
+    return String(value || "Project")
+      .replaceAll("-", " ")
+      .replace(/\b\w/g, (character) => character.toUpperCase());
   }
 
   function renderProjectCard(project) {
