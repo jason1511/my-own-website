@@ -241,6 +241,9 @@
       ? "project.html?slug=" + encodeURIComponent(projectSlug)
       : "";
     const tags = splitTags(project.tech_stack).slice(0, 8);
+    const imageUrl = safeImageUrl(
+      project.image_key || project.cover_image_url || project.thumbnail_url
+    );
     const links = [
       detailUrl
         ? `<a href="${escapeAttr(detailUrl)}">Details <span aria-hidden="true">→</span></a>`
@@ -254,7 +257,12 @@
     ].filter(Boolean).join("");
 
     return `
-      <article class="archive-row">
+      <article class="archive-row${imageUrl ? " archive-row--with-preview" : ""}">
+        ${imageUrl
+          ? `<figure class="archive-row__preview" aria-hidden="true">
+              <img src="${escapeAttr(imageUrl)}" alt="" loading="lazy" />
+            </figure>`
+          : ""}
         <div class="archive-row__project">
           <h3>${escapeHtml(project.title)}</h3>
           <p>${escapeHtml(project.summary)}</p>

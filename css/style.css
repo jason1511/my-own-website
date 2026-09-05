@@ -2688,3 +2688,283 @@ h3 {
     font-size: clamp(2.5rem, 12vw, 3.75rem);
   }
 }
+
+
+/* =========================
+   Public interaction layer
+========================= */
+.cursor-spotlight {
+  --spotlight-x: 50vw;
+  --spotlight-y: 28vh;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    460px circle at var(--spotlight-x) var(--spotlight-y),
+    rgba(45, 212, 191, 0.065),
+    rgba(122, 162, 255, 0.025) 42%,
+    transparent 72%
+  );
+}
+
+.cursor-spotlight ~ * {
+  position: relative;
+}
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--archive-accent-bright), var(--archive-accent));
+  box-shadow: 0 0 16px rgba(116, 232, 212, 0.45);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.effects-ready .reveal-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+.effects-ready .reveal-item.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.archive-row__preview {
+  --preview-x: calc(100vw - 320px);
+  --preview-y: 24px;
+  position: fixed;
+  top: var(--preview-y);
+  left: var(--preview-x);
+  z-index: 60;
+  width: clamp(220px, 20vw, 300px);
+  aspect-ratio: 16 / 10;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border: 1px solid rgba(116, 232, 212, 0.32);
+  border-radius: 7px;
+  background: var(--archive-panel);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  transform: translateY(8px) rotate(1deg) scale(0.97);
+  transition:
+    opacity 150ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.archive-row__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.82) contrast(1.03);
+  transition: filter 180ms ease, transform 280ms ease;
+}
+
+.archive-row--with-preview:hover .archive-row__preview,
+.archive-row--with-preview:focus-within .archive-row__preview {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg) scale(1);
+}
+
+.archive-row--with-preview:hover .archive-row__preview img,
+.archive-row--with-preview:focus-within .archive-row__preview img {
+  filter: saturate(1) contrast(1.03);
+  transform: scale(1.015);
+}
+
+.article-cover img,
+.article-media img {
+  cursor: zoom-in;
+  transition: filter 180ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.article-cover:hover img,
+.article-media:hover img {
+  filter: saturate(1.04) contrast(1.02);
+  transform: scale(1.008);
+}
+
+.article-cover img:focus-visible,
+.article-media img:focus-visible {
+  outline: 2px solid var(--archive-accent-bright);
+  outline-offset: -4px;
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.image-lightbox[hidden] {
+  display: none;
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-columns: minmax(48px, 1fr) minmax(0, 1200px) minmax(48px, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: rgba(3, 9, 17, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.image-lightbox__figure {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  max-width: 100%;
+  max-height: calc(100vh - 7rem);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: var(--archive-panel);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.55);
+}
+
+.image-lightbox__image {
+  width: 100%;
+  max-height: calc(100vh - 11rem);
+  object-fit: contain;
+  background: #07101d;
+}
+
+.image-lightbox__caption {
+  padding: 0.8rem 1rem;
+  color: var(--archive-muted);
+  font-size: 0.8rem;
+}
+
+.image-lightbox button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 50%;
+  background: rgba(13, 25, 42, 0.86);
+  color: var(--archive-text);
+  font: inherit;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.image-lightbox button[hidden] {
+  display: none;
+}
+
+.image-lightbox button:hover {
+  border-color: var(--archive-accent-bright);
+  color: var(--archive-accent-bright);
+  transform: translateY(-2px);
+}
+
+.image-lightbox button:focus-visible {
+  outline: 2px solid var(--archive-accent-bright);
+  outline-offset: 3px;
+}
+
+.image-lightbox__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+.image-lightbox__nav--previous {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.image-lightbox__nav--next {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.image-lightbox__count {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  margin: 0;
+  color: var(--archive-dim);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 780px), (hover: none), (pointer: coarse) {
+  .cursor-spotlight,
+  .archive-row__preview {
+    display: none;
+  }
+
+  .image-lightbox {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    gap: 0.75rem;
+    padding: 3.75rem 0.75rem 1rem;
+  }
+
+  .image-lightbox__figure {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    max-height: calc(100vh - 9rem);
+  }
+
+  .image-lightbox__image {
+    max-height: calc(100vh - 13rem);
+  }
+
+  .image-lightbox__nav--previous,
+  .image-lightbox__nav--next {
+    grid-row: 2;
+    justify-self: center;
+  }
+
+  .image-lightbox__nav--previous {
+    grid-column: 1;
+  }
+
+  .image-lightbox__nav--next {
+    grid-column: 2;
+  }
+
+  .image-lightbox__count {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .effects-ready .reveal-item,
+  .effects-ready .reveal-item.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .article-cover img,
+  .article-media img,
+  .image-lightbox button {
+    transition: none;
+  }
+}
