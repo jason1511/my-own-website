@@ -7,29 +7,21 @@
   <title>Admin | Jason Leonard</title>
   <meta name="robots" content="noindex, nofollow" />
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=20260905-admin-refresh" />
 </head>
 
-<body>
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Jason Leonard</a>
-
-      <nav class="site-nav" aria-label="Admin navigation">
-        <a href="index.html">Public Site</a>
-        <a href="projects.html">Projects</a>
-        <a href="case-studies.html">Case Studies</a>
-        <a href="blog.html">Blog</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="site-main">
+<body class="admin-page">
+  <main class="admin-root">
     <!-- Admin Login -->
-    <section id="adminLoginSection" class="about-hero">
-      <div class="container">
-        <article class="card" style="max-width: 560px;">
+    <section id="adminLoginSection" class="admin-login">
+      <div class="admin-login__shell">
+        <header class="admin-login__brand">
+          <a href="index.html">Jason Leonard</a>
+          <span>Portfolio CMS</span>
+        </header>
+
+        <article class="card admin-login__card">
+          <p class="admin-app__eyebrow">Private workspace</p>
           <h1>Admin Login</h1>
           <p class="section-lead">
             Enter the admin password to unlock the dashboard.
@@ -60,71 +52,44 @@
             </div>
           </form>
         </article>
+
+        <a class="admin-login__back" href="index.html">
+          <span aria-hidden="true">←</span> Return to public site
+        </a>
       </div>
     </section>
 
     <!-- Admin Dashboard -->
     <div id="adminDashboard" hidden>
-      <!-- Admin Hero -->
-      <section class="about-hero">
-        <div class="container about-hero__grid">
-          <div class="about-hero__content">
-            <h1>Admin</h1>
-
-            <p>
-              Private dashboard for managing portfolio projects, case studies,
-              blog posts, workshop entries, and media assets.
-            </p>
-
-            <p>
-              Projects, case studies, blog posts, and workshop entries can be created,
-              edited, published, unpublished, and deleted from this dashboard.
-            </p>
-
-            <div class="about-hero__actions">
-              <button id="adminLogoutBtn" class="btn" type="button">
-                Log Out
-              </button>
+      <section class="admin-dashboard-intro" data-admin-dashboard-intro>
+        <div class="container">
+          <div class="admin-dashboard-intro__content">
+            <div>
+              <p class="admin-app__eyebrow">Portfolio CMS</p>
+              <h2>Content at a glance</h2>
+              <p>
+                Create, organise, and publish the work shown across your portfolio.
+              </p>
             </div>
+
+            <ul class="admin-dashboard-status" aria-label="System status">
+              <li><span class="admin-dashboard-status__dot" aria-hidden="true"></span>CMS active</li>
+              <li>Cloudflare D1</li>
+              <li>Cloudflare R2</li>
+            </ul>
           </div>
-
-          <aside class="profile-card" aria-label="Admin summary">
-            <div class="profile-card__header">
-              <div>
-                <p class="profile-card__name">Admin Mode</p>
-                <p class="profile-card__role">D1 + R2 content management</p>
-              </div>
-            </div>
-
-            <dl class="profile-card__list">
-              <div class="profile-card__item">
-                <dt>Status</dt>
-                <dd>Content management enabled</dd>
-              </div>
-
-              <div class="profile-card__item">
-                <dt>Database</dt>
-                <dd>Cloudflare D1</dd>
-              </div>
-
-              <div class="profile-card__item">
-                <dt>Storage</dt>
-                <dd>Cloudflare R2 planned</dd>
-              </div>
-            </dl>
-          </aside>
         </div>
       </section>
 
       <!-- Overview -->
-      <section>
+      <section class="admin-dashboard-overview">
         <div class="container">
-          <h2>Content Overview</h2>
+          <h2>Manage content</h2>
           <p class="section-lead">
-            These sections load content from D1.
+            Choose a section to review existing entries or publish something new.
           </p>
 
-          <div class="cards">
+          <div class="cards admin-dashboard-links">
             <article class="card">
               <h3>Projects</h3>
               <p>
@@ -189,7 +154,6 @@
         </div>
       </section>
 
-      <!-- Projects -->
       <!-- Projects -->
 <section id="admin-projects">
   <div class="container">
@@ -880,13 +844,6 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <small>© <span id="year"></span> Jason Leonard</small>
-    </div>
-  </footer>
-
-  <script src="js/main.js"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js?v=20260905-admin-refresh"></script>
 </body>
 </html>

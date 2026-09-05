@@ -30,7 +30,7 @@
 
   function setupAdminApp() {
     const dashboard = document.getElementById("adminDashboard");
-    const hero = dashboard?.querySelector(".about-hero");
+    const hero = dashboard?.querySelector("[data-admin-dashboard-intro]");
     const overview = hero?.nextElementSibling;
     if (!dashboard || !hero || !overview || dashboard.querySelector("[data-admin-app]")) {
       return;
@@ -136,7 +136,6 @@
     const sidebarFooter = document.createElement("div");
     sidebarFooter.className = "admin-app__sidebar-footer";
     sidebarFooter.innerHTML =
-      '<a class="btn btn--small" href="index.html">View Public Site</a>' +
       '<span class="admin-app__session">Secure 8-hour session</span>';
 
     sidebar.append(sidebarHeader, navigation, sidebarFooter);
@@ -280,7 +279,7 @@
       content,
     };
 
-    updateAdminAppOffset();
+    document.documentElement.style.setProperty("--admin-app-offset", "0px");
     applyAdminRoute(readAdminRoute());
   }
 
@@ -448,7 +447,7 @@
     updateAdminDirtyIndicator();
 
     window.requestAnimationFrame(() => {
-      adminAppState.content.scrollIntoView({ block: "start" });
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     });
   }
 
@@ -570,26 +569,6 @@
     if (!adminAppState?.dirty) return;
     const section = getAdminSectionForRoute(currentAdminRoute);
     adminAppState.dirty.hidden = !section?.form || !dirtyAdminForms.has(section.form);
-  }
-
-  function updateAdminAppOffset() {
-    const header = document.querySelector(".site-header");
-    if (!header) return;
-
-    const update = () => {
-      document.documentElement.style.setProperty(
-        "--admin-app-offset",
-        Math.ceil(header.getBoundingClientRect().height) + "px"
-      );
-    };
-
-    update();
-
-    if ("ResizeObserver" in window) {
-      new ResizeObserver(update).observe(header);
-    } else {
-      window.addEventListener("resize", update);
-    }
   }
 
   /* ---------------- ADMIN LOGIN ---------------- */
