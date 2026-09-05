@@ -7,7 +7,7 @@
   <title>Admin | Jason Leonard</title>
   <meta name="robots" content="noindex, nofollow" />
 
-  <link rel="stylesheet" href="css/style.css?v=20260905-drag-order" />
+  <link rel="stylesheet" href="css/style.css?v=20260905-editor-pages" />
 </head>
 
 <body class="admin-page">
@@ -97,8 +97,9 @@
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-projects">
-                  View Projects
+                  Manage Projects
                 </a>
+                <a class="btn btn--small" href="#admin-projects/new">New Project</a>
               </div>
             </article>
 
@@ -110,8 +111,9 @@
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-case-studies">
-                  View Case Studies
+                  Manage Case Studies
                 </a>
+                <a class="btn btn--small" href="#admin-case-studies/new">New Case Study</a>
               </div>
             </article>
 
@@ -122,8 +124,9 @@
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-blog">
-                  View Blog
+                  Manage Blog
                 </a>
+                <a class="btn btn--small" href="#admin-blog/new">New Post</a>
               </div>
             </article>
 
@@ -134,8 +137,9 @@
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-workshop">
-                  View Workshop
+                  Manage Workshop
                 </a>
+                <a class="btn btn--small" href="#admin-workshop/new">New Item</a>
               </div>
             </article>
 
@@ -162,7 +166,7 @@
       Create, edit, and review portfolio projects stored in D1.
     </p>
 
-    <article class="card" style="margin-bottom: 1.5rem;">
+    <article class="card admin-content-editor" hidden>
       <h3>Create Project</h3>
 
       <form id="adminProjectForm">
@@ -303,14 +307,12 @@
 
           <p id="adminProjectStatus" style="margin:0;"></p>
 
-          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <div class="admin-form-actions admin-editor-actions">
             <button id="adminProjectSubmitBtn" class="btn btn--primary" type="submit">
               Create Project
             </button>
-
-            <button id="adminProjectCancelEditBtn" class="btn" type="button" hidden>
-              Cancel Edit
-            </button>
+            <button class="btn" type="button" data-admin-save-draft>Save as Draft</button>
+            <button id="adminProjectCancelEditBtn" class="btn" type="button">Cancel</button>
           </div>
         </div>
       </form>
@@ -332,7 +334,7 @@
             Create detailed project stories and control when they appear publicly.
           </p>
 
-          <article class="card" style="margin-bottom: 1.5rem;">
+          <article class="card admin-content-editor" hidden>
             <h3>Create Case Study</h3>
 
             <form id="adminCaseStudyForm">
@@ -522,13 +524,12 @@
 
                 <p id="adminCaseStudyStatus" class="admin-form-status" role="status"></p>
 
-                <div class="admin-form-actions">
+                <div class="admin-form-actions admin-editor-actions">
                   <button id="adminCaseStudySubmitBtn" class="btn btn--primary" type="submit">
                     Create Case Study
                   </button>
-                  <button id="adminCaseStudyCancelEditBtn" class="btn" type="button" hidden>
-                    Cancel Edit
-                  </button>
+                  <button class="btn" type="button" data-admin-save-draft>Save as Draft</button>
+                  <button id="adminCaseStudyCancelEditBtn" class="btn" type="button">Cancel</button>
                 </div>
               </div>
             </form>
@@ -550,7 +551,7 @@
             Create, edit, and review blog posts stored in D1.
           </p>
 
-          <article class="card" style="margin-bottom: 1.5rem;">
+          <article class="card admin-content-editor" hidden>
             <h3>Create Blog Post</h3>
 
             <form id="adminBlogForm">
@@ -631,14 +632,12 @@
 
                 <p id="adminBlogStatus" style="margin:0;"></p>
 
-                <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <div class="admin-form-actions admin-editor-actions">
                   <button id="adminBlogSubmitBtn" class="btn btn--primary" type="submit">
                     Create Blog Post
                   </button>
-
-                  <button id="adminBlogCancelEditBtn" class="btn" type="button" hidden>
-                    Cancel Edit
-                  </button>
+                  <button class="btn" type="button" data-admin-save-draft>Save as Draft</button>
+                  <button id="adminBlogCancelEditBtn" class="btn" type="button">Cancel</button>
                 </div>
               </div>
             </form>
@@ -661,7 +660,7 @@
       Create, edit, and review Steam Workshop items stored in D1.
     </p>
 
-    <article class="card" style="margin-bottom: 1.5rem;">
+    <article class="card admin-content-editor" hidden>
       <h3>Create Workshop Item</h3>
 
       <form id="adminWorkshopForm">
@@ -737,14 +736,12 @@
 
           <p id="adminWorkshopStatus" style="margin:0;"></p>
 
-          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <div class="admin-form-actions admin-editor-actions">
             <button id="adminWorkshopSubmitBtn" class="btn btn--primary" type="submit">
               Create Workshop Item
             </button>
-
-            <button id="adminWorkshopCancelEditBtn" class="btn" type="button" hidden>
-              Cancel Edit
-            </button>
+            <button class="btn" type="button" data-admin-save-draft>Save as Draft</button>
+            <button id="adminWorkshopCancelEditBtn" class="btn" type="button">Cancel</button>
           </div>
         </div>
       </form>
@@ -857,6 +854,6 @@
     </div>
   </main>
 
-  <script src="js/admin.js?v=20260905-drag-order"></script>
+  <script src="js/admin.js?v=20260905-editor-pages"></script>
 </body>
 </html>

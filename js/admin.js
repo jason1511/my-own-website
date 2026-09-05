@@ -207,7 +207,10 @@
       section.editorHeading = section.editor?.querySelector(":scope > h3") || null;
       section.list = section.panel.querySelector(section.listSelector);
 
-      if (section.form) setupAdminFormTracking(section);
+      if (section.form) {
+        setupAdminFormTracking(section);
+        setupAdminDraftSave(section);
+      }
       if (section.list) observeAdminList(section);
     }
 
@@ -311,6 +314,19 @@
           skipGuard: true,
         });
       }, 0);
+    });
+  }
+
+  function setupAdminDraftSave(section) {
+    const button = section.form?.querySelector("[data-admin-save-draft]");
+    const published = section.form?.elements["is_published"];
+    const submit = document.getElementById(section.submitId);
+    if (!button || !published || !submit) return;
+
+    button.addEventListener("click", () => {
+      published.checked = false;
+      published.dispatchEvent(new Event("change", { bubbles: true }));
+      section.form.requestSubmit(submit);
     });
   }
 
@@ -515,11 +531,16 @@
     if (form.elements[section.idField]) {
       form.elements[section.idField].value = "";
     }
+    if (form.elements["display_order"]) {
+      form.elements["display_order"].value = String(
+        nextDisplayOrder.get(section.key) || 0
+      );
+    }
 
     const submit = document.getElementById(section.submitId);
     const cancel = document.getElementById(section.cancelId);
     if (submit) submit.textContent = "Create " + section.singular;
-    if (cancel) cancel.hidden = true;
+    if (cancel) cancel.hidden = false;
 
     if (section.key === "case-studies") {
       renderCaseStudySectionEditors([]);
@@ -571,6 +592,31 @@
     if (!adminAppState?.dirty) return;
     const section = getAdminSectionForRoute(currentAdminRoute);
     adminAppState.dirty.hidden = !section?.form || !dirtyAdminForms.has(section.form);
+  }
+
+  function completeAdminEditorSave(form, route, message) {
+    dirtyAdminForms.delete(form);
+    updateAdminDirtyIndicator();
+    navigateAdminRoute(route, { replace: true, skipGuard: true });
+    showAdminToast(message);
+  }
+
+  function cancelAdminEditor(form, route, reset) {
+    if (!navigateAdminRoute(route)) return;
+    dirtyAdminForms.delete(form);
+    reset();
+    updateAdminDirtyIndicator();
+  }
+
+  function showAdminToast(message) {
+    document.querySelector("[data-admin-toast]")?.remove();
+    const toast = document.createElement("div");
+    toast.className = "admin-toast";
+    toast.dataset.adminToast = "";
+    toast.setAttribute("role", "status");
+    toast.textContent = message;
+    document.body.append(toast);
+    window.setTimeout(() => toast.remove(), 3200);
   }
 
   /* ---------------- ADMIN LOGIN ---------------- */
@@ -683,6 +729,8 @@
     if (loginSection) loginSection.hidden = true;
     if (dashboard) dashboard.hidden = false;
 
+    applyAdminRoute(readAdminRoute());
+
     loadAdminProjects();
     loadAdminCaseStudies();
     loadAdminBlogPosts();
@@ -790,14 +838,14 @@
           throw new Error(data.error || `Request failed: ${response.status}`);
         }
 
-        setStatus(
+        const successMessage =
           isEditing
             ? "Workshop item updated successfully."
-            : "Workshop item created successfully."
-        );
+            : "Workshop item created successfully.";
 
         resetWorkshopForm();
         await loadAdminWorkshopItems();
+        completeAdminEditorSave(form, "workshop", successMessage);
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Failed to save workshop item.");
@@ -808,8 +856,7 @@
 
     if (cancelEditBtn) {
       cancelEditBtn.addEventListener("click", () => {
-        resetWorkshopForm();
-        setStatus("Edit cancelled.");
+        cancelAdminEditor(form, "workshop", resetWorkshopForm);
       });
     }
 
@@ -912,14 +959,14 @@
           throw new Error(data.error || `Request failed: ${response.status}`);
         }
 
-        setStatus(
+        const successMessage =
           isEditing
             ? "Project updated successfully."
-            : "Project created successfully."
-        );
+            : "Project created successfully.";
 
         resetProjectForm();
         await loadAdminProjects();
+        completeAdminEditorSave(form, "projects", successMessage);
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Failed to save project.");
@@ -930,8 +977,7 @@
 
     if (cancelEditBtn) {
       cancelEditBtn.addEventListener("click", () => {
-        resetProjectForm();
-        setStatus("Edit cancelled.");
+        cancelAdminEditor(form, "projects", resetProjectForm);
       });
     }
 
@@ -1156,13 +1202,13 @@
           throw new Error(data.error || `Request failed: ${response.status}`);
         }
 
-        resetForm();
-        setStatus(
+        const successMessage =
           isEditing
             ? "Case study updated successfully."
-            : "Case study created successfully."
-        );
+            : "Case study created successfully.";
+        resetForm();
         await loadAdminCaseStudies();
+        completeAdminEditorSave(form, "case-studies", successMessage);
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Failed to save case study.");
@@ -1172,8 +1218,7 @@
     });
 
     cancelEditBtn?.addEventListener("click", () => {
-      resetForm();
-      setStatus("Edit cancelled.");
+      cancelAdminEditor(form, "case-studies", resetForm);
     });
 
     function resetForm() {
@@ -1391,14 +1436,14 @@
           throw new Error(data.error || `Request failed: ${response.status}`);
         }
 
-        setStatus(
+        const successMessage =
           isEditing
             ? "Blog post updated successfully."
-            : "Blog post created successfully."
-        );
+            : "Blog post created successfully.";
 
         resetBlogForm();
         await loadAdminBlogPosts();
+        completeAdminEditorSave(form, "blog", successMessage);
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Failed to save blog post.");
@@ -1409,8 +1454,7 @@
 
     if (cancelEditBtn) {
       cancelEditBtn.addEventListener("click", () => {
-        resetBlogForm();
-        setStatus("Edit cancelled.");
+        cancelAdminEditor(form, "blog", resetBlogForm);
       });
     }
 
