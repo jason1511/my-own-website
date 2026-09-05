@@ -203,9 +203,17 @@
       section.form = section.formId
         ? document.getElementById(section.formId)
         : null;
-      section.editor = section.form?.closest("article.card") || null;
+      section.editor =
+        container?.querySelector(":scope > .admin-content-editor") ||
+        section.form?.closest("article.card") ||
+        null;
       section.editorHeading = section.editor?.querySelector(":scope > h3") || null;
       section.list = section.panel.querySelector(section.listSelector);
+
+      if (section.form && section.list) {
+        section.listToolbar = createAdminListToolbar(section);
+        section.list.before(section.listToolbar);
+      }
 
       if (section.form) {
         setupAdminFormTracking(section);
@@ -256,14 +264,18 @@
       menuButton.setAttribute("aria-expanded", String(open));
     });
 
-    window.addEventListener("popstate", () => {
+    const syncRouteFromLocation = () => {
       const nextRoute = readAdminRoute();
+      if (nextRoute === currentAdminRoute) return;
       if (!canLeaveCurrentAdminRoute(nextRoute)) {
-        window.history.pushState(null, "", "#" + currentAdminRoute);
+        window.history.replaceState(null, "", "#" + currentAdminRoute);
         return;
       }
       applyAdminRoute(nextRoute);
-    });
+    };
+
+    window.addEventListener("popstate", syncRouteFromLocation);
+    window.addEventListener("hashchange", syncRouteFromLocation);
 
     window.addEventListener("beforeunload", (event) => {
       if (!dirtyAdminForms.size) return;
@@ -286,6 +298,20 @@
 
     document.documentElement.style.setProperty("--admin-app-offset", "0px");
     applyAdminRoute(readAdminRoute());
+  }
+
+  function createAdminListToolbar(section) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "admin-list-toolbar";
+    toolbar.innerHTML = `
+      <p>Drag the cards to reorder them, or open an entry to edit it.</p>
+      <a
+        class="btn btn--small btn--primary"
+        href="#${escapeAttr(section.key)}/new"
+        data-admin-route-link="${escapeAttr(section.key)}/new"
+      >New ${escapeHtml(section.singular)}</a>
+    `;
+    return toolbar;
   }
 
   function setupAdminFormTracking(section) {
@@ -475,6 +501,7 @@
 
     if (section.editor) section.editor.hidden = !editorMode;
     if (section.list) section.list.hidden = editorMode;
+    if (section.listToolbar) section.listToolbar.hidden = editorMode;
 
     if (mode === "new" && hasEditor && currentAdminRoute !== route) {
       prepareNewAdminEditor(section);
