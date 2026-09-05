@@ -103,9 +103,7 @@ function json(body, status = 200) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": status === 200
-        ? "public, max-age=60"
-        : "no-store",
+      "Cache-Control": "no-store",
     },
   });
 }
