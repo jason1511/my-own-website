@@ -327,6 +327,13 @@
 
     document.documentElement.style.setProperty("--admin-app-offset", "0px");
     applyAdminRoute(readAdminRoute());
+
+    // A clean `/admin#section/new` navigation can restore its fragment after
+    // the document scripts have started. Re-read it on the next frame so the
+    // editor mode always matches the address bar on first load.
+    window.requestAnimationFrame(() => {
+      applyAdminRoute(readAdminRoute());
+    });
   }
 
   function createAdminListToolbar(section) {
@@ -532,6 +539,8 @@
   }
 
   function applyAdminContentMode(section, mode, itemId, route) {
+    refreshAdminSectionReferences(section);
+
     const hasEditor = Boolean(section.form && section.editor);
     const editorMode = hasEditor && (mode === "new" || mode === "edit");
 
@@ -583,6 +592,32 @@
         section.key + "/new",
         "New " + section.singular
       );
+    }
+  }
+
+  function refreshAdminSectionReferences(section) {
+    if (!section?.panel) return;
+
+    section.form = section.form || (
+      section.formId ? document.getElementById(section.formId) : null
+    );
+    section.editor = section.editor ||
+      section.panel.querySelector(".admin-content-editor") ||
+      section.form?.closest("article.card") ||
+      null;
+    section.list = section.list || (
+      section.listSelector
+        ? section.panel.querySelector(section.listSelector)
+        : null
+    );
+
+    if (
+      section.form &&
+      section.list &&
+      (!section.listToolbar || !section.listToolbar.isConnected)
+    ) {
+      section.listToolbar = createAdminListToolbar(section);
+      section.list.before(section.listToolbar);
     }
   }
 
@@ -793,6 +828,13 @@
     if (dashboard) dashboard.hidden = false;
 
     applyAdminRoute(readAdminRoute());
+
+    // Session restoration and login both happen asynchronously. Apply the
+    // route once more after the dashboard becomes renderable so direct create
+    // and edit links cannot fall back to their section list.
+    window.requestAnimationFrame(() => {
+      applyAdminRoute(readAdminRoute());
+    });
 
     loadAdminProjects();
     loadAdminCaseStudies();
