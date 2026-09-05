@@ -2708,8 +2708,9 @@ h3 {
   );
 }
 
-.cursor-spotlight ~ * {
+.cursor-spotlight ~ main {
   position: relative;
+  z-index: 1;
 }
 
 .reading-progress {
