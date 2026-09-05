@@ -7,6 +7,7 @@
   let mediaLibraryTarget = null;
   let mediaAssets = [];
   const dirtyAdminForms = new Set();
+  const nextDisplayOrder = new Map();
   const MAX_MEDIA_SIZE = 5 * 1024 * 1024;
   const ALLOWED_MEDIA_TYPES = new Set([
     "image/jpeg",
@@ -819,7 +820,7 @@
       form.elements["game"].value = "";
       form.elements["description"].value = "";
       form.elements["workshop_url"].value = "";
-      form.elements["display_order"].value = "0";
+      form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
       form.elements["is_published"].checked = true;
 
       if (submitBtn) submitBtn.textContent = "Create Workshop Item";
@@ -946,7 +947,7 @@
       form.elements["live_url"].value = "";
       form.elements["image_key"].value = "";
       renderProjectGalleryEditors([]);
-      form.elements["display_order"].value = "0";
+      form.elements["display_order"].value = String(nextDisplayOrder.get("projects") || 0);
       form.elements["is_featured"].checked = false;
       form.elements["is_published"].checked = true;
 
@@ -1178,7 +1179,7 @@
     function resetForm() {
       form.reset();
       form.elements["case_study_id"].value = "";
-      form.elements["display_order"].value = "0";
+      form.elements["display_order"].value = String(nextDisplayOrder.get("case-studies") || 0);
       renderCaseStudySectionEditors([]);
 
       if (submitBtn) submitBtn.textContent = "Create Case Study";
@@ -1420,7 +1421,7 @@
       form.elements["excerpt"].value = "";
       form.elements["content"].value = "";
       form.elements["cover_image_key"].value = "";
-      form.elements["display_order"].value = "0";
+      form.elements["display_order"].value = String(nextDisplayOrder.get("blog") || 0);
       form.elements["is_published"].checked = true;
 
       if (submitBtn) submitBtn.textContent = "Create Blog Post";
@@ -1453,6 +1454,7 @@
       }
 
       populateCaseStudyProjectOptions(data.projects);
+      setNextDisplayOrder("projects", data.projects, "adminProjectForm");
 
       if (data.projects.length === 0) {
   container.innerHTML = renderEmptyCard("No projects found.");
@@ -1467,6 +1469,10 @@ setupDeleteButtons(container, {
   itemLabel: "project",
   reload: loadAdminProjects,
 });
+setupReorderableList(container, {
+  collection: "projects",
+  reload: loadAdminProjects,
+});
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load projects.");
@@ -1475,7 +1481,8 @@ setupDeleteButtons(container, {
 
 function renderProjectCard(project) {
   return `
-    <article class="card">
+    <article class="card" data-reorder-id="${Number(project.id)}">
+      ${renderOrderControls(project.title)}
       <header>
         <h3>${escapeHtml(project.title)}</h3>
         <p class="card__meta">
@@ -1490,7 +1497,6 @@ function renderProjectCard(project) {
         <li class="tag">${project.is_featured ? "Featured" : "Not featured"}</li>
         <li class="tag">${project.is_published ? "Published" : "Draft"}</li>
         <li class="tag">${Array.isArray(project.screenshots) ? project.screenshots.length : 0} gallery images</li>
-        <li class="tag">Order: ${Number(project.display_order)}</li>
         <li class="tag">ID: ${Number(project.id)}</li>
       </ul>
 
@@ -1606,6 +1612,7 @@ function setupProjectEditButtons(container) {
       for (const caseStudy of data.case_studies) {
         caseStudiesById.set(String(caseStudy.id), caseStudy);
       }
+      setNextDisplayOrder("case-studies", data.case_studies, "adminCaseStudyForm");
 
       if (data.case_studies.length === 0) {
         container.innerHTML = renderEmptyCard("No case studies found.");
@@ -1623,6 +1630,10 @@ function setupProjectEditButtons(container) {
         itemLabel: "case study",
         reload: loadAdminCaseStudies,
       });
+      setupReorderableList(container, {
+        collection: "case-studies",
+        reload: loadAdminCaseStudies,
+      });
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load case studies.");
@@ -1631,7 +1642,8 @@ function setupProjectEditButtons(container) {
 
   function renderCaseStudyAdminCard(caseStudy) {
     return `
-      <article class="card">
+      <article class="card" data-reorder-id="${Number(caseStudy.id)}">
+        ${renderOrderControls(caseStudy.title)}
         <header>
           <h3>${escapeHtml(caseStudy.title)}</h3>
           <p class="card__meta">
@@ -1646,7 +1658,6 @@ function setupProjectEditButtons(container) {
           <li class="tag">${caseStudy.is_featured ? "Featured" : "Not featured"}</li>
           <li class="tag">${caseStudy.is_published ? "Published" : "Draft"}</li>
           <li class="tag">${Array.isArray(caseStudy.content_sections) ? caseStudy.content_sections.length : 0} sections</li>
-          <li class="tag">Order: ${Number(caseStudy.display_order)}</li>
           <li class="tag">ID: ${Number(caseStudy.id)}</li>
         </ul>
 
@@ -1759,6 +1770,7 @@ function setupProjectEditButtons(container) {
       if (!data.ok || !Array.isArray(data.blog_posts)) {
         throw new Error("Invalid blog API response");
       }
+      setNextDisplayOrder("blog", data.blog_posts, "adminBlogForm");
 
       if (data.blog_posts.length === 0) {
         container.innerHTML = renderEmptyCard("No blog posts found.");
@@ -1773,6 +1785,10 @@ function setupProjectEditButtons(container) {
         itemLabel: "blog post",
         reload: loadAdminBlogPosts,
       });
+      setupReorderableList(container, {
+        collection: "blog",
+        reload: loadAdminBlogPosts,
+      });
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load blog posts.");
@@ -1781,7 +1797,8 @@ function setupProjectEditButtons(container) {
 
   function renderBlogPostCard(post) {
     return `
-      <article class="card">
+      <article class="card" data-reorder-id="${Number(post.id)}">
+        ${renderOrderControls(post.title)}
         <header>
           <h3>${escapeHtml(post.title)}</h3>
           <p class="card__meta">Slug: ${escapeHtml(post.slug)}</p>
@@ -1791,7 +1808,6 @@ function setupProjectEditButtons(container) {
 
         <ul class="tag-list">
           <li class="tag">${post.is_published ? "Published" : "Draft"}</li>
-          <li class="tag">Order: ${Number(post.display_order)}</li>
           <li class="tag">ID: ${Number(post.id)}</li>
         </ul>
 
@@ -1885,6 +1901,7 @@ function setupProjectEditButtons(container) {
       if (!data.ok || !Array.isArray(data.workshop_items)) {
         throw new Error("Invalid workshop API response");
       }
+      setNextDisplayOrder("workshop", data.workshop_items, "adminWorkshopForm");
 
       if (data.workshop_items.length === 0) {
   container.innerHTML = renderEmptyCard("No workshop items found.");
@@ -1899,6 +1916,10 @@ setupDeleteButtons(container, {
   itemLabel: "workshop item",
   reload: loadAdminWorkshopItems,
 });
+setupReorderableList(container, {
+  collection: "workshop",
+  reload: loadAdminWorkshopItems,
+});
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard("Could not load workshop items.");
@@ -1907,7 +1928,8 @@ setupDeleteButtons(container, {
 
 function renderWorkshopCard(item) {
   return `
-    <article class="card">
+    <article class="card" data-reorder-id="${Number(item.id)}">
+      ${renderOrderControls(item.title)}
       <header>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card__meta">
@@ -1919,7 +1941,6 @@ function renderWorkshopCard(item) {
 
       <ul class="tag-list">
         <li class="tag">${item.is_published ? "Published" : "Draft"}</li>
-        <li class="tag">Order: ${Number(item.display_order)}</li>
         <li class="tag">ID: ${Number(item.id)}</li>
       </ul>
 
@@ -2496,6 +2517,151 @@ function setupWorkshopEditButtons(container) {
   }
 
   /* ---------------- HELPERS ---------------- */
+
+  function setNextDisplayOrder(collection, items, formId) {
+    const nextOrder = items.reduce(
+      (highest, item) => Math.max(highest, Number(item.display_order) + 1 || 0),
+      0
+    );
+    nextDisplayOrder.set(collection, nextOrder);
+
+    const form = document.getElementById(formId);
+    if (form && !String(form.elements[formId === "adminCaseStudyForm" ? "case_study_id" :
+      formId === "adminProjectForm" ? "project_id" :
+      formId === "adminBlogForm" ? "blog_id" : "workshop_id"]?.value || "")) {
+      form.elements["display_order"].value = String(nextOrder);
+    }
+  }
+
+  function renderOrderControls(title) {
+    const label = escapeAttr(title || "item");
+    return `
+      <div class="admin-order-controls">
+        <button
+          class="admin-order-handle"
+          type="button"
+          draggable="true"
+          aria-label="Drag to reorder ${label}"
+          title="Drag to reorder"
+        >⠿</button>
+        <span class="admin-order-position" data-order-position></span>
+        <button class="admin-order-step" type="button" data-order-move="-1" aria-label="Move ${label} earlier" title="Move earlier">↑</button>
+        <button class="admin-order-step" type="button" data-order-move="1" aria-label="Move ${label} later" title="Move later">↓</button>
+      </div>
+    `;
+  }
+
+  function setupReorderableList(container, { collection, reload }) {
+    let draggedCard = null;
+    let startingOrder = "";
+
+    updateOrderPositions(container);
+
+    container.querySelectorAll("[data-order-move]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        if (container.classList.contains("is-saving-order")) return;
+        const card = button.closest("[data-reorder-id]");
+        const direction = Number(button.dataset.orderMove);
+        const sibling = direction < 0
+          ? card?.previousElementSibling
+          : card?.nextElementSibling;
+        if (!card || !sibling?.matches("[data-reorder-id]")) return;
+
+        if (direction < 0) container.insertBefore(card, sibling);
+        else container.insertBefore(sibling, card);
+        updateOrderPositions(container);
+        await saveContentOrder(container, collection, reload);
+      });
+    });
+
+    container.querySelectorAll(".admin-order-handle").forEach((handle) => {
+      handle.addEventListener("dragstart", (event) => {
+        draggedCard = handle.closest("[data-reorder-id]");
+        if (!draggedCard || container.classList.contains("is-saving-order")) {
+          event.preventDefault();
+          return;
+        }
+
+        startingOrder = readOrderIds(container).join(",");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedCard.dataset.reorderId || "");
+        requestAnimationFrame(() => draggedCard?.classList.add("is-dragging"));
+      });
+
+      handle.addEventListener("dragend", async () => {
+        draggedCard?.classList.remove("is-dragging");
+        const changed = startingOrder !== readOrderIds(container).join(",");
+        draggedCard = null;
+        startingOrder = "";
+        updateOrderPositions(container);
+        if (changed) await saveContentOrder(container, collection, reload);
+      });
+    });
+
+    container.addEventListener("dragover", (event) => {
+      if (!draggedCard) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+
+      const target = event.target.closest("[data-reorder-id]");
+      if (!target || target === draggedCard || target.parentElement !== container) return;
+
+      const bounds = target.getBoundingClientRect();
+      const nearSameRow = Math.abs(event.clientY - (bounds.top + bounds.height / 2)) < bounds.height * 0.25;
+      const insertBefore = nearSameRow
+        ? event.clientX < bounds.left + bounds.width / 2
+        : event.clientY < bounds.top + bounds.height / 2;
+
+      container.insertBefore(draggedCard, insertBefore ? target : target.nextElementSibling);
+      updateOrderPositions(container);
+    });
+
+    container.addEventListener("drop", (event) => {
+      if (draggedCard) event.preventDefault();
+    });
+  }
+
+  function readOrderIds(container) {
+    return [...container.querySelectorAll(":scope > [data-reorder-id]")]
+      .map((card) => Number(card.dataset.reorderId));
+  }
+
+  function updateOrderPositions(container) {
+    const cards = [...container.querySelectorAll(":scope > [data-reorder-id]")];
+    cards.forEach((card, index) => {
+      setText(card.querySelector("[data-order-position]"), `Position ${index + 1}`);
+      const up = card.querySelector('[data-order-move="-1"]');
+      const down = card.querySelector('[data-order-move="1"]');
+      if (up) up.disabled = index === 0;
+      if (down) down.disabled = index === cards.length - 1;
+    });
+  }
+
+  async function saveContentOrder(container, collection, reload) {
+    const ids = readOrderIds(container);
+    container.classList.add("is-saving-order");
+    container.setAttribute("aria-busy", "true");
+
+    try {
+      const response = await adminFetch("/api/admin/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ collection, ids }),
+      });
+      const data = await readJsonSafe(response);
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || `Reorder failed: ${response.status}`);
+      }
+      await reload();
+    } catch (error) {
+      console.error(error);
+      window.alert(error.message || "Failed to save the new order.");
+      await reload();
+    } finally {
+      container.classList.remove("is-saving-order");
+      container.removeAttribute("aria-busy");
+    }
+  }
 
   function setupDeleteButtons(
     container,

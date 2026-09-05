@@ -289,16 +289,7 @@
             </button>
           </fieldset>
 
-          <div>
-            <label for="projectDisplayOrder"><strong>Display Order</strong></label><br />
-            <input
-              id="projectDisplayOrder"
-              name="display_order"
-              type="number"
-              value="0"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
-          </div>
+          <input id="projectDisplayOrder" name="display_order" type="hidden" value="0" />
 
           <label>
             <input id="projectFeatured" name="is_featured" type="checkbox" />
@@ -515,15 +506,7 @@
                   </button>
                 </fieldset>
 
-                <div>
-                  <label for="caseStudyDisplayOrder"><strong>Display Order</strong></label>
-                  <input
-                    id="caseStudyDisplayOrder"
-                    name="display_order"
-                    type="number"
-                    value="0"
-                  />
-                </div>
+                <input id="caseStudyDisplayOrder" name="display_order" type="hidden" value="0" />
 
                 <div class="admin-form-options">
                   <label>
@@ -639,16 +622,7 @@
                   </div>
                 </div>
 
-                <div>
-                  <label for="blogDisplayOrder"><strong>Display Order</strong></label><br />
-                  <input
-                    id="blogDisplayOrder"
-                    name="display_order"
-                    type="number"
-                    value="0"
-                    style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-                  />
-                </div>
+                <input id="blogDisplayOrder" name="display_order" type="hidden" value="0" />
 
                 <label>
                   <input id="blogPublished" name="is_published" type="checkbox" checked />
@@ -754,16 +728,7 @@
             />
           </div>
 
-          <div>
-            <label for="workshopDisplayOrder"><strong>Display Order</strong></label><br />
-            <input
-              id="workshopDisplayOrder"
-              name="display_order"
-              type="number"
-              value="0"
-              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
-            />
-          </div>
+          <input id="workshopDisplayOrder" name="display_order" type="hidden" value="0" />
 
           <label>
             <input id="workshopPublished" name="is_published" type="checkbox" checked />
@@ -892,6 +857,6 @@
     </div>
   </main>
 
-  <script src="js/admin.js?v=20260905-legacy-media"></script>
+  <script src="js/admin.js?v=20260905-drag-order"></script>
 </body>
 </html>

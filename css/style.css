@@ -1225,6 +1225,61 @@ h3 {
   margin-top: 1rem;
 }
 
+.admin-order-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: -0.25rem 0 0.9rem;
+  color: var(--muted);
+}
+
+.admin-order-handle,
+.admin-order-step {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.2rem;
+  min-height: 2.2rem;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-order-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.admin-order-handle:active {
+  cursor: grabbing;
+}
+
+.admin-order-position {
+  margin-right: auto;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.card[data-reorder-id] {
+  transition: border-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.card[data-reorder-id].is-dragging {
+  opacity: 0.48;
+  border-color: var(--accent);
+}
+
+.cards.is-saving-order .card[data-reorder-id] {
+  pointer-events: none;
+}
+
+.admin-order-step:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .tag-list {
   list-style: none;
   display: flex;
