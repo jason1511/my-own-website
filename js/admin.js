@@ -113,7 +113,8 @@
     sidebarHeader.className = "admin-app__sidebar-header";
     sidebarHeader.innerHTML =
       '<p class="admin-app__eyebrow">Portfolio CMS</p>' +
-      '<p class="admin-app__brand">Admin Workspace</p>';
+      '<p class="admin-app__brand">Admin Workspace</p>' +
+      '<button class="admin-app__nav-close" type="button" aria-label="Close admin navigation">×</button>';
 
     const navigation = document.createElement("nav");
     navigation.className = "admin-app__nav";
@@ -222,8 +223,14 @@
       if (section.list) observeAdminList(section);
     }
 
+    const navigationScrim = document.createElement("button");
+    navigationScrim.className = "admin-app__scrim";
+    navigationScrim.type = "button";
+    navigationScrim.setAttribute("aria-label", "Close admin navigation");
+    navigationScrim.hidden = true;
+
     workspace.append(topbar, content);
-    app.append(sidebar, workspace);
+    app.append(sidebar, navigationScrim, workspace);
     dashboard.replaceChildren(app);
 
     for (const link of dashboardPage.querySelectorAll('a[href^="#admin-"]')) {
@@ -259,9 +266,31 @@
       }
     });
 
-    menuButton.addEventListener("click", () => {
-      const open = app.classList.toggle("admin-app--nav-open");
+    const setNavigationOpen = (open) => {
+      app.classList.toggle("admin-app--nav-open", open);
+      document.body.classList.toggle("admin-nav-open", open);
       menuButton.setAttribute("aria-expanded", String(open));
+      navigationScrim.hidden = !open;
+      if (open) sidebar.querySelector(".admin-app__nav-close")?.focus();
+      else menuButton.focus({ preventScroll: true });
+    };
+
+    menuButton.addEventListener("click", () => {
+      setNavigationOpen(!app.classList.contains("admin-app--nav-open"));
+    });
+    navigationScrim.addEventListener("click", () => setNavigationOpen(false));
+    sidebar.querySelector(".admin-app__nav-close")?.addEventListener("click", () => {
+      setNavigationOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && app.classList.contains("admin-app--nav-open")) {
+        setNavigationOpen(false);
+      }
+    });
+    window.matchMedia("(min-width: 901px)").addEventListener("change", (event) => {
+      if (event.matches && app.classList.contains("admin-app--nav-open")) {
+        setNavigationOpen(false);
+      }
     });
 
     const syncRouteFromLocation = () => {
@@ -304,7 +333,7 @@
     const toolbar = document.createElement("div");
     toolbar.className = "admin-list-toolbar";
     toolbar.innerHTML = `
-      <p>Drag the cards to reorder them, or open an entry to edit it.</p>
+      <p>Use the reorder controls to arrange cards, or open an entry to edit it.</p>
       <a
         class="btn btn--small btn--primary"
         href="#${escapeAttr(section.key)}/new"
@@ -485,9 +514,16 @@
       setAdminPageChrome("Dashboard", "Overview", "", "");
     }
 
+    const navigationWasOpen = adminAppState.app.classList.contains("admin-app--nav-open");
     currentAdminRoute = normalized;
     adminAppState.app.classList.remove("admin-app--nav-open");
+    document.body.classList.remove("admin-nav-open");
+    const scrim = adminAppState.app.querySelector(".admin-app__scrim");
+    if (scrim) scrim.hidden = true;
     adminAppState.menuButton.setAttribute("aria-expanded", "false");
+    if (navigationWasOpen && window.matchMedia("(max-width: 900px)").matches) {
+      adminAppState.menuButton.focus({ preventScroll: true });
+    }
     updateAdminDirtyIndicator();
 
     window.requestAnimationFrame(() => {
