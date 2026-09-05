@@ -5,6 +5,7 @@
   let currentAdminRoute = "";
   let mediaLibraryDialog = null;
   let mediaLibraryTarget = null;
+  let mediaAssets = [];
   const dirtyAdminForms = new Set();
   const MAX_MEDIA_SIZE = 5 * 1024 * 1024;
   const ALLOWED_MEDIA_TYPES = new Set([
@@ -1994,11 +1995,19 @@ function setupWorkshopEditButtons(container) {
 
     const statusEl = document.getElementById("adminMediaStatus");
     const submitBtn = form.querySelector('button[type="submit"]');
+    const searchInput = document.querySelector("[data-media-search]");
+    const typeSelect = document.querySelector("[data-media-type]");
+    const sortSelect = document.querySelector("[data-media-sort]");
+
+    searchInput?.addEventListener("input", renderAdminMedia);
+    typeSelect?.addEventListener("change", renderAdminMedia);
+    sortSelect?.addEventListener("change", renderAdminMedia);
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const file = form.elements["file"].files?.[0];
       const altText = form.elements["alt_text"].value.trim();
+      const displayName = form.elements["display_name"].value.trim();
 
       if (!file) {
         setText(statusEl, "Choose an image first.");
@@ -2009,7 +2018,7 @@ function setupWorkshopEditButtons(container) {
       setText(statusEl, "Uploading image...");
 
       try {
-        const asset = await uploadMediaFile(file, altText);
+        const asset = await uploadMediaFile(file, altText, displayName);
         form.reset();
         setText(statusEl, `Uploaded ${asset.filename}. Path: ${asset.url}`);
         await loadAdminMedia();
@@ -2105,17 +2114,22 @@ function setupWorkshopEditButtons(container) {
           throw new Error("This browser cannot attach the pasted image.");
         }
 
+        const pastedFile = createPastedImageFile(file);
         const transfer = new DataTransfer();
-        transfer.items.add(file);
+        transfer.items.add(pastedFile);
         fileInput.files = transfer.files;
 
         if (zone.matches("[data-media-picker]")) {
           setText(statusEl, "Pasted image detected. Uploading...");
           zone.querySelector("[data-media-upload]")?.click();
         } else {
+          const nameInput = document.getElementById("adminMediaName");
+          if (nameInput && !nameInput.value.trim()) {
+            nameInput.value = pastedFile.name.replace(/\.[^.]+$/, "");
+          }
           setText(
             statusEl,
-            `Pasted ${file.name || "clipboard image"}. Add alt text, then select Upload Image.`
+            `Pasted ${pastedFile.name}. Rename it if needed, add alt text, then select Upload Image.`
           );
         }
       } catch (error) {
@@ -2262,12 +2276,13 @@ function setupWorkshopEditButtons(container) {
     else dialog.removeAttribute("open");
   }
 
-  async function uploadMediaFile(file, altText) {
+  async function uploadMediaFile(file, altText, filename = "") {
     validateMediaFile(file);
 
     const body = new FormData();
     body.append("file", file);
     body.append("alt_text", altText || "");
+    if (filename) body.append("filename", filename);
 
     const response = await adminFetch("/api/admin/media", {
       method: "POST",
@@ -2292,6 +2307,27 @@ function setupWorkshopEditButtons(container) {
     }
   }
 
+  function createPastedImageFile(file) {
+    const extensions = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+      "image/avif": "avif",
+    };
+    const extension = extensions[file.type] || "png";
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace("T", "-")
+      .slice(0, 15);
+
+    return new File([file], `pasted-screenshot-${timestamp}.${extension}`, {
+      type: file.type,
+      lastModified: Date.now(),
+    });
+  }
+
   async function loadAdminMedia() {
     const container = document.querySelector("[data-admin-media]");
     if (!container) return;
@@ -2306,19 +2342,60 @@ function setupWorkshopEditButtons(container) {
         throw new Error(data.error || "Invalid media API response.");
       }
 
-      if (!data.assets.length) {
-        container.innerHTML = renderEmptyCard("No images uploaded yet.");
-        return;
-      }
-
-      container.innerHTML = data.assets.map(renderMediaCard).join("");
-      setupMediaCardButtons(container);
+      mediaAssets = data.assets;
+      renderAdminMedia();
     } catch (error) {
       console.error(error);
       container.innerHTML = renderErrorCard(
         error.message || "Could not load media assets."
       );
     }
+  }
+
+  function renderAdminMedia() {
+    const container = document.querySelector("[data-admin-media]");
+    const count = document.querySelector("[data-media-count]");
+    if (!container) return;
+
+    const query = String(document.querySelector("[data-media-search]")?.value || "")
+      .trim()
+      .toLowerCase();
+    const type = document.querySelector("[data-media-type]")?.value || "all";
+    const sort = document.querySelector("[data-media-sort]")?.value || "newest";
+
+    const visible = mediaAssets.filter((asset) => {
+      const matchesType = type === "all" || asset.content_type === type;
+      const haystack = `${asset.filename || ""} ${asset.alt_text || ""}`.toLowerCase();
+      return matchesType && (!query || haystack.includes(query));
+    });
+
+    visible.sort((a, b) => {
+      if (sort === "oldest") return new Date(a.uploaded_at) - new Date(b.uploaded_at);
+      if (sort === "name-asc") return String(a.filename).localeCompare(String(b.filename));
+      if (sort === "name-desc") return String(b.filename).localeCompare(String(a.filename));
+      if (sort === "largest") return Number(b.size_bytes) - Number(a.size_bytes);
+      if (sort === "smallest") return Number(a.size_bytes) - Number(b.size_bytes);
+      return new Date(b.uploaded_at) - new Date(a.uploaded_at);
+    });
+
+    if (count) {
+      count.textContent = visible.length === mediaAssets.length
+        ? `${visible.length} ${visible.length === 1 ? "image" : "images"}`
+        : `${visible.length} of ${mediaAssets.length} images`;
+    }
+
+    if (!mediaAssets.length) {
+      container.innerHTML = renderEmptyCard("No images uploaded yet.");
+      return;
+    }
+
+    if (!visible.length) {
+      container.innerHTML = renderEmptyCard("No images match these filters.");
+      return;
+    }
+
+    container.innerHTML = visible.map(renderMediaCard).join("");
+    setupMediaCardButtons(container);
   }
 
   function renderMediaCard(asset) {
@@ -2332,6 +2409,7 @@ function setupWorkshopEditButtons(container) {
           <code>${escapeHtml(asset.url)}</code>
           <div class="card__actions">
             <button class="btn btn--small btn--primary" type="button" data-media-copy data-media-url="${escapeAttr(asset.url)}">Copy Path</button>
+            <button class="btn btn--small" type="button" data-media-rename data-media-key="${escapeAttr(asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Rename</button>
             <button class="btn btn--small btn--danger" type="button" data-media-delete data-media-key="${escapeAttr(asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Delete</button>
           </div>
         </div>
@@ -2348,6 +2426,41 @@ function setupWorkshopEditButtons(container) {
           button.textContent = "Copied";
         } catch {
           window.prompt("Copy this image path:", value);
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-media-rename]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const key = button.dataset.mediaKey || "";
+        const currentName = button.dataset.mediaName || "image";
+        const nextName = window.prompt("Rename this media item:", currentName);
+        if (!key || nextName === null || !nextName.trim() || nextName.trim() === currentName) {
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Renaming…";
+
+        try {
+          const response = await adminFetch(
+            `/api/admin/media/${encodeURIComponent(key)}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ filename: nextName.trim() }),
+            }
+          );
+          const data = await readJsonSafe(response);
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || `Rename failed: ${response.status}`);
+          }
+          await loadAdminMedia();
+        } catch (error) {
+          console.error(error);
+          window.alert(error.message || "Failed to rename image.");
+          button.disabled = false;
+          button.textContent = "Rename";
         }
       });
     });

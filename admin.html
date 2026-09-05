@@ -812,6 +812,16 @@
                   required
                 />
               </div>
+              <div>
+                <label for="adminMediaName"><strong>Media Name</strong></label>
+                <input
+                  id="adminMediaName"
+                  name="display_name"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Optional — for example, Niaga catalogue"
+                />
+              </div>
               <div class="admin-media-paste-zone" data-media-paste-zone tabindex="0">
                 <strong>Paste a screenshot</strong>
                 <span>Click this area, then press Ctrl+V after using Print Screen or copying an image.</span>
@@ -834,6 +844,44 @@
             </form>
           </article>
 
+          <div class="admin-media-toolbar" aria-label="Filter and sort media">
+            <label class="admin-media-toolbar__search">
+              <span>Search</span>
+              <input
+                type="search"
+                placeholder="Name or alt text"
+                autocomplete="off"
+                data-media-search
+              />
+            </label>
+
+            <label>
+              <span>Type</span>
+              <select data-media-type>
+                <option value="all">All types</option>
+                <option value="image/png">PNG</option>
+                <option value="image/jpeg">JPG</option>
+                <option value="image/webp">WebP</option>
+                <option value="image/gif">GIF</option>
+                <option value="image/avif">AVIF</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Sort</span>
+              <select data-media-sort>
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="largest">Largest first</option>
+                <option value="smallest">Smallest first</option>
+              </select>
+            </label>
+
+            <p class="admin-media-toolbar__count" data-media-count aria-live="polite"></p>
+          </div>
+
           <div class="admin-media-grid" data-admin-media>
             <article class="card">
               <p>Loading media assets…</p>
@@ -844,6 +892,6 @@
     </div>
   </main>
 
-  <script src="js/admin.js?v=20260905-admin-refresh"></script>
+  <script src="js/admin.js?v=20260905-media-tools"></script>
 </body>
 </html>

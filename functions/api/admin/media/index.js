@@ -18,7 +18,7 @@ export async function onRequestGet(context) {
     if (bucket instanceof Response) return bucket;
 
     const listed = await bucket.list({
-      limit: 100,
+      limit: 1000,
       include: ["httpMetadata", "customMetadata"],
     });
 
@@ -30,7 +30,8 @@ export async function onRequestGet(context) {
         alt_text: object.customMetadata?.altText || "",
         content_type: object.httpMetadata?.contentType || "application/octet-stream",
         size_bytes: object.size,
-        uploaded_at: object.uploaded.toISOString(),
+        uploaded_at:
+          object.customMetadata?.uploadedAt || object.uploaded.toISOString(),
         url: mediaUrl(object.key),
       }));
 
@@ -52,6 +53,7 @@ export async function onRequestPost(context) {
     const formData = await context.request.formData();
     const file = formData.get("file");
     const altText = String(formData.get("alt_text") || "").trim().slice(0, 300);
+    const requestedName = String(formData.get("filename") || "").trim();
 
     if (!file || typeof file === "string") {
       return json({ ok: false, error: "Choose an image to upload." }, 400);
@@ -69,9 +71,14 @@ export async function onRequestPost(context) {
       return json({ ok: false, error: "Images must be 5 MB or smaller." }, 413);
     }
 
-    const originalName = cleanFilename(file.name || `image.${extension}`);
+    const originalName = buildFilename(
+      requestedName || file.name,
+      extension,
+      `image-${Date.now()}`
+    );
     const key = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
 
+    const uploadedAt = new Date().toISOString();
     const object = await bucket.put(key, file.stream(), {
       httpMetadata: {
         contentType: file.type,
@@ -80,6 +87,7 @@ export async function onRequestPost(context) {
       customMetadata: {
         filename: originalName,
         altText,
+        uploadedAt,
       },
     });
 
@@ -97,7 +105,7 @@ export async function onRequestPost(context) {
           alt_text: altText,
           content_type: file.type,
           size_bytes: file.size,
-          uploaded_at: object.uploaded.toISOString(),
+          uploaded_at: uploadedAt,
           url: mediaUrl(key),
         },
       },
@@ -129,6 +137,15 @@ function cleanFilename(value) {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 120) || "image";
+}
+
+function buildFilename(value, extension, fallback) {
+  const cleaned = cleanFilename(value || fallback)
+    .replace(/\.(jpe?g|png|webp|gif|avif)$/i, "")
+    .replace(/\.+$/g, "")
+    .trim();
+  const maximumBaseLength = 120 - extension.length - 1;
+  return `${(cleaned || fallback).slice(0, maximumBaseLength)}.${extension}`;
 }
 
 function mediaUrl(key) {
