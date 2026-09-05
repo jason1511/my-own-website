@@ -2409,8 +2409,8 @@ function setupWorkshopEditButtons(container) {
           <code>${escapeHtml(asset.url)}</code>
           <div class="card__actions">
             <button class="btn btn--small btn--primary" type="button" data-media-copy data-media-url="${escapeAttr(asset.url)}">Copy Path</button>
-            <button class="btn btn--small" type="button" data-media-rename data-media-key="${escapeAttr(asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Rename</button>
-            <button class="btn btn--small btn--danger" type="button" data-media-delete data-media-key="${escapeAttr(asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Delete</button>
+            <button class="btn btn--small" type="button" data-media-rename data-media-key="${escapeAttr(asset.reference || asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Rename</button>
+            <button class="btn btn--small btn--danger" type="button" data-media-delete data-media-key="${escapeAttr(asset.reference || asset.key)}" data-media-name="${escapeAttr(asset.filename)}">Delete</button>
           </div>
         </div>
       </article>

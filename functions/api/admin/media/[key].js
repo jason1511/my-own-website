@@ -1,4 +1,5 @@
 import { requireAdmin } from "../../../../lib/admin-auth.js";
+import { decodeMediaReference } from "../../../../lib/media-key.js";
 
 const IMAGE_EXTENSIONS = new Map([
   ["image/jpeg", "jpg"],
@@ -86,8 +87,7 @@ export async function onRequestDelete(context) {
 }
 
 function readKey(context) {
-  const key = String(context.params.key || "").trim();
-  return key && !key.includes("/") && !key.includes("\\") ? key : "";
+  return decodeMediaReference(context.params.key);
 }
 
 function cleanFilename(value) {

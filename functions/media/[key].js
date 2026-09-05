@@ -1,11 +1,13 @@
+import { decodeMediaReference } from "../../lib/media-key.js";
+
 export async function onRequestGet(context) {
   try {
     if (!context.env.MEDIA_BUCKET) {
       return new Response("Media storage is not configured.", { status: 503 });
     }
 
-    const key = String(context.params.key || "").trim();
-    if (!key || key.includes("/") || key.includes("\\")) {
+    const key = decodeMediaReference(context.params.key);
+    if (!key) {
       return new Response("Invalid media key.", { status: 400 });
     }
 

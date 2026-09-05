@@ -1,4 +1,5 @@
 import { requireAdmin } from "../../../../lib/admin-auth.js";
+import { mediaReference } from "../../../../lib/media-key.js";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Map([
@@ -26,6 +27,7 @@ export async function onRequestGet(context) {
       .sort((a, b) => b.uploaded.getTime() - a.uploaded.getTime())
       .map((object) => ({
         key: object.key,
+        reference: mediaReference(object.key),
         filename: object.customMetadata?.filename || object.key,
         alt_text: object.customMetadata?.altText || "",
         content_type: object.httpMetadata?.contentType || "application/octet-stream",
@@ -101,6 +103,7 @@ export async function onRequestPost(context) {
         message: "Image uploaded.",
         asset: {
           key,
+          reference: mediaReference(key),
           filename: originalName,
           alt_text: altText,
           content_type: file.type,
@@ -149,7 +152,7 @@ function buildFilename(value, extension, fallback) {
 }
 
 function mediaUrl(key) {
-  return `/media/${encodeURIComponent(key)}`;
+  return `/media/${mediaReference(key)}`;
 }
 
 function json(body, status = 200) {
