@@ -14,3 +14,7 @@
 
 /js/*
   Cache-Control: no-cache, must-revalidate
+
+/assets/Jason_Leonard_General_CV.pdf
+  Cache-Control: no-cache, must-revalidate
+  Content-Disposition: attachment; filename="Jason_Leonard_CV.pdf"

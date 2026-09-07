@@ -1929,6 +1929,50 @@ h3 {
   font-size: 1rem;
 }
 
+.portfolio-intro__actions {
+  display: flex;
+  align-items: center;
+  margin-top: 1.35rem;
+}
+
+.portfolio-cv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(122, 162, 255, 0.42);
+  border-radius: 5px;
+  color: var(--portfolio-accent);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.portfolio-cv-link svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.portfolio-cv-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--portfolio-accent);
+  background: var(--portfolio-accent-soft);
+  color: var(--portfolio-text);
+}
+
 .portfolio-nav {
   display: grid;
   gap: 0.25rem;
@@ -2402,6 +2446,11 @@ h3 {
 
   .portfolio-identity h1 {
     font-size: clamp(2.7rem, 15vw, 4rem);
+  }
+
+  .portfolio-cv-link {
+    min-height: 3rem;
+    padding-inline: 1rem;
   }
 
   .portfolio-nav {
