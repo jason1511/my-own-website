@@ -326,7 +326,7 @@
       if (!source) return;
       image.src = source.currentSrc || source.src;
       image.alt = source.alt || "Expanded project screenshot";
-      const text = source.closest("figure")?.querySelector("figcaption")?.textContent?.trim()
+      const text = source.dataset.caption || source.closest("figure")?.querySelector("figcaption")?.textContent?.trim()
         || source.alt
         || "Project screenshot";
       caption.textContent = text;
@@ -335,10 +335,10 @@
       nextButton.hidden = images.length < 2;
     };
 
-    const open = (source) => {
-      images = collectImages();
+    const open = (source, collection = collectImages(), focus = source) => {
+      images = collection;
       currentIndex = Math.max(images.indexOf(source), 0);
-      returnFocus = source;
+      returnFocus = focus;
       render();
       lightbox.hidden = false;
       document.body.classList.add("lightbox-open");
@@ -357,6 +357,21 @@
     };
 
     document.addEventListener("click", (event) => {
+      const galleryButton = event.target.closest("[data-hobby-gallery]");
+      if (galleryButton) {
+        try {
+          const entries = JSON.parse(galleryButton.dataset.hobbyGallery);
+          const collection = entries.map(entry => {
+            const url = new URL(entry.src, window.location.origin);
+            if (!["http:", "https:"].includes(url.protocol)) return null;
+            const img = document.createElement("img");
+            img.src = url.href; img.alt = entry.alt || ""; img.dataset.caption = entry.caption || "";
+            return img;
+          }).filter(Boolean);
+          if (collection.length) open(collection[0], collection, galleryButton);
+        } catch { /* Ignore an invalid gallery payload. */ }
+        return;
+      }
       const source = event.target.closest(".article-cover img, .article-media img");
       if (source) open(source);
     });
@@ -388,6 +403,18 @@
       }
     });
 
+    let touchStart = null;
+    image.addEventListener("touchstart", event => {
+      touchStart = event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+    }, { passive: true });
+    image.addEventListener("touchend", event => {
+      if (!touchStart || lightbox.hidden || images.length < 2) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStart.x, dy = touch.clientY - touchStart.y;
+      touchStart = null;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1);
+    }, { passive: true });
+    image.addEventListener("touchcancel", () => { touchStart = null; });
     closeButton.addEventListener("click", close);
     previousButton.addEventListener("click", () => move(-1));
     nextButton.addEventListener("click", () => move(1));

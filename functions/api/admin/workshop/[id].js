@@ -1,4 +1,4 @@
-import { ensureHobbyMedia, normalizeHobbyImage } from "../../../../lib/hobby-media.js";
+import { ensureHobbyMedia, normalizeHobbyImage, normalizeHobbyGallery, normalizeModDownload } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
 
 import { requireAdmin } from "../../../../lib/admin-auth.js";
@@ -22,8 +22,12 @@ export async function onRequestPut(context) {
     }
 
     const data = await context.request.json();
-    let imageKey;
-    try { imageKey = normalizeHobbyImage(data.image_key); }
+    let imageKey, screenshots, downloadUrl;
+    try {
+      imageKey = normalizeHobbyImage(data.image_key);
+      screenshots = JSON.stringify(normalizeHobbyGallery(data.screenshots));
+      downloadUrl = normalizeModDownload(data.download_url);
+    }
     catch (error) { return json({ ok: false, error: error.message }, 400); }
     const imageAlt = String(data.image_alt || "").trim().slice(0, 300);
     await ensureHobbyMedia(db);
@@ -39,17 +43,17 @@ export async function onRequestPut(context) {
     const isPublished = data.is_published ? 1 : 0;
 
     try {
-      steamId = hobbyLinkIdentity(workshopUrl, data.steam_id);
+      steamId = hobbyLinkIdentity(workshopUrl || new URL(downloadUrl, context.request.url).href, data.steam_id);
     } catch (error) {
       return json({ ok: false, error: error.message }, 400);
     }
 
-    if (!title || !game || !description || !workshopUrl) {
+    if (!title || !game || !description || (!workshopUrl && !downloadUrl)) {
       return json(
         {
           ok: false,
           error:
-            "Title, game/platform, description, and project URL are required.",
+            "Title, game/platform, description, and a project link or uploaded archive are required.",
         },
         400
       );
@@ -89,6 +93,8 @@ export async function onRequestPut(context) {
           workshop_url = ?,
           image_key = ?,
           image_alt = ?,
+          screenshots = ?,
+          download_url = ?,
           display_order = ?,
           is_published = ?,
           updated_at = CURRENT_TIMESTAMP
@@ -103,6 +109,8 @@ export async function onRequestPut(context) {
         workshopUrl,
         imageKey,
         imageAlt,
+        screenshots,
+        downloadUrl,
         displayOrder,
         isPublished,
         id
@@ -121,6 +129,8 @@ export async function onRequestPut(context) {
           workshop_url,
           image_key,
           image_alt,
+          screenshots,
+          download_url,
           display_order,
           is_published,
           created_at,

@@ -24,6 +24,7 @@ export async function onRequestGet(context) {
     });
 
     const assets = listed.objects
+      .filter((object) => !object.key.startsWith("mods/"))
       .sort((a, b) => b.uploaded.getTime() - a.uploaded.getTime())
       .map((object) => ({
         key: object.key,

@@ -318,6 +318,19 @@
     } catch { return "Visit"; }
   }
 
+  function renderHobbyActions(item) {
+    const external = safeExternalUrl(item.workshop_url);
+    const download = /^\/downloads\/[a-f0-9-]{36}-[a-zA-Z0-9._-]+\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(item.download_url || "") ? item.download_url : "";
+    let gallery = [];
+    try { gallery = typeof item.screenshots === "string" ? JSON.parse(item.screenshots || "[]") : item.screenshots || []; } catch { /* Older entries have no gallery. */ }
+    gallery = (Array.isArray(gallery) ? gallery : []).slice(0, 30).map(image => ({ src: safeImageUrl(image?.image_url), alt: String(image?.image_alt || item.title || ""), caption: String(image?.image_caption || "") })).filter(image => image.src);
+    return [
+      gallery.length ? `<button class="hobby-gallery-button" type="button" data-hobby-gallery="${escapeAttr(JSON.stringify(gallery))}" aria-label="View gallery for ${escapeAttr(item.title)}">View gallery (${gallery.length})</button>` : "",
+      download ? `<a href="${escapeAttr(download)}" download>Download <span aria-hidden="true">↓</span></a>` : "",
+      external ? `<a href="${escapeAttr(external)}" target="_blank" rel="noopener">${hobbyLinkLabel(external)} <span aria-hidden="true">↗</span></a>` : ""
+    ].filter(Boolean).join("");
+  }
+
   function renderArchiveWorkshop(item) {
     const workshopUrl = safeExternalUrl(item.workshop_url);
     const isSteam = /^\d+$/.test(item.steam_id);
@@ -341,9 +354,7 @@
           <li data-stat="favs">— favorites</li>
         </ul>` : `<p class="archive-row__category" aria-label="Activity not available">—</p>`}
         <div class="archive-row__links">
-          ${workshopUrl
-            ? `<a href="${escapeAttr(workshopUrl)}" target="_blank" rel="noopener">${linkLabel} <span aria-hidden="true">↗</span></a>`
-            : ""}
+          ${renderHobbyActions(item)}
         </div>
       </article>
     `;
@@ -376,22 +387,7 @@
           <li class="tag" data-stat="favs">— favorites</li>
         </ul>` : ""}
 
-        ${
-          workshopUrl
-            ? `
-              <div class="card__actions">
-                <a
-                  class="btn btn--small btn--primary"
-                  href="${escapeAttr(workshopUrl)}"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  ${linkLabel}
-                </a>
-              </div>
-            `
-            : ""
-        }
+        <div class="card__actions">${renderHobbyActions(item)}</div>
       </article>
     `;
   }

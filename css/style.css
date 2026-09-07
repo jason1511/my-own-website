@@ -3863,3 +3863,22 @@ body.lightbox-open {
     transition: none;
   }
 }
+
+/* Hobby archives and galleries reuse the portfolio table and image lightbox. */
+.hobby-gallery-button { font-size: .79rem; appearance: none; border: 0; padding: 0; background: none; color: inherit; font: inherit; font-size: .79rem; font-weight: 700; cursor: pointer; text-align: left; }
+.hobby-gallery-button:hover { color: var(--archive-accent, #5eead4); }
+.hobby-gallery-button:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.hobby-mod-drop { display: grid; gap: .75rem; padding: 1.25rem; border: 1px dashed currentColor; border-radius: 8px; min-width: 0; }
+.hobby-mod-drop.is-dragging { background: rgba(94, 234, 212, .12); }
+.hobby-mod-drop progress { width: 100%; accent-color: #5eead4; }
+.hobby-mod-drop p { margin: 0; overflow-wrap: anywhere; }
+.hobby-file-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; padding: .75rem 0; border-bottom: 1px solid rgba(148,163,184,.2); }
+.hobby-file-row span { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; }
+[data-hobby-gallery] { min-width: 0; }
+[data-hobby-gallery] .admin-project-gallery-item { margin: .75rem 0; }
+.image-lightbox__image { touch-action: pan-y pinch-zoom; }
+@media (max-width: 780px) {
+  .hobby-gallery-button { min-height: 44px; }
+  .hobby-mod-drop { padding: 1rem; }
+  .hobby-mod-drop input { width: 100%; min-width: 0; }
+}

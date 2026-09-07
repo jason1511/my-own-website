@@ -723,7 +723,6 @@
               id="workshopUrl"
               name="workshop_url"
               type="url"
-              required
               placeholder="https://… Steam, CDN download, Google Drive, or another site"
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             />
@@ -753,6 +752,32 @@
             <input id="workshopImageAlt" name="image_alt" type="text" maxlength="300" placeholder="Describe what the screenshot shows" style="width:100%;" />
             <small>Optional cover image. Clear the image path to remove it from this project.</small>
           </div>
+
+          <fieldset class="admin-project-gallery">
+            <legend>Screenshot gallery</legend>
+            <p>Add up to 30 images. Drag the handle to reorder, or use Move Up and Move Down.</p>
+            <div data-hobby-gallery></div>
+            <button class="btn btn--small" type="button" data-hobby-add-image>Add Gallery Image</button>
+          </fieldset>
+          <fieldset class="admin-project-gallery">
+            <legend>Mod download</legend>
+            <div class="hobby-mod-drop" data-mod-drop>
+              <label for="hobbyModFile"><strong>Drop a mod archive here or choose a file</strong></label>
+              <input id="hobbyModFile" data-mod-file type="file" accept=".zip,.rar,.7z,.scs,.pak,.tar,.gz" />
+              <small>ZIP, RAR, 7Z, SCS, PAK, TAR, GZ · up to 256 MB</small>
+              <progress max="100" value="0" aria-label="Mod upload progress" hidden></progress>
+              <p data-mod-status role="status" aria-live="polite"></p>
+              <button class="btn btn--small" type="button" data-mod-cancel hidden>Cancel Upload</button>
+            </div>
+            <label for="hobbyDownloadUrl">Attached archive</label>
+            <input id="hobbyDownloadUrl" name="download_url" type="text" readonly placeholder="Upload or choose an archive below" />
+            <button class="btn btn--small" type="button" data-mod-remove>Remove attachment</button>
+            <p>Save the project after changing its attachment. Removing an attachment keeps the file available for reuse.</p>
+            <details data-mod-library><summary>Manage uploaded archives</summary>
+              <button class="btn btn--small" type="button" data-mod-refresh>Refresh files</button>
+              <div data-mod-files></div>
+            </details>
+          </fieldset>
 
           <input id="workshopDisplayOrder" name="display_order" type="hidden" value="0" />
 
@@ -881,6 +906,7 @@
     </div>
   </main>
 
+  <script src="js/admin-hobbies.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
