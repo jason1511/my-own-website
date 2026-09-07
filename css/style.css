@@ -3038,6 +3038,31 @@ h3 {
   color: var(--archive-muted) !important;
 }
 
+.writing-row__main--with-image {
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+}
+
+.writing-row__main,
+.writing-row__copy {
+  min-width: 0;
+}
+
+.writing-row__thumbnail {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--archive-line);
+  border-radius: 5px;
+  background: var(--archive-panel);
+}
+
+.writing-row__thumbnail img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
 @media (max-width: 780px) {
   .writing-heading {
     align-items: flex-start;
@@ -3466,30 +3491,18 @@ h3 {
 
   .writing-row__main--with-image {
     grid-template-columns: 1fr auto;
+    column-gap: 1rem;
   }
 
   .writing-row__main--with-image .writing-row__thumbnail {
     grid-column: 1 / -1;
   }
-}
 
-.writing-row__main--with-image {
-  grid-template-columns: 110px minmax(0, 1fr) auto;
-}
-
-.writing-row__thumbnail {
-  display: block;
-  overflow: hidden;
-  border: 1px solid var(--archive-line);
-  border-radius: 5px;
-  background: var(--archive-panel);
-}
-
-.writing-row__thumbnail img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  .writing-row__thumbnail img {
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: #07101d;
+  }
 }
 
 
@@ -3805,6 +3818,34 @@ body.lightbox-open {
   .image-lightbox__count {
     grid-column: 1 / -1;
     grid-row: 3;
+  }
+}
+
+@media (max-width: 780px) {
+  .archive-row__preview {
+    position: static;
+    order: -3;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 0 0 0.25rem;
+    border-color: var(--archive-line);
+    box-shadow: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .archive-row__preview img {
+    object-fit: contain;
+    background: #07101d;
+    filter: none;
+  }
+
+  .article-cover img {
+    aspect-ratio: auto;
+    max-height: 70vh;
+    object-fit: contain;
+    background: #07101d;
   }
 }
 
