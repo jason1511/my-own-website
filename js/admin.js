@@ -932,6 +932,8 @@
             game,
             description,
             workshop_url: workshopUrl,
+            image_key: form.elements["image_key"].value.trim(),
+            image_alt: form.elements["image_alt"].value.trim(),
             display_order: displayOrder,
             is_published: isPublished,
           }),
@@ -972,6 +974,8 @@
       form.elements["game"].value = "";
       form.elements["description"].value = "";
       form.elements["workshop_url"].value = "";
+      form.elements["image_key"].value = "";
+      form.elements["image_alt"].value = "";
       form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
       form.elements["is_published"].checked = true;
 
@@ -2104,6 +2108,8 @@ function renderWorkshopCard(item) {
           data-workshop-game="${escapeAttr(item.game)}"
           data-workshop-description="${escapeAttr(item.description)}"
           data-workshop-url="${escapeAttr(item.workshop_url)}"
+          data-workshop-image-key="${escapeAttr(item.image_key || "")}"
+          data-workshop-image-alt="${escapeAttr(item.image_alt || "")}"
           data-workshop-order="${Number(item.display_order)}"
           data-workshop-published="${item.is_published ? "1" : "0"}"
         >
@@ -2143,6 +2149,8 @@ function setupWorkshopEditButtons(container) {
       form.elements["description"].value =
         button.dataset.workshopDescription || "";
       form.elements["workshop_url"].value = button.dataset.workshopUrl || "";
+      form.elements["image_key"].value = button.dataset.workshopImageKey || "";
+      form.elements["image_alt"].value = button.dataset.workshopImageAlt || "";
       form.elements["display_order"].value =
         button.dataset.workshopOrder || "0";
       form.elements["is_published"].checked =

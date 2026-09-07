@@ -1,3 +1,4 @@
+import { ensureHobbyMedia, normalizeHobbyImage } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
 
 import { requireAdmin } from "../../../../lib/admin-auth.js";
@@ -6,6 +7,8 @@ export async function onRequestGet(context) {
   try {
     const authError = await requireAdmin(context);
     if (authError) return authError;
+
+    await ensureHobbyMedia(context.env.DB);
 
     const { results } = await context.env.DB.prepare(
       `
@@ -16,6 +19,8 @@ export async function onRequestGet(context) {
         game,
         description,
         workshop_url,
+        image_key,
+        image_alt,
         display_order,
         is_published,
         created_at,
@@ -42,6 +47,11 @@ export async function onRequestPost(context) {
 
     const db = context.env.DB;
     const data = await context.request.json();
+    let imageKey;
+    try { imageKey = normalizeHobbyImage(data.image_key); }
+    catch (error) { return json({ ok: false, error: error.message }, 400); }
+    const imageAlt = String(data.image_alt || "").trim().slice(0, 300);
+    await ensureHobbyMedia(db);
 
     let steamId;
     const title = String(data.title || "").trim();
@@ -79,10 +89,12 @@ export async function onRequestPost(context) {
           game,
           description,
           workshop_url,
+          image_key,
+          image_alt,
           display_order,
           is_published
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -91,6 +103,8 @@ export async function onRequestPost(context) {
         game,
         description,
         workshopUrl,
+        imageKey,
+        imageAlt,
         displayOrder,
         isPublished
       )

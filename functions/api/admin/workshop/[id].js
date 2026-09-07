@@ -1,3 +1,4 @@
+import { ensureHobbyMedia, normalizeHobbyImage } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
 
 import { requireAdmin } from "../../../../lib/admin-auth.js";
@@ -21,6 +22,11 @@ export async function onRequestPut(context) {
     }
 
     const data = await context.request.json();
+    let imageKey;
+    try { imageKey = normalizeHobbyImage(data.image_key); }
+    catch (error) { return json({ ok: false, error: error.message }, 400); }
+    const imageAlt = String(data.image_alt || "").trim().slice(0, 300);
+    await ensureHobbyMedia(db);
 
     let steamId;
     const title = String(data.title || "").trim();
@@ -81,6 +87,8 @@ export async function onRequestPut(context) {
           game = ?,
           description = ?,
           workshop_url = ?,
+          image_key = ?,
+          image_alt = ?,
           display_order = ?,
           is_published = ?,
           updated_at = CURRENT_TIMESTAMP
@@ -93,6 +101,8 @@ export async function onRequestPut(context) {
         game,
         description,
         workshopUrl,
+        imageKey,
+        imageAlt,
         displayOrder,
         isPublished,
         id
@@ -109,6 +119,8 @@ export async function onRequestPut(context) {
           game,
           description,
           workshop_url,
+          image_key,
+          image_alt,
           display_order,
           is_published,
           created_at,

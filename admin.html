@@ -731,6 +731,29 @@
 
           <p class="muted">Paste the full link to your project or hosted file. Google Drive files must be shared so visitors can open them. Steam activity is shown only for Workshop items.</p>
 
+          <div>
+            <label for="workshopImageKey"><strong>Cover Image Path or URL</strong></label><br />
+            <input
+              id="workshopImageKey"
+              name="image_key"
+              type="text"
+              placeholder="/media/example.webp or https://..."
+              style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
+            />
+            <div class="admin-media-picker" data-media-picker tabindex="0">
+              <input data-media-file type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" />
+              <button class="btn btn--small" type="button" data-media-upload data-media-target="workshopImageKey">Upload Cover</button>
+              <small>or focus here and press Ctrl+V to paste an image</small>
+              <span data-media-upload-status></span>
+            </div>
+          </div>
+
+          <div>
+            <label for="workshopImageAlt"><strong>Image description (alt text)</strong></label>
+            <input id="workshopImageAlt" name="image_alt" type="text" maxlength="300" placeholder="Describe what the screenshot shows" style="width:100%;" />
+            <small>Optional cover image. Clear the image path to remove it from this project.</small>
+          </div>
+
           <input id="workshopDisplayOrder" name="display_order" type="hidden" value="0" />
 
           <label>

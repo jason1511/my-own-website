@@ -5,17 +5,7 @@ export async function onRequestGet(context) {
     const { results } = await db
       .prepare(
         `
-        SELECT
-          id,
-          steam_id,
-          title,
-          game,
-          description,
-          workshop_url,
-          display_order,
-          is_published,
-          created_at,
-          updated_at
+        SELECT *
         FROM workshop_items
         WHERE is_published = 1
         ORDER BY display_order ASC, created_at DESC

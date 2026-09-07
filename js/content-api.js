@@ -322,12 +322,14 @@
     const workshopUrl = safeExternalUrl(item.workshop_url);
     const isSteam = /^\d+$/.test(item.steam_id);
     const linkLabel = hobbyLinkLabel(workshopUrl);
+    const imageUrl = safeImageUrl(item.image_key);
 
     return `
       <article
-        class="archive-row workshop-card"
+        class="archive-row workshop-card${imageUrl ? " archive-row--with-preview" : ""}"
         ${isSteam ? `data-workshop-id="${escapeAttr(item.steam_id)}"` : ""}
       >
+        ${imageUrl ? `<figure class="archive-row__preview"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(item.image_alt || item.title)}" loading="lazy" /></figure>` : ""}
         <div class="archive-row__project">
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.description)}</p>
@@ -351,12 +353,14 @@
     const workshopUrl = safeExternalUrl(item.workshop_url);
     const isSteam = /^\d+$/.test(item.steam_id);
     const linkLabel = hobbyLinkLabel(workshopUrl);
+    const imageUrl = safeImageUrl(item.image_key);
 
     return `
       <article
         class="card workshop-card"
         ${isSteam ? `data-workshop-id="${escapeAttr(item.steam_id)}"` : ""}
       >
+        ${imageUrl ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(item.image_alt || item.title)}" loading="lazy" style="display:block;width:100%;height:auto;object-fit:contain;" />` : ""}
         <header>
           <h3>${escapeHtml(item.title)}</h3>
           <p class="card__meta">
