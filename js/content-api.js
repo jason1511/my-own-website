@@ -308,27 +308,39 @@
     }
   }
 
+  function hobbyLinkLabel(value) {
+    try {
+      const url = new URL(value);
+      if (["steamcommunity.com", "www.steamcommunity.com"].includes(url.hostname)) return "Steam";
+      if (["drive.google.com", "docs.google.com"].includes(url.hostname)) return "Google Drive";
+      if (/\.(zip|rar|7z|scs|exe|msi|pdf|tar|gz|pak)$/i.test(url.pathname) || /(^|\.)cdn\./i.test(url.hostname) || url.pathname.startsWith("/media/")) return "Download";
+      return "Visit";
+    } catch { return "Visit"; }
+  }
+
   function renderArchiveWorkshop(item) {
     const workshopUrl = safeExternalUrl(item.workshop_url);
+    const isSteam = /^\d+$/.test(item.steam_id);
+    const linkLabel = hobbyLinkLabel(workshopUrl);
 
     return `
       <article
         class="archive-row workshop-card"
-        data-workshop-id="${escapeAttr(item.steam_id)}"
+        ${isSteam ? `data-workshop-id="${escapeAttr(item.steam_id)}"` : ""}
       >
         <div class="archive-row__project">
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.description)}</p>
         </div>
         <p class="archive-row__category">${escapeHtml(item.game)}</p>
-        <ul class="archive-stats" aria-label="Workshop activity">
+        ${isSteam ? `<ul class="archive-stats" aria-label="Workshop activity">
           <li data-stat="views">— views</li>
           <li data-stat="subs">— subscribers</li>
           <li data-stat="favs">— favorites</li>
-        </ul>
+        </ul>` : `<p class="archive-row__category" aria-label="Activity not available">—</p>`}
         <div class="archive-row__links">
           ${workshopUrl
-            ? `<a href="${escapeAttr(workshopUrl)}" target="_blank" rel="noopener">Steam <span aria-hidden="true">↗</span></a>`
+            ? `<a href="${escapeAttr(workshopUrl)}" target="_blank" rel="noopener">${linkLabel} <span aria-hidden="true">↗</span></a>`
             : ""}
         </div>
       </article>
@@ -337,26 +349,28 @@
 
   function renderWorkshopCard(item) {
     const workshopUrl = safeExternalUrl(item.workshop_url);
+    const isSteam = /^\d+$/.test(item.steam_id);
+    const linkLabel = hobbyLinkLabel(workshopUrl);
 
     return `
       <article
         class="card workshop-card"
-        data-workshop-id="${escapeAttr(item.steam_id)}"
+        ${isSteam ? `data-workshop-id="${escapeAttr(item.steam_id)}"` : ""}
       >
         <header>
           <h3>${escapeHtml(item.title)}</h3>
           <p class="card__meta">
-            ${escapeHtml(item.game)} · Steam Workshop
+            ${escapeHtml(item.game)} · ${linkLabel}
           </p>
         </header>
 
         <p>${escapeHtml(item.description)}</p>
 
-        <ul class="tag-list workshop-stats">
+        ${isSteam ? `<ul class="tag-list workshop-stats">
           <li class="tag" data-stat="views">— views</li>
           <li class="tag" data-stat="subs">— subscribers</li>
           <li class="tag" data-stat="favs">— favorites</li>
-        </ul>
+        </ul>` : ""}
 
         ${
           workshopUrl
@@ -368,7 +382,7 @@
                   target="_blank"
                   rel="noopener"
                 >
-                  View on Steam
+                  ${linkLabel}
                 </a>
               </div>
             `

@@ -132,13 +132,13 @@
             </article>
 
             <article class="card">
-              <h3>Workshop Items</h3>
+              <h3>Hobby Projects</h3>
               <p>
-                Steam Workshop entries stored in D1, with live stats fetched separately.
+                Game mods, reskins, and hobby creations with Steam, download, or external links.
               </p>
               <div class="card__actions">
                 <a class="btn btn--small btn--primary" href="#admin-workshop">
-                  Manage Workshop
+                  Manage Hobby Projects
                 </a>
                 <a class="btn btn--small" href="#admin-workshop/new">New Item</a>
               </div>
@@ -652,30 +652,31 @@
         </div>
       </section>
 
-      <!-- Workshop Items -->
-      <!-- Workshop Items -->
+      <!-- Hobby Projects -->
+      <!-- Hobby Projects -->
 <section id="admin-workshop">
   <div class="container">
-    <h2>Workshop Items</h2>
+    <h2>Hobby Projects</h2>
     <p class="section-lead">
-      Create, edit, and review Steam Workshop items stored in D1.
+      Manage hobby creations shown under Additional projects, separately from your main portfolio.
     </p>
 
     <article class="card admin-content-editor" hidden>
-      <h3>Create Workshop Item</h3>
+      <h3>Create Hobby Project</h3>
 
       <form id="adminWorkshopForm">
         <input id="adminWorkshopId" name="workshop_id" type="hidden" />
 
         <div style="display:grid; gap:0.9rem;">
           <div>
-            <label for="workshopSteamId"><strong>Steam ID</strong></label><br />
+            <label for="workshopSteamId"><strong>Steam ID (optional)</strong></label><br />
             <input
               id="workshopSteamId"
               name="steam_id"
               type="text"
-              required
-              placeholder="3654483140"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              placeholder="Auto-detected from a Steam Workshop link"
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             />
           </div>
@@ -687,13 +688,13 @@
               name="title"
               type="text"
               required
-              placeholder="Workshop item title"
+              placeholder="Hobby project title"
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             />
           </div>
 
           <div>
-            <label for="workshopGame"><strong>Game</strong></label><br />
+            <label for="workshopGame"><strong>Game / platform</strong></label><br />
             <input
               id="workshopGame"
               name="game"
@@ -711,22 +712,24 @@
               name="description"
               rows="4"
               required
-              placeholder="Short workshop item description..."
+              placeholder="Short description of the mod, reskin, or hobby creation..."
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             ></textarea>
           </div>
 
           <div>
-            <label for="workshopUrl"><strong>Workshop URL</strong></label><br />
+            <label for="workshopUrl"><strong>Project or download URL</strong></label><br />
             <input
               id="workshopUrl"
               name="workshop_url"
               type="url"
               required
-              placeholder="https://steamcommunity.com/sharedfiles/filedetails/?id=..."
+              placeholder="https://… Steam, CDN download, Google Drive, or another site"
               style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:inherit;"
             />
           </div>
+
+          <p class="muted">Paste the full link to your project or hosted file. Google Drive files must be shared so visitors can open them. Steam activity is shown only for Workshop items.</p>
 
           <input id="workshopDisplayOrder" name="display_order" type="hidden" value="0" />
 
@@ -739,7 +742,7 @@
 
           <div class="admin-form-actions admin-editor-actions">
             <button id="adminWorkshopSubmitBtn" class="btn btn--primary" type="submit">
-              Create Workshop Item
+              Create Hobby Project
             </button>
             <button class="btn" type="button" data-admin-save-draft>Save as Draft</button>
             <button id="adminWorkshopCancelEditBtn" class="btn" type="button">Cancel</button>

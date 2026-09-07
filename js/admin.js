@@ -77,8 +77,8 @@
       },
       {
         key: "workshop",
-        label: "Workshop",
-        singular: "Workshop Item",
+        label: "Hobby Projects",
+        singular: "Hobby Project",
         panel: document.getElementById("admin-workshop"),
         formId: "adminWorkshopForm",
         listSelector: "[data-admin-workshop]",
@@ -902,15 +902,15 @@
       const displayOrder = Number(form.elements["display_order"].value || 0);
       const isPublished = form.elements["is_published"].checked;
 
-      if (!steamId || !title || !game || !description || !workshopUrl) {
-        setStatus("Steam ID, title, game, description, and Workshop URL are required.");
+      if (!title || !game || !description || !workshopUrl) {
+        setStatus("Title, game/platform, description, and project URL are required.");
         return;
       }
 
       const isEditing = Boolean(workshopId);
 
       setStatus(
-        isEditing ? "Updating workshop item..." : "Creating workshop item..."
+        isEditing ? "Updating hobby project..." : "Creating hobby project..."
       );
       setSubmitDisabled(true);
 
@@ -953,7 +953,7 @@
         completeAdminEditorSave(form, "workshop", successMessage);
       } catch (error) {
         console.error(error);
-        setStatus(error.message || "Failed to save workshop item.");
+        setStatus(error.message || "Failed to save hobby project.");
       } finally {
         setSubmitDisabled(false);
       }
@@ -975,7 +975,7 @@
       form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
       form.elements["is_published"].checked = true;
 
-      if (submitBtn) submitBtn.textContent = "Create Workshop Item";
+      if (submitBtn) submitBtn.textContent = "Create Hobby Project";
       if (cancelEditBtn) cancelEditBtn.hidden = true;
     }
 
@@ -2053,7 +2053,7 @@ function setupProjectEditButtons(container) {
       setNextDisplayOrder("workshop", data.workshop_items, "adminWorkshopForm");
 
       if (data.workshop_items.length === 0) {
-  container.innerHTML = renderEmptyCard("No workshop items found.");
+  container.innerHTML = renderEmptyCard("No hobby projects found.");
   return;
 }
 
@@ -2062,7 +2062,7 @@ setupWorkshopEditButtons(container);
 setupDeleteButtons(container, {
   selector: "[data-workshop-delete]",
   endpoint: "/api/admin/workshop",
-  itemLabel: "workshop item",
+  itemLabel: "hobby project",
   reload: loadAdminWorkshopItems,
 });
 setupReorderableList(container, {
@@ -2071,7 +2071,7 @@ setupReorderableList(container, {
 });
     } catch (error) {
       console.error(error);
-      container.innerHTML = renderErrorCard("Could not load workshop items.");
+      container.innerHTML = renderErrorCard("Could not load hobby projects.");
     }
   }
 
@@ -2082,7 +2082,7 @@ function renderWorkshopCard(item) {
       <header>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card__meta">
-          ${escapeHtml(item.game)} · Steam ID ${escapeHtml(item.steam_id)}
+          ${escapeHtml(item.game)}${/^\d+$/.test(item.steam_id) ? ` · Steam ID ${escapeHtml(item.steam_id)}` : " · External link"}
         </p>
       </header>
 
@@ -2099,7 +2099,7 @@ function renderWorkshopCard(item) {
           type="button"
           data-workshop-edit
           data-workshop-id="${Number(item.id)}"
-          data-workshop-steam-id="${escapeAttr(item.steam_id)}"
+          data-workshop-steam-id="${escapeAttr(/^\d+$/.test(item.steam_id) ? item.steam_id : "")}"
           data-workshop-title="${escapeAttr(item.title)}"
           data-workshop-game="${escapeAttr(item.game)}"
           data-workshop-description="${escapeAttr(item.description)}"
@@ -2120,7 +2120,7 @@ function renderWorkshopCard(item) {
           Delete
         </button>
 
-        ${renderPrimaryLinkButton(item.workshop_url, "View on Steam")}
+        ${renderPrimaryLinkButton(item.workshop_url, "Open link")}
       </div>
     </article>
   `;
@@ -2148,9 +2148,9 @@ function setupWorkshopEditButtons(container) {
       form.elements["is_published"].checked =
         button.dataset.workshopPublished === "1";
 
-      if (submitBtn) submitBtn.textContent = "Update Workshop Item";
+      if (submitBtn) submitBtn.textContent = "Update Hobby Project";
       if (cancelEditBtn) cancelEditBtn.hidden = false;
-      if (statusEl) statusEl.textContent = "Editing existing workshop item.";
+      if (statusEl) statusEl.textContent = "Editing existing hobby project.";
 
       form.scrollIntoView({ behavior: "smooth", block: "start" });
     });

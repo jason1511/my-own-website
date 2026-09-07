@@ -1,3 +1,5 @@
+import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
+
 import { requireAdmin } from "../../../../lib/admin-auth.js";
 
 export async function onRequestPut(context) {
@@ -20,7 +22,7 @@ export async function onRequestPut(context) {
 
     const data = await context.request.json();
 
-    const steamId = String(data.steam_id || "").trim();
+    let steamId;
     const title = String(data.title || "").trim();
     const game = String(data.game || "").trim();
     const description = String(data.description || "").trim();
@@ -30,12 +32,18 @@ export async function onRequestPut(context) {
       : 0;
     const isPublished = data.is_published ? 1 : 0;
 
-    if (!steamId || !title || !game || !description || !workshopUrl) {
+    try {
+      steamId = hobbyLinkIdentity(workshopUrl, data.steam_id);
+    } catch (error) {
+      return json({ ok: false, error: error.message }, 400);
+    }
+
+    if (!title || !game || !description || !workshopUrl) {
       return json(
         {
           ok: false,
           error:
-            "Steam ID, title, game, description, and workshop URL are required.",
+            "Title, game/platform, description, and project URL are required.",
         },
         400
       );
@@ -127,7 +135,7 @@ export async function onRequestPut(context) {
       return json(
         {
           ok: false,
-          error: "A workshop item with this Steam ID already exists.",
+          error: "A hobby project with this Steam ID or external URL already exists.",
         },
         409
       );

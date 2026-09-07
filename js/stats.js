@@ -8,7 +8,9 @@
 
     const ids = Array.from(cards)
       .map((card) => card.getAttribute("data-workshop-id"))
-      .filter(Boolean);
+      .filter((id) => /^\d+$/.test(id));
+
+    if (!ids.length) return;
 
     const url = "/workshop-stats?ids=" + encodeURIComponent(ids.join(","));
 
