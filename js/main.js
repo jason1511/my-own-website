@@ -129,7 +129,7 @@
     root.classList.add("effects-ready");
     setupScrollReveals(reduceMotion);
     setupImageLightbox();
-    setupArchivePreviews(reduceMotion);
+    setupArchivePreviews();
 
     if (document.body.classList.contains("article-page")) {
       setupReadingProgress();
@@ -248,44 +248,66 @@
     window.addEventListener("resize", requestUpdate, { passive: true });
   }
 
-  function setupArchivePreviews(reduceMotion) {
-    if (reduceMotion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-      return;
-    }
-
+  function setupArchivePreviews() {
+    const enabled = window.matchMedia("(min-width: 781px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
+    // The page and row reveal transforms create containing/stacking contexts.
+    // Keep one fixed preview directly under body, outside all transformed rows.
+    const overlay = document.createElement("figure");
+    overlay.className = "archive-pointer-preview";
+    overlay.hidden = true;
+    overlay.setAttribute("aria-hidden", "true");
+    const image = document.createElement("img");
+    image.alt = "";
+    overlay.append(image);
+    document.body.append(overlay);
+    let activeRow = null;
+    const hide = () => { overlay.hidden = true; activeRow = null; };
     const registered = new WeakSet();
     const register = (scope = document) => {
       const rows = [];
       if (scope instanceof Element && scope.matches(".archive-row")) rows.push(scope);
       rows.push(...scope.querySelectorAll(".archive-row"));
-
       for (const row of rows) {
-        const preview = row.querySelector(".archive-row__preview");
-        if (!preview || registered.has(row)) continue;
+        if (!row.querySelector(".archive-row__preview img") || registered.has(row)) continue;
         registered.add(row);
-
-        row.addEventListener("pointermove", (event) => {
-          const width = preview.offsetWidth || 280;
-          const height = preview.offsetHeight || 176;
-          const x = Math.min(event.clientX + 24, window.innerWidth - width - 16);
-          const y = Math.min(
-            Math.max(event.clientY - height / 2, 16),
-            window.innerHeight - height - 16
-          );
-          preview.style.setProperty("--preview-x", `${Math.max(16, x)}px`);
-          preview.style.setProperty("--preview-y", `${y}px`);
-        });
+        const follow = (event) => {
+          if (!enabled.matches || event.pointerType === "touch" || document.body.classList.contains("lightbox-open")) { hide(); return; }
+          const source = row.querySelector(".archive-row__preview img");
+          const src = source?.currentSrc || source?.src;
+          if (!src) { hide(); return; }
+          if (activeRow !== row || image.src !== src) image.src = src;
+          activeRow = row;
+          overlay.hidden = false;
+          const width = overlay.offsetWidth;
+          const height = overlay.offsetHeight;
+          const gap = 24, edge = 16;
+          const right = event.clientX + gap;
+          const x = right + width <= window.innerWidth - edge ? right : event.clientX - width - gap;
+          const y = event.clientY - height / 2;
+          overlay.style.left = `${Math.max(edge, Math.min(x, window.innerWidth - width - edge))}px`;
+          overlay.style.top = `${Math.max(edge, Math.min(y, window.innerHeight - height - edge))}px`;
+        };
+        row.addEventListener("pointerenter", follow);
+        row.addEventListener("pointermove", follow);
+        row.addEventListener("pointerleave", hide);
+        row.addEventListener("pointercancel", hide);
+        row.addEventListener("click", hide);
       }
     };
-
     register();
     new MutationObserver((mutations) => {
+      if (activeRow && !activeRow.isConnected) hide();
       for (const mutation of mutations) {
         for (const node of mutation.addedNodes) {
           if (node instanceof Element) register(node);
         }
       }
     }).observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("scroll", hide, { passive: true, capture: true });
+    window.addEventListener("resize", hide);
+    window.addEventListener("blur", hide);
+    enabled.addEventListener("change", hide);
+    document.addEventListener("keydown", event => { if (event.key === "Escape" || event.key === "Tab") hide(); });
   }
 
   function setupImageLightbox() {

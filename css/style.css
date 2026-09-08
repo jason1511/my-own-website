@@ -3889,3 +3889,28 @@ body.lightbox-open {
 .hobby-page .article-body { overflow-wrap: anywhere; }
 .hobby-page .article-media img { width: 100%; height: auto; object-fit: contain; }
 .hobby-page .article-cover img { max-height: 65vh; object-fit: contain; }
+
+/* Pointer previews live outside transformed archive rows. */
+.archive-pointer-preview { display: none; }
+.archive-pointer-preview[hidden] { display: none !important; }
+@media (min-width: 781px) and (hover: hover) and (pointer: fine) {
+  .archive-row__preview { display: none; }
+}
+@media (min-width: 781px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body > .archive-pointer-preview:not([hidden]) {
+    display: block;
+    position: fixed;
+    z-index: 150;
+    width: clamp(220px, 20vw, 300px);
+    aspect-ratio: 16 / 10;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border: 1px solid rgba(116, 232, 212, .32);
+    border-radius: 7px;
+    background: #0a1322;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .48);
+    transform: none;
+  }
+  .archive-pointer-preview img { display: block; width: 100%; height: 100%; object-fit: cover; }
+}
