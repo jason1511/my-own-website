@@ -325,6 +325,7 @@
     try { gallery = typeof item.screenshots === "string" ? JSON.parse(item.screenshots || "[]") : item.screenshots || []; } catch { /* Older entries have no gallery. */ }
     gallery = (Array.isArray(gallery) ? gallery : []).slice(0, 30).map(image => ({ src: safeImageUrl(image?.image_url), alt: String(image?.image_alt || item.title || ""), caption: String(image?.image_caption || "") })).filter(image => image.src);
     return [
+      Number.isSafeInteger(Number(item.id)) && Number(item.id) > 0 ? `<a href="hobby.html?id=${Number(item.id)}">Details <span aria-hidden="true">→</span></a>` : "",
       gallery.length ? `<button class="hobby-gallery-button" type="button" data-hobby-gallery="${escapeAttr(JSON.stringify(gallery))}" aria-label="View gallery for ${escapeAttr(item.title)}">View gallery (${gallery.length})</button>` : "",
       download ? `<a href="${escapeAttr(download)}" download>Download <span aria-hidden="true">↓</span></a>` : "",
       external ? `<a href="${escapeAttr(external)}" target="_blank" rel="noopener">${hobbyLinkLabel(external)} <span aria-hidden="true">↗</span></a>` : ""
@@ -344,7 +345,7 @@
       >
         ${imageUrl ? `<figure class="archive-row__preview"><img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(item.image_alt || item.title)}" loading="lazy" /></figure>` : ""}
         <div class="archive-row__project">
-          <h3>${escapeHtml(item.title)}</h3>
+          <h3>${Number.isSafeInteger(Number(item.id)) && Number(item.id) > 0 ? `<a class="hobby-title-link" href="hobby.html?id=${Number(item.id)}">${escapeHtml(item.title)}</a>` : escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.description)}</p>
         </div>
         <p class="archive-row__category">${escapeHtml(item.game)}</p>
@@ -373,7 +374,7 @@
       >
         ${imageUrl ? `<img src="${escapeAttr(imageUrl)}" alt="${escapeAttr(item.image_alt || item.title)}" loading="lazy" style="display:block;width:100%;height:auto;object-fit:contain;" />` : ""}
         <header>
-          <h3>${escapeHtml(item.title)}</h3>
+          <h3>${Number.isSafeInteger(Number(item.id)) && Number(item.id) > 0 ? `<a class="hobby-title-link" href="hobby.html?id=${Number(item.id)}">${escapeHtml(item.title)}</a>` : escapeHtml(item.title)}</h3>
           <p class="card__meta">
             ${escapeHtml(item.game)} · ${linkLabel}
           </p>

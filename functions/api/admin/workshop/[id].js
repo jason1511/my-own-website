@@ -36,6 +36,7 @@ export async function onRequestPut(context) {
     const title = String(data.title || "").trim();
     const game = String(data.game || "").trim();
     const description = String(data.description || "").trim();
+    const body = String(data.body || "").trim().slice(0, 20000);
     const workshopUrl = String(data.workshop_url || "").trim();
     const displayOrder = Number.isFinite(Number(data.display_order))
       ? Number(data.display_order)
@@ -90,6 +91,7 @@ export async function onRequestPut(context) {
           title = ?,
           game = ?,
           description = ?,
+          body = ?,
           workshop_url = ?,
           image_key = ?,
           image_alt = ?,
@@ -106,6 +108,7 @@ export async function onRequestPut(context) {
         title,
         game,
         description,
+        body,
         workshopUrl,
         imageKey,
         imageAlt,
@@ -126,6 +129,7 @@ export async function onRequestPut(context) {
           title,
           game,
           description,
+          body,
           workshop_url,
           image_key,
           image_alt,

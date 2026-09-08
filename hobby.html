@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hobby Project | Jason Leonard</title>
+  <meta name="description" content="Game mods, reskins, and hobby creations by Jason Leonard." />
+  <meta name="theme-color" content="#0a1322" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="portfolio-archive article-page hobby-page">
+  <a class="portfolio-skip-link" href="#hobby-content">Skip to hobby project</a>
+  <main class="article-shell" id="hobby-content">
+    <a class="article-back" href="projects.html#hobby"><span aria-hidden="true">←</span> Additional projects</a>
+    <div class="article-status" data-hobby-status role="status" aria-live="polite">Loading hobby project…</div>
+    <article class="article-document" data-hobby-detail hidden>
+      <header class="article-header">
+        <p class="article-eyebrow" data-hobby-game></p>
+        <h1 data-hobby-title></h1>
+        <p class="article-lead" data-hobby-summary></p>
+        <div class="article-actions" data-hobby-actions></div>
+      </header>
+      <figure class="article-cover" data-hobby-cover hidden><img data-hobby-image alt="" /></figure>
+      <section class="article-body" data-hobby-body hidden>
+        <h2>About this project</h2>
+        <div data-hobby-description></div>
+      </section>
+      <section class="article-body" data-hobby-gallery-section hidden>
+        <h2>Screenshots</h2>
+        <div data-hobby-screenshots></div>
+      </section>
+    </article>
+    <footer class="article-footer">
+      <a href="projects.html#hobby"><span aria-hidden="true">←</span> Back to additional projects</a>
+      <p>© <span id="year"></span> Jason Leonard</p>
+    </footer>
+  </main>
+  <script src="js/main.js"></script>
+  <script src="js/hobby-detail.js"></script>
+</body>
+</html>

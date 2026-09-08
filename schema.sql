@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS workshop_items (
   title TEXT NOT NULL,
   game TEXT NOT NULL,
   description TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
   workshop_url TEXT NOT NULL,
   image_key TEXT NOT NULL DEFAULT '',
   image_alt TEXT NOT NULL DEFAULT '',

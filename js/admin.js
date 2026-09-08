@@ -932,6 +932,7 @@
             title,
             game,
             description,
+            body: form.elements["body"].value.trim(),
             workshop_url: workshopUrl,
             screenshots: window.hobbyEditor.collect(),
             download_url: form.elements["download_url"].value,
@@ -976,6 +977,7 @@
       form.elements["title"].value = "";
       form.elements["game"].value = "";
       form.elements["description"].value = "";
+      form.elements["body"].value = "";
       form.elements["workshop_url"].value = "";
       form.elements["download_url"].value = "";
       window.hobbyEditor.render([]);
@@ -2112,6 +2114,7 @@ function renderWorkshopCard(item) {
           data-workshop-title="${escapeAttr(item.title)}"
           data-workshop-game="${escapeAttr(item.game)}"
           data-workshop-description="${escapeAttr(item.description)}"
+          data-workshop-body="${escapeAttr(item.body || "")}"
           data-workshop-url="${escapeAttr(item.workshop_url)}"
           data-workshop-gallery="${escapeAttr(typeof item.screenshots === "string" ? item.screenshots : JSON.stringify(item.screenshots || []))}"
           data-workshop-download="${escapeAttr(item.download_url || "")}"
@@ -2155,6 +2158,7 @@ function setupWorkshopEditButtons(container) {
       form.elements["game"].value = button.dataset.workshopGame || "";
       form.elements["description"].value =
         button.dataset.workshopDescription || "";
+      form.elements["body"].value = button.dataset.workshopBody || "";
       form.elements["workshop_url"].value = button.dataset.workshopUrl || "";
       form.elements["download_url"].value = button.dataset.workshopDownload || "";
       window.hobbyEditor.render(button.dataset.workshopGallery || "[]");

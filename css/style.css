@@ -3882,3 +3882,10 @@ body.lightbox-open {
   .hobby-mod-drop { padding: 1rem; }
   .hobby-mod-drop input { width: 100%; min-width: 0; }
 }
+
+.hobby-title-link { color: inherit; text-decoration: none; }
+.hobby-title-link:hover, .hobby-title-link:focus-visible { color: var(--archive-accent, #5eead4); text-decoration: underline; text-underline-offset: .2em; }
+.hobby-page .article-actions { flex-wrap: wrap; }
+.hobby-page .article-body { overflow-wrap: anywhere; }
+.hobby-page .article-media img { width: 100%; height: auto; object-fit: contain; }
+.hobby-page .article-cover img { max-height: 65vh; object-fit: contain; }
