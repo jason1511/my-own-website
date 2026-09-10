@@ -773,10 +773,10 @@
           </fieldset>
           <fieldset class="admin-project-gallery">
             <legend>Files and versions</legend>
-            <div class="hobby-release-defaults">
-              <label>Version for new uploads<input data-upload-version type="text" maxlength="64" placeholder="e.g. 1.2 or ETS2 1.60" /></label>
-              <label>Release date<input data-upload-date type="date" /></label>
-            </div>
+            <details class="hobby-batch-options">
+              <summary>Set a version for this upload (optional)</summary>
+              <label>Version<input data-upload-version type="text" maxlength="64" placeholder="e.g. 1.2 or ETS2 1.60" /></label>
+            </details>
             <div class="hobby-mod-drop" data-mod-drop>
               <label for="hobbyModFile"><strong>Drop mod archives here or choose files</strong></label>
               <input id="hobbyModFile" data-mod-file type="file" multiple accept=".zip,.rar,.7z,.scs,.pak,.tar,.gz" />
@@ -786,9 +786,9 @@
               <button class="btn btn--small" type="button" data-mod-cancel hidden>Cancel Upload</button>
             </div>
             <input id="hobbyDownloadUrl" name="download_url" type="hidden" />
-            <p>New uploads add files; they do not replace older versions. Set a version, date, and optional notes for each attachment. Save the project to publish changes.</p>
+            <p>Files attach automatically after upload and use today’s date. Version and notes are optional. Older versions stay available. Save the project when ready.</p>
             <div data-hobby-attachments></div>
-            <details data-mod-library><summary>Manage uploaded archives</summary>
+            <details data-mod-library><summary>Choose from uploaded files</summary>
               <button class="btn btn--small" type="button" data-mod-refresh>Refresh files</button>
               <div data-mod-files></div>
             </details>

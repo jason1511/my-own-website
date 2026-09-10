@@ -11,9 +11,7 @@
   let busy = false, queueBusy = false, stopQueue = false, controller = null, dragged = null, sequence = 0;
   const attachments = form.querySelector("[data-hobby-attachments]");
   const uploadVersion = form.querySelector("[data-upload-version]");
-  const uploadDate = form.querySelector("[data-upload-date]");
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
-  uploadDate.value = today();
   const dirty = () => form.dispatchEvent(new Event("input", { bubbles: true }));
   const escape = value => String(value || "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   const sizeText = window.formatFileSize;
@@ -69,7 +67,15 @@
       ...Object.fromEntries([...row.querySelectorAll("[data-release-field]")].map(input => [input.dataset.releaseField, input.value.trim()]))
     }));
   }
-  function syncAttachment() { attachment.value = collectFiles()[0]?.url || ""; }
+  function syncLibraryButtons() {
+    const attached = new Set(collectFiles().map(file => file.url));
+    form.querySelectorAll("[data-archive-attach]").forEach(button => {
+      const used = attached.has(button.dataset.archiveAttach);
+      button.disabled = used;
+      button.textContent = used ? "Attached" : "Attach";
+    });
+  }
+  function syncAttachment() { attachment.value = collectFiles()[0]?.url || ""; syncLibraryButtons(); }
   function addFile(file, notify = true, prepend = true) {
     if ([...attachments.children].some(row => row.fileRecord.url === file.url)) {
       if (notify) status.textContent = "This file is already attached. Upload a separate file for a new version.";
@@ -80,11 +86,15 @@
     const name = file.filename || decodeURIComponent(file.url.split("/").pop()).replace(/^[a-f0-9-]{36}-/i, "");
     row.fileRecord = { ...file, filename: name };
     row.innerHTML = `<div class="hobby-file-row"><strong>${escape(name)}</strong><span>${file.size ? sizeText(file.size) : ""}</span><button class="btn btn--small" type="button" data-remove-version>Remove attachment</button></div>
-      <div class="hobby-release-defaults">
+      <details class="hobby-file-options">
+        <summary data-version-summary>${escape(file.version ? `Version ${file.version} · Edit details` : "Add version or notes (optional)")}</summary>
         <label>Version<input type="text" data-release-field="version" maxlength="64" value="${escape(file.version)}" placeholder="e.g. 1.2" /></label>
-        <label>Release date<input type="date" data-release-field="released_at" value="${escape(file.released_at)}" /></label>
-      </div>
-      <label>Release notes<textarea rows="2" data-release-field="notes" maxlength="2000" placeholder="Changes, compatibility, or what this file contains">${escape(file.notes)}</textarea></label>`;
+        <label>Release notes<textarea rows="2" data-release-field="notes" maxlength="2000" placeholder="Changes, compatibility, or what this file contains">${escape(file.notes)}</textarea></label>
+      </details>`;
+    row.querySelector('[data-release-field="version"]').addEventListener("input", event => {
+      const value = event.target.value.trim();
+      row.querySelector("[data-version-summary]").textContent = value ? `Version ${value} · Edit details` : "Add version or notes (optional)";
+    });
     row.querySelector("[data-remove-version]").onclick = () => {
       if (busy || queueBusy) return;
       row.remove(); syncAttachment(); dirty(); status.textContent = "Attachment removed. Save the project to apply; the archive remains available in storage.";
@@ -98,7 +108,7 @@
     try { if (typeof value === "string") entries = value.trim() ? JSON.parse(value) : null; } catch { entries = null; }
     if (!Array.isArray(entries)) entries = legacyUrl ? [{ url: legacyUrl }] : [];
     entries.forEach(file => addFile(file, false, false)); syncAttachment();
-    uploadVersion.value = ""; uploadDate.value = today();
+    uploadVersion.value = "";
   }
   const dependencies = form.querySelector("[data-hobby-dependencies]");
   function addDependency(entry = {}, notify = true) {
@@ -171,7 +181,7 @@
     const batch = [...selected]; if (!batch.length) return;
     if (batch.length + attachments.children.length > 100) { status.textContent = "A project can contain up to 100 files."; return; }
     queueBusy = true; stopQueue = false;
-    const defaults = { version: uploadVersion.value.trim(), released_at: uploadDate.value, notes: "" };
+    const defaults = { version: uploadVersion.value.trim(), released_at: today(), notes: "" };
     let done = 0;
     try {
       for (const file of batch) {
@@ -199,7 +209,7 @@
       for (const file of result.files) {
         const row = document.createElement("div"); row.className = "hobby-file-row";
         const name = document.createElement("span"); name.textContent = `${file.filename} · ${sizeText(file.size)}`;
-        const use = document.createElement("button"); use.className = "btn btn--small"; use.type = "button"; use.textContent = "Attach"; use.onclick = () => { if (!busy && !queueBusy) { addFile({ ...file, version: uploadVersion.value.trim(), released_at: uploadDate.value, notes: "" }); } };
+        const use = document.createElement("button"); use.className = "btn btn--small"; use.type = "button"; use.textContent = "Attach"; use.dataset.archiveAttach = file.url; use.onclick = () => { if (!busy && !queueBusy) { addFile({ ...file, version: uploadVersion.value.trim(), released_at: today(), notes: "" }); } };
         const remove = document.createElement("button"); remove.className = "btn btn--small btn--danger"; remove.type = "button"; remove.textContent = "Delete file";
         remove.onclick = async () => {
           if (busy || queueBusy || !confirm(`Permanently delete ${file.filename}?`)) return;
@@ -208,6 +218,7 @@
         };
         row.append(name, use, remove); files.append(row);
       }
+      syncLibraryButtons();
       if (!result.files.length) files.textContent = "No mod archives uploaded yet.";
       if (result.truncated) files.append(document.createTextNode("Showing the first 1,000 archives."));
     } catch (error) { files.textContent = error.message; }
