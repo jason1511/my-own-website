@@ -647,7 +647,7 @@
     if (section.key === "projects") {
       renderProjectGalleryEditors([]);
     }
-    if (section.key === "workshop") { window.hobbyEditor.render([]); window.hobbyEditor.renderFiles([]); }
+    if (section.key === "workshop") { window.hobbyEditor.render([]); window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]); }
 
     dirtyAdminForms.delete(form);
   }
@@ -937,6 +937,7 @@
             screenshots: window.hobbyEditor.collect(),
             download_url: form.elements["download_url"].value,
             files: window.hobbyEditor.collectFiles(),
+            dependencies: window.hobbyEditor.collectDependencies(),
             image_key: form.elements["image_key"].value.trim(),
             image_alt: form.elements["image_alt"].value.trim(),
             display_order: displayOrder,
@@ -982,7 +983,7 @@
       form.elements["workshop_url"].value = "";
       form.elements["download_url"].value = "";
       window.hobbyEditor.render([]);
-      window.hobbyEditor.renderFiles([]);
+      window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]);
       form.elements["image_key"].value = "";
       form.elements["image_alt"].value = "";
       form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
@@ -2120,6 +2121,7 @@ function renderWorkshopCard(item) {
           data-workshop-url="${escapeAttr(item.workshop_url)}"
           data-workshop-gallery="${escapeAttr(typeof item.screenshots === "string" ? item.screenshots : JSON.stringify(item.screenshots || []))}"
           data-workshop-download="${escapeAttr(item.download_url || "")}"
+          data-workshop-dependencies="${escapeAttr(typeof item.dependencies === "string" ? item.dependencies : JSON.stringify(item.dependencies || []))}"
           data-workshop-files="${escapeAttr(typeof item.files === "string" ? item.files : JSON.stringify(item.files || null))}"
           data-workshop-image-key="${escapeAttr(item.image_key || "")}"
           data-workshop-image-alt="${escapeAttr(item.image_alt || "")}"
@@ -2166,6 +2168,7 @@ function setupWorkshopEditButtons(container) {
       form.elements["download_url"].value = button.dataset.workshopDownload || "";
       window.hobbyEditor.render(button.dataset.workshopGallery || "[]");
       window.hobbyEditor.renderFiles(button.dataset.workshopFiles || "", button.dataset.workshopDownload || "");
+      window.hobbyEditor.renderDependencies(button.dataset.workshopDependencies || "[]");
       form.elements["image_key"].value = button.dataset.workshopImageKey || "";
       form.elements["image_alt"].value = button.dataset.workshopImageAlt || "";
       form.elements["display_order"].value =

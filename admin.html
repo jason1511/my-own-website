@@ -735,6 +735,12 @@
           </div>
 
           <p class="muted">Paste the full link to your project or hosted file. Google Drive files must be shared so visitors can open them. Steam activity is shown only for Workshop items.</p>
+          <fieldset class="hobby-dependencies-editor">
+            <legend>Dependencies</legend>
+            <p>List the original mod and any other mods required to use this project.</p>
+            <div data-hobby-dependencies></div>
+            <button class="btn btn--small" type="button" data-add-dependency>Add dependency</button>
+          </fieldset>
 
           <div>
             <label for="workshopImageKey"><strong>Cover Image Path or URL</strong></label><br />
@@ -915,6 +921,7 @@
     </div>
   </main>
 
+  <script src="js/file-size.js"></script>
   <script src="js/admin-hobbies.js"></script>
   <script src="js/admin.js"></script>
 </body>

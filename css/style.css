@@ -3939,3 +3939,10 @@ body.lightbox-open {
 .hobby-attachment-editor strong { overflow-wrap: anywhere; }
 .hobby-attachment-editor input, .hobby-attachment-editor textarea, .hobby-release-defaults input { display: block; width: 100%; min-width: 0; }
 @media (max-width: 600px) { .hobby-release-defaults { grid-template-columns: 1fr; } .hobby-page .article-header { margin-top: 1.5rem; } }
+
+.hobby-dependencies { padding-left: 1.25rem; }
+.hobby-dependencies li { margin: .65rem 0; overflow-wrap: anywhere; }
+.hobby-dependencies a { text-decoration: underline; text-underline-offset: 3px; }
+.hobby-dependency-editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; align-items: end; gap: .75rem; margin-bottom: 1rem; }
+.hobby-dependency-editor label, .hobby-dependency-editor input { min-width: 0; width: 100%; }
+@media (max-width: 700px) { .hobby-dependency-editor { grid-template-columns: minmax(0, 1fr); } }

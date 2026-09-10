@@ -16,7 +16,7 @@
   uploadDate.value = today();
   const dirty = () => form.dispatchEvent(new Event("input", { bubbles: true }));
   const escape = value => String(value || "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  const sizeText = size => `${(size / 1024 / 1024).toFixed(1)} MB`;
+  const sizeText = window.formatFileSize;
   async function api(action, options = {}, signal) {
     const response = await fetch(`/api/admin/mods?action=${action}`, { credentials: "same-origin", ...options, signal });
     const data = await response.json();
@@ -100,7 +100,24 @@
     entries.forEach(file => addFile(file, false, false)); syncAttachment();
     uploadVersion.value = ""; uploadDate.value = today();
   }
+  const dependencies = form.querySelector("[data-hobby-dependencies]");
+  function addDependency(entry = {}, notify = true) {
+    if (dependencies.children.length >= 30) { status.textContent = "Use up to 30 dependencies."; return; }
+    const row = document.createElement("div"); row.className = "hobby-dependency-editor";
+    row.innerHTML = `<label>Mod name<input type="text" data-dependency-name maxlength="180" required value="${escape(entry.name)}" placeholder="e.g. HKC Trailers V3" /></label>
+      <label>Link<input type="url" data-dependency-url maxlength="2048" required value="${escape(entry.url)}" placeholder="https://…" /></label>
+      <button type="button" class="btn btn--small" data-remove-dependency>Remove</button>`;
+    row.querySelector("[data-remove-dependency]").onclick = () => { row.remove(); dirty(); };
+    dependencies.append(row); if (notify) dirty();
+  }
+  function renderDependencies(value = []) {
+    dependencies.replaceChildren();
+    try { const entries = typeof value === "string" ? JSON.parse(value || "[]") : value; if (Array.isArray(entries)) entries.forEach(entry => addDependency(entry, false)); } catch {}
+  }
+  form.querySelector("[data-add-dependency]").onclick = () => addDependency();
   window.hobbyEditor = {
+    renderDependencies,
+    collectDependencies: () => [...dependencies.children].map(row => ({ name: row.querySelector("[data-dependency-name]").value.trim(), url: row.querySelector("[data-dependency-url]").value.trim() })),
     collect: () => [...gallery.children].map(row => Object.fromEntries([...row.querySelectorAll("[data-field]")].map(field => [field.dataset.field, field.value.trim()]))).filter(image => image.image_url),
     render(value = []) {
       gallery.replaceChildren();

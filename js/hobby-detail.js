@@ -50,7 +50,7 @@
         const date = document.createElement("time"); date.dateTime = file.released_at;
         date.textContent = new Date(file.released_at).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); metadata.append(date);
       }
-      if (Number(file.size) > 0) { const size = document.createElement("span"); size.textContent = `${(Number(file.size) / 1024 / 1024).toFixed(1)} MB`; metadata.append(size); }
+      if (Number(file.size) > 0) { const size = document.createElement("span"); size.textContent = window.formatFileSize(file.size); metadata.append(size); }
       if (metadata.children.length) row.append(metadata);
       if (file.notes) { const notes = document.createElement("p"); notes.className = "hobby-release-notes"; notes.textContent = file.notes; row.append(notes); }
       list.append(row);
@@ -76,7 +76,20 @@
       img.src = imageUrl; img.alt = item.image_alt || item.title || "Project cover";
       document.querySelector("[data-hobby-cover]").hidden = false;
     }
-    const body = String(item.body || "").trim();
+    let dependencies = item.dependencies || [];
+    try { if (typeof dependencies === "string") dependencies = JSON.parse(dependencies); } catch { dependencies = []; }
+    const dependencyList = document.querySelector("[data-hobby-dependencies]");
+    for (const entry of (Array.isArray(dependencies) ? dependencies : []).slice(0, 30)) {
+      const url = safeUrl(entry?.url); if (!url || !entry.name) continue;
+      const li = document.createElement("li"), a = document.createElement("a");
+      a.href = url; a.textContent = entry.name; a.target = "_blank"; a.rel = "noopener";
+      li.append(a); dependencyList.append(li);
+    }
+    document.querySelector("[data-hobby-dependencies-section]").hidden = !dependencyList.children.length;
+    const body = String(item.body || "").split(/\r?\n/).filter(line => {
+      const match = line.match(/^\s*mod asli\s*:\s*(https?:\/\/\S+)\s*$/i);
+      return !match || !Array.isArray(dependencies) || !dependencies.some(entry => safeUrl(entry.url) === safeUrl(match[1]));
+    }).join("\n").trim();
     if (body) {
       const container = document.querySelector("[data-hobby-description]");
       for (const paragraph of body.split(/\n\s*\n/)) {

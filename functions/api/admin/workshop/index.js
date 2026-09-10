@@ -1,3 +1,4 @@
+import { normalizeDependencies, hobbyDependencies } from "../../../../lib/hobby-dependencies.js";
 import { normalizeHobbyFiles, hobbyFiles, withHobbyFiles } from "../../../../lib/hobby-files.js";
 import { ensureHobbyMedia, normalizeHobbyImage, normalizeHobbyGallery, normalizeModDownload } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
@@ -26,6 +27,7 @@ export async function onRequestGet(context) {
           screenshots,
           download_url,
           files,
+          dependencies,
         display_order,
         is_published,
         created_at,
@@ -52,11 +54,12 @@ export async function onRequestPost(context) {
 
     const db = context.env.DB;
     const data = await context.request.json();
-    let imageKey, screenshots, downloadUrl, files;
+    let imageKey, screenshots, downloadUrl, files, dependencies;
     try {
       imageKey = normalizeHobbyImage(data.image_key);
       screenshots = JSON.stringify(normalizeHobbyGallery(data.screenshots));
       files = normalizeHobbyFiles((data.files === undefined ? hobbyFiles(data) : data.files));
+      dependencies = normalizeDependencies(data.dependencies === undefined ? hobbyDependencies(data) : data.dependencies);
       downloadUrl = files[0]?.url || "";
     }
     catch (error) { return json({ ok: false, error: error.message }, 400); }
@@ -106,10 +109,11 @@ export async function onRequestPost(context) {
           screenshots,
           download_url,
           files,
+          dependencies,
           display_order,
           is_published
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -124,6 +128,7 @@ export async function onRequestPost(context) {
         screenshots,
         downloadUrl,
         JSON.stringify(files),
+        JSON.stringify(dependencies),
         displayOrder,
         isPublished
       )

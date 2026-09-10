@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS workshop_items (
   screenshots TEXT NOT NULL DEFAULT '',
   download_url TEXT NOT NULL DEFAULT '',
   files TEXT NOT NULL DEFAULT '',
+  dependencies TEXT NOT NULL DEFAULT '',
   display_order INTEGER NOT NULL DEFAULT 0,
   is_published INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
