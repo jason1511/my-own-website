@@ -1,3 +1,4 @@
+import { hobbyFiles } from "../../../../lib/hobby-files.js";
 import { requireAdmin } from "../../../../lib/admin-auth.js";
 
 export const CHUNK_SIZE = 8 * 1024 * 1024;
@@ -61,7 +62,7 @@ export async function onRequest(context) {
       // Check both new attachment fields and older pasted project links.
       const { results } = await env.DB.prepare("SELECT * FROM workshop_items").all();
       if (results.some(item => {
-        if (item.download_url === download) return true;
+        if (item.download_url === download || hobbyFiles(item).some(file => file.url === download)) return true;
         try { return new URL(item.workshop_url).pathname === download; } catch { return false; }
       })) throw fail("This file is attached to a saved hobby project. Remove its attachment and save that project first.", 409);
       await bucket.delete(key);

@@ -1,3 +1,4 @@
+import { normalizeHobbyFiles, hobbyFiles, withHobbyFiles } from "../../../../lib/hobby-files.js";
 import { ensureHobbyMedia, normalizeHobbyImage, normalizeHobbyGallery, normalizeModDownload } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
 
@@ -21,12 +22,35 @@ export async function onRequestPut(context) {
       );
     }
 
+    const existing = await db
+      .prepare(
+        `
+        SELECT *
+        FROM workshop_items
+        WHERE id = ?
+        LIMIT 1
+        `
+      )
+      .bind(id)
+      .first();
+
+    if (!existing) {
+      return json(
+        {
+          ok: false,
+          error: "Workshop item not found.",
+        },
+        404
+      );
+    }
+
     const data = await context.request.json();
-    let imageKey, screenshots, downloadUrl;
+    let imageKey, screenshots, downloadUrl, files;
     try {
       imageKey = normalizeHobbyImage(data.image_key);
       screenshots = JSON.stringify(normalizeHobbyGallery(data.screenshots));
-      downloadUrl = normalizeModDownload(data.download_url);
+      files = normalizeHobbyFiles((data.files === undefined ? hobbyFiles(existing) : data.files));
+      downloadUrl = files[0]?.url || "";
     }
     catch (error) { return json({ ok: false, error: error.message }, 400); }
     const imageAlt = String(data.image_alt || "").trim().slice(0, 300);
@@ -60,28 +84,6 @@ export async function onRequestPut(context) {
       );
     }
 
-    const existing = await db
-      .prepare(
-        `
-        SELECT id
-        FROM workshop_items
-        WHERE id = ?
-        LIMIT 1
-        `
-      )
-      .bind(id)
-      .first();
-
-    if (!existing) {
-      return json(
-        {
-          ok: false,
-          error: "Workshop item not found.",
-        },
-        404
-      );
-    }
-
     await db
       .prepare(
         `
@@ -97,6 +99,7 @@ export async function onRequestPut(context) {
           image_alt = ?,
           screenshots = ?,
           download_url = ?,
+          files = ?,
           display_order = ?,
           is_published = ?,
           updated_at = CURRENT_TIMESTAMP
@@ -114,6 +117,7 @@ export async function onRequestPut(context) {
         imageAlt,
         screenshots,
         downloadUrl,
+        JSON.stringify(files),
         displayOrder,
         isPublished,
         id
@@ -135,6 +139,7 @@ export async function onRequestPut(context) {
           image_alt,
           screenshots,
           download_url,
+          files,
           display_order,
           is_published,
           created_at,
@@ -150,7 +155,7 @@ export async function onRequestPut(context) {
     return json({
       ok: true,
       message: "Workshop item updated.",
-      workshop_item: updatedItem,
+      workshop_item: await withHobbyFiles(updatedItem, context.env.MEDIA_BUCKET),
     });
   } catch (error) {
     console.error(error);

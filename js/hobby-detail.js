@@ -18,12 +18,44 @@
   function addLink(label, url, download = false) {
     if (!url) return;
     const a = document.createElement("a");
-    a.className = "btn btn--small";
+    a.className = "hobby-external-link";
     a.textContent = label;
     a.href = url;
     if (download) a.setAttribute("download", "");
     else { a.target = "_blank"; a.rel = "noopener"; }
     document.querySelector("[data-hobby-actions]").append(a);
+    document.querySelector("[data-hobby-links-section]").hidden = false;
+  }
+  function renderFiles(item) {
+    let entries = item.files;
+    if (typeof entries === "string") { try { entries = JSON.parse(entries); } catch { entries = null; } }
+    if (!Array.isArray(entries)) entries = item.download_url ? [{ url: item.download_url }] : [];
+    entries = [...entries];
+    const external = safeUrl(item.workshop_url);
+    if (external && /\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(new URL(external).pathname) && !entries.some(file => safeUrl(file.url) === external)) entries.push({ url: external });
+    entries.sort((a, b) => String(b.released_at || "").localeCompare(String(a.released_at || "")));
+    const list = document.querySelector("[data-hobby-files]");
+    for (const file of entries.slice(0, 100)) {
+      const url = safeUrl(file?.url); if (!url) continue;
+      let name = file.filename;
+      if (!name) { try { name = decodeURIComponent(new URL(url).pathname.split("/").pop()).replace(/^[a-f0-9-]{36}-/i, ""); } catch { name = "Archive"; } }
+      const row = document.createElement("article"); row.className = "hobby-release-row";
+      const heading = document.createElement("h3");
+      const link = document.createElement("a"); link.href = url; link.textContent = name;
+      if (new URL(url).origin === location.origin) link.setAttribute("download", name); else { link.target = "_blank"; link.rel = "noopener"; }
+      heading.append(link); row.append(heading);
+      const metadata = document.createElement("div"); metadata.className = "hobby-release-meta";
+      if (file.version) { const version = document.createElement("span"); version.textContent = `Version ${file.version}`; metadata.append(version); }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(file.released_at || "") && Number.isFinite(Date.parse(file.released_at))) {
+        const date = document.createElement("time"); date.dateTime = file.released_at;
+        date.textContent = new Date(file.released_at).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); metadata.append(date);
+      }
+      if (Number(file.size) > 0) { const size = document.createElement("span"); size.textContent = `${(Number(file.size) / 1024 / 1024).toFixed(1)} MB`; metadata.append(size); }
+      if (metadata.children.length) row.append(metadata);
+      if (file.notes) { const notes = document.createElement("p"); notes.className = "hobby-release-notes"; notes.textContent = file.notes; row.append(notes); }
+      list.append(row);
+    }
+    document.querySelector("[data-hobby-files-section]").hidden = !list.children.length;
   }
   function render(item) {
     document.title = `${item.title || "Hobby Project"} | Jason Leonard`;
@@ -31,11 +63,11 @@
     text("[data-hobby-title]", item.title);
     text("[data-hobby-game]", item.game || "Hobby project");
     text("[data-hobby-summary]", item.description);
-    if (/^\/downloads\/[a-f0-9-]{36}-[a-zA-Z0-9._-]+\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(item.download_url || "")) addLink("Download ↓", item.download_url, true);
+    renderFiles(item);
     const external = safeUrl(item.workshop_url);
-    if (external) {
+    if (external && !/\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(new URL(external).pathname)) {
       const url = new URL(external);
-      const label = ["steamcommunity.com", "www.steamcommunity.com"].includes(url.hostname) ? "View on Steam ↗" : ["drive.google.com", "docs.google.com"].includes(url.hostname) ? "Google Drive ↗" : /\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(url.pathname) ? "Download ↗" : "Visit project ↗";
+      const label = ["steamcommunity.com", "www.steamcommunity.com"].includes(url.hostname) ? "View on Steam ↗" : ["drive.google.com", "docs.google.com"].includes(url.hostname) ? "Google Drive ↗" : "Visit project ↗";
       addLink(label, external);
     }
     const imageUrl = safeUrl(item.image_key);

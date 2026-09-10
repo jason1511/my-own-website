@@ -1,3 +1,4 @@
+import { hobbyFiles } from "../../lib/hobby-files.js";
 export async function onRequestGet(context) {
   try {
     const db = context.env.DB;
@@ -15,7 +16,7 @@ export async function onRequestGet(context) {
 
     return json({
       ok: true,
-      workshop_items: results,
+      workshop_items: results.map(item => ({ ...item, files: hobbyFiles(item) })),
     });
   } catch (error) {
     console.error(error);

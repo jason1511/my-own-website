@@ -8,7 +8,12 @@
   const progress = area.querySelector("progress");
   const cancel = area.querySelector("[data-mod-cancel]");
   const attachment = form.elements.download_url;
-  let busy = false, controller = null, dragged = null, sequence = 0;
+  let busy = false, queueBusy = false, stopQueue = false, controller = null, dragged = null, sequence = 0;
+  const attachments = form.querySelector("[data-hobby-attachments]");
+  const uploadVersion = form.querySelector("[data-upload-version]");
+  const uploadDate = form.querySelector("[data-upload-date]");
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+  uploadDate.value = today();
   const dirty = () => form.dispatchEvent(new Event("input", { bubbles: true }));
   const escape = value => String(value || "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   const sizeText = size => `${(size / 1024 / 1024).toFixed(1)} MB`;
@@ -59,16 +64,53 @@
     row.addEventListener("dragend", () => { dragged = null; });
     gallery.append(row); renumber(); if (notify) dirty();
   }
+  function collectFiles() {
+    return [...attachments.children].map(row => ({ ...row.fileRecord,
+      ...Object.fromEntries([...row.querySelectorAll("[data-release-field]")].map(input => [input.dataset.releaseField, input.value.trim()]))
+    }));
+  }
+  function syncAttachment() { attachment.value = collectFiles()[0]?.url || ""; }
+  function addFile(file, notify = true, prepend = true) {
+    if ([...attachments.children].some(row => row.fileRecord.url === file.url)) {
+      if (notify) status.textContent = "This file is already attached. Upload a separate file for a new version.";
+      return false;
+    }
+    if (attachments.children.length >= 100) { status.textContent = "A project can contain up to 100 files."; return false; }
+    const row = document.createElement("article"); row.className = "hobby-attachment-editor";
+    const name = file.filename || decodeURIComponent(file.url.split("/").pop()).replace(/^[a-f0-9-]{36}-/i, "");
+    row.fileRecord = { ...file, filename: name };
+    row.innerHTML = `<div class="hobby-file-row"><strong>${escape(name)}</strong><span>${file.size ? sizeText(file.size) : ""}</span><button class="btn btn--small" type="button" data-remove-version>Remove attachment</button></div>
+      <div class="hobby-release-defaults">
+        <label>Version<input type="text" data-release-field="version" maxlength="64" value="${escape(file.version)}" placeholder="e.g. 1.2" /></label>
+        <label>Release date<input type="date" data-release-field="released_at" value="${escape(file.released_at)}" /></label>
+      </div>
+      <label>Release notes<textarea rows="2" data-release-field="notes" maxlength="2000" placeholder="Changes, compatibility, or what this file contains">${escape(file.notes)}</textarea></label>`;
+    row.querySelector("[data-remove-version]").onclick = () => {
+      if (busy || queueBusy) return;
+      row.remove(); syncAttachment(); dirty(); status.textContent = "Attachment removed. Save the project to apply; the archive remains available in storage.";
+    };
+    if (prepend) attachments.prepend(row); else attachments.append(row);
+    syncAttachment(); if (notify) dirty(); return true;
+  }
+  function renderFiles(value, legacyUrl = "") {
+    attachments.replaceChildren();
+    let entries = value;
+    try { if (typeof value === "string") entries = value.trim() ? JSON.parse(value) : null; } catch { entries = null; }
+    if (!Array.isArray(entries)) entries = legacyUrl ? [{ url: legacyUrl }] : [];
+    entries.forEach(file => addFile(file, false, false)); syncAttachment();
+    uploadVersion.value = ""; uploadDate.value = today();
+  }
   window.hobbyEditor = {
     collect: () => [...gallery.children].map(row => Object.fromEntries([...row.querySelectorAll("[data-field]")].map(field => [field.dataset.field, field.value.trim()]))).filter(image => image.image_url),
     render(value = []) {
       gallery.replaceChildren();
       try { const entries = typeof value === "string" ? JSON.parse(value || "[]") : value; if (Array.isArray(entries)) entries.forEach(image => add(image, false)); } catch { /* Legacy entries have no gallery. */ }
     },
-    get busy() { return busy; }
+    collectFiles, renderFiles,
+    get busy() { return busy || queueBusy; }
   };
   form.querySelector("[data-hobby-add-image]").onclick = () => add();
-  async function upload(file) {
+  async function uploadOne(file, defaults) {
     if (busy || !file) return;
     if (!/\.(zip|rar|7z|scs|pak|tar|gz)$/i.test(file.name) || !file.size || file.size > 256 * 1024 * 1024) { status.textContent = "Choose a ZIP, RAR, 7Z, SCS, PAK, TAR, or GZ file up to 256 MB."; return; }
     busy = true; controller = new AbortController();
@@ -98,23 +140,40 @@
       }
       const result = await retry("complete", { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify({ parts }) });
       completed = true;
-      attachment.value = result.url; attachment.dispatchEvent(new Event("input", { bubbles: true }));
+      addFile({ url: result.url, filename: result.filename || file.name, size: result.size, ...defaults });
       status.textContent = `${file.name} uploaded (${sizeText(file.size)}). Save the project to publish its download link.`;
     } catch (error) { status.textContent = signal.aborted ? "Upload cancelled." : error.message; }
     finally {
       if (token && !completed) { try { await api("abort", { method: "DELETE", headers: { "X-Upload-Token": token } }); } catch { /* R2 expires abandoned multipart uploads. */ } }
       busy = false; controller = null; fileInput.disabled = false; fileInput.value = ""; cancel.hidden = true;
     }
+    return completed;
   }
-  fileInput.addEventListener("change", () => upload(fileInput.files[0]));
+  async function upload(selected) {
+    if (busy || queueBusy) return;
+    const batch = [...selected]; if (!batch.length) return;
+    if (batch.length + attachments.children.length > 100) { status.textContent = "A project can contain up to 100 files."; return; }
+    queueBusy = true; stopQueue = false;
+    const defaults = { version: uploadVersion.value.trim(), released_at: uploadDate.value, notes: "" };
+    let done = 0;
+    try {
+      for (const file of batch) {
+        if (stopQueue) break;
+        if (!await uploadOne(file, defaults)) break;
+        done++;
+      }
+      if (done === batch.length) status.textContent = `${done} file(s) uploaded. Review versions and save the project.`;
+    } finally { queueBusy = false; }
+  }
+  fileInput.addEventListener("change", () => upload(fileInput.files));
   for (const type of ["dragenter", "dragover"]) area.addEventListener(type, event => { if (event.dataTransfer.types.includes("Files")) { event.preventDefault(); area.classList.add("is-dragging"); } });
   area.addEventListener("dragleave", () => area.classList.remove("is-dragging"));
-  area.addEventListener("drop", event => { if (event.dataTransfer.files.length) { event.preventDefault(); area.classList.remove("is-dragging"); upload(event.dataTransfer.files[0]); } });
-  cancel.onclick = () => controller?.abort();
-  form.querySelector("[data-mod-remove]").onclick = () => { if (!busy) { attachment.value = ""; dirty(); status.textContent = "Attachment removed. Save the project to apply."; } };
-  form.addEventListener("submit", event => { if (busy) { event.preventDefault(); event.stopImmediatePropagation(); status.textContent = "Wait for the upload to finish, or cancel it before saving."; } }, true);
-  window.addEventListener("hashchange", () => { if (busy) controller?.abort(); });
-  window.addEventListener("beforeunload", event => { if (busy) { event.preventDefault(); event.returnValue = ""; } });
+  area.addEventListener("drop", event => { if (event.dataTransfer.files.length) { event.preventDefault(); area.classList.remove("is-dragging"); upload(event.dataTransfer.files); } });
+  cancel.onclick = () => { stopQueue = true; controller?.abort(); };
+
+  form.addEventListener("submit", event => { if (busy || queueBusy) { event.preventDefault(); event.stopImmediatePropagation(); status.textContent = "Wait for the upload to finish, or cancel it before saving."; } }, true);
+  window.addEventListener("hashchange", () => { if (busy || queueBusy) { stopQueue = true; controller?.abort(); } });
+  window.addEventListener("beforeunload", event => { if (busy || queueBusy) { event.preventDefault(); event.returnValue = ""; } });
   const files = form.querySelector("[data-mod-files]");
   async function listFiles() {
     files.textContent = "Loading archives…";
@@ -123,11 +182,11 @@
       for (const file of result.files) {
         const row = document.createElement("div"); row.className = "hobby-file-row";
         const name = document.createElement("span"); name.textContent = `${file.filename} · ${sizeText(file.size)}`;
-        const use = document.createElement("button"); use.className = "btn btn--small"; use.type = "button"; use.textContent = "Attach"; use.onclick = () => { if (!busy) { attachment.value = file.url; dirty(); status.textContent = "Archive attached. Save the project to apply."; } };
+        const use = document.createElement("button"); use.className = "btn btn--small"; use.type = "button"; use.textContent = "Attach"; use.onclick = () => { if (!busy && !queueBusy) { addFile({ ...file, version: uploadVersion.value.trim(), released_at: uploadDate.value, notes: "" }); } };
         const remove = document.createElement("button"); remove.className = "btn btn--small btn--danger"; remove.type = "button"; remove.textContent = "Delete file";
         remove.onclick = async () => {
-          if (busy || !confirm(`Permanently delete ${file.filename}?`)) return;
-          try { await api(`file&key=${encodeURIComponent(file.key)}`, { method: "DELETE" }); if (attachment.value === file.url) { attachment.value = ""; dirty(); } await listFiles(); }
+          if (busy || queueBusy || !confirm(`Permanently delete ${file.filename}?`)) return;
+          try { await api(`file&key=${encodeURIComponent(file.key)}`, { method: "DELETE" }); for (const row of [...attachments.children]) { if (row.fileRecord.url === file.url) row.remove(); } syncAttachment(); dirty(); await listFiles(); }
           catch (error) { status.textContent = error.message; }
         };
         row.append(name, use, remove); files.append(row);

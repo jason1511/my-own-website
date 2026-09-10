@@ -647,7 +647,7 @@
     if (section.key === "projects") {
       renderProjectGalleryEditors([]);
     }
-    if (section.key === "workshop") window.hobbyEditor.render([]);
+    if (section.key === "workshop") { window.hobbyEditor.render([]); window.hobbyEditor.renderFiles([]); }
 
     dirtyAdminForms.delete(form);
   }
@@ -936,6 +936,7 @@
             workshop_url: workshopUrl,
             screenshots: window.hobbyEditor.collect(),
             download_url: form.elements["download_url"].value,
+            files: window.hobbyEditor.collectFiles(),
             image_key: form.elements["image_key"].value.trim(),
             image_alt: form.elements["image_alt"].value.trim(),
             display_order: displayOrder,
@@ -981,6 +982,7 @@
       form.elements["workshop_url"].value = "";
       form.elements["download_url"].value = "";
       window.hobbyEditor.render([]);
+      window.hobbyEditor.renderFiles([]);
       form.elements["image_key"].value = "";
       form.elements["image_alt"].value = "";
       form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
@@ -2118,6 +2120,7 @@ function renderWorkshopCard(item) {
           data-workshop-url="${escapeAttr(item.workshop_url)}"
           data-workshop-gallery="${escapeAttr(typeof item.screenshots === "string" ? item.screenshots : JSON.stringify(item.screenshots || []))}"
           data-workshop-download="${escapeAttr(item.download_url || "")}"
+          data-workshop-files="${escapeAttr(typeof item.files === "string" ? item.files : JSON.stringify(item.files || null))}"
           data-workshop-image-key="${escapeAttr(item.image_key || "")}"
           data-workshop-image-alt="${escapeAttr(item.image_alt || "")}"
           data-workshop-order="${Number(item.display_order)}"
@@ -2162,6 +2165,7 @@ function setupWorkshopEditButtons(container) {
       form.elements["workshop_url"].value = button.dataset.workshopUrl || "";
       form.elements["download_url"].value = button.dataset.workshopDownload || "";
       window.hobbyEditor.render(button.dataset.workshopGallery || "[]");
+      window.hobbyEditor.renderFiles(button.dataset.workshopFiles || "", button.dataset.workshopDownload || "");
       form.elements["image_key"].value = button.dataset.workshopImageKey || "";
       form.elements["image_alt"].value = button.dataset.workshopImageAlt || "";
       form.elements["display_order"].value =

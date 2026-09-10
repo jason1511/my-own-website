@@ -1,3 +1,4 @@
+import { normalizeHobbyFiles, hobbyFiles, withHobbyFiles } from "../../../../lib/hobby-files.js";
 import { ensureHobbyMedia, normalizeHobbyImage, normalizeHobbyGallery, normalizeModDownload } from "../../../../lib/hobby-media.js";
 import { hobbyLinkIdentity } from "../../../../lib/hobby-link.js";
 
@@ -24,6 +25,7 @@ export async function onRequestGet(context) {
         image_alt,
           screenshots,
           download_url,
+          files,
         display_order,
         is_published,
         created_at,
@@ -33,7 +35,7 @@ export async function onRequestGet(context) {
       `
     ).all();
 
-    return json({ ok: true, workshop_items: results });
+    return json({ ok: true, workshop_items: await Promise.all(results.map(item => withHobbyFiles(item, context.env.MEDIA_BUCKET))) });
   } catch (error) {
     console.error(error);
     return json(
@@ -50,11 +52,12 @@ export async function onRequestPost(context) {
 
     const db = context.env.DB;
     const data = await context.request.json();
-    let imageKey, screenshots, downloadUrl;
+    let imageKey, screenshots, downloadUrl, files;
     try {
       imageKey = normalizeHobbyImage(data.image_key);
       screenshots = JSON.stringify(normalizeHobbyGallery(data.screenshots));
-      downloadUrl = normalizeModDownload(data.download_url);
+      files = normalizeHobbyFiles((data.files === undefined ? hobbyFiles(data) : data.files));
+      downloadUrl = files[0]?.url || "";
     }
     catch (error) { return json({ ok: false, error: error.message }, 400); }
     const imageAlt = String(data.image_alt || "").trim().slice(0, 300);
@@ -102,10 +105,11 @@ export async function onRequestPost(context) {
           image_alt,
           screenshots,
           download_url,
+          files,
           display_order,
           is_published
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -119,6 +123,7 @@ export async function onRequestPost(context) {
         imageAlt,
         screenshots,
         downloadUrl,
+        JSON.stringify(files),
         displayOrder,
         isPublished
       )

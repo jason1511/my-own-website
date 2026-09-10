@@ -327,7 +327,7 @@
     return [
       Number.isSafeInteger(Number(item.id)) && Number(item.id) > 0 ? `<a href="hobby.html?id=${Number(item.id)}">Details <span aria-hidden="true">→</span></a>` : "",
       gallery.length ? `<button class="hobby-gallery-button" type="button" data-hobby-gallery="${escapeAttr(JSON.stringify(gallery))}" aria-label="View gallery for ${escapeAttr(item.title)}">View gallery (${gallery.length})</button>` : "",
-      download ? `<a href="${escapeAttr(download)}" download>Download <span aria-hidden="true">↓</span></a>` : "",
+      download ? `<a href="hobby.html?id=${Number(item.id)}#files">Files <span aria-hidden="true">→</span></a>` : "",
       external ? `<a href="${escapeAttr(external)}" target="_blank" rel="noopener">${hobbyLinkLabel(external)} <span aria-hidden="true">↗</span></a>` : ""
     ].filter(Boolean).join("");
   }

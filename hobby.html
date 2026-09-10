@@ -18,16 +18,23 @@
         <p class="article-eyebrow" data-hobby-game></p>
         <h1 data-hobby-title></h1>
         <p class="article-lead" data-hobby-summary></p>
-        <div class="article-actions" data-hobby-actions></div>
       </header>
       <figure class="article-cover" data-hobby-cover hidden><img data-hobby-image alt="" /></figure>
+      <section class="article-body hobby-gallery" data-hobby-gallery-section hidden aria-label="Screenshot gallery">
+        <div class="hobby-screenshot-grid" data-hobby-screenshots></div>
+      </section>
       <section class="article-body" data-hobby-body hidden>
         <h2>About this project</h2>
         <div data-hobby-description></div>
       </section>
-      <section class="article-body" data-hobby-gallery-section hidden>
-        <h2>Screenshots</h2>
-        <div data-hobby-screenshots></div>
+      <section class="article-body hobby-files" id="files" data-hobby-files-section hidden>
+        <h2>Files</h2>
+        <p class="hobby-files-hint">Select a filename to download. Dated releases appear newest first.</p>
+        <div data-hobby-files></div>
+      </section>
+      <section class="article-body" data-hobby-links-section hidden>
+        <h2>Links</h2>
+        <div class="hobby-related-links" data-hobby-actions></div>
       </section>
     </article>
     <footer class="article-footer">
