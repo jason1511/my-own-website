@@ -2096,7 +2096,7 @@ function renderWorkshopCard(item) {
       <header>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card__meta">
-          ${escapeHtml(item.game)}${/^\d+$/.test(item.steam_id) ? ` · Steam ID ${escapeHtml(item.steam_id)}` : " · External link"}
+          ${escapeHtml(item.game)}${/^\d+$/.test(item.steam_id) ? ` · Steam ID ${escapeHtml(item.steam_id)}` : item.workshop_url ? " · External link" : " · Files"}
         </p>
       </header>
 
@@ -2141,7 +2141,7 @@ function renderWorkshopCard(item) {
           Delete
         </button>
 
-        ${renderPrimaryLinkButton(item.workshop_url, "Open link")}
+        ${item.is_published ? renderPrimaryLinkButton(`hobby.html?id=${Number(item.id)}`, "View project") : ""}
       </div>
     </article>
   `;
@@ -2914,6 +2914,7 @@ function setupWorkshopEditButtons(container) {
   }
 
   function renderPrimaryLinkButton(url, label) {
+    if (!String(url || "").trim()) return "";
     return `
       <a
         class="btn btn--small btn--primary"
