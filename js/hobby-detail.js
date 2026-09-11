@@ -92,9 +92,7 @@
     }).join("\n").trim();
     if (body) {
       const container = document.querySelector("[data-hobby-description]");
-      for (const paragraph of body.split(/\n\s*\n/)) {
-        const p = document.createElement("p"); p.textContent = paragraph; p.style.whiteSpace = "pre-line"; container.append(p);
-      }
+      window.portfolioMarkdown.render(container, body);
       document.querySelector("[data-hobby-body]").hidden = false;
     }
     let gallery = [];

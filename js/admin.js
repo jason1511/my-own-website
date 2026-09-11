@@ -647,7 +647,7 @@
     if (section.key === "projects") {
       renderProjectGalleryEditors([]);
     }
-    if (section.key === "workshop") { window.hobbyEditor.render([]); window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]); }
+    if (section.key === "workshop") { window.hobbyEditor.render([]); window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]); window.hobbyMarkdownEditor?.reset(); }
 
     dirtyAdminForms.delete(form);
   }
@@ -983,7 +983,7 @@
       form.elements["workshop_url"].value = "";
       form.elements["download_url"].value = "";
       window.hobbyEditor.render([]);
-      window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]);
+      window.hobbyEditor.renderFiles([]); window.hobbyEditor.renderDependencies([]); window.hobbyMarkdownEditor?.reset();
       form.elements["image_key"].value = "";
       form.elements["image_alt"].value = "";
       form.elements["display_order"].value = String(nextDisplayOrder.get("workshop") || 0);
@@ -2164,6 +2164,7 @@ function setupWorkshopEditButtons(container) {
       form.elements["description"].value =
         button.dataset.workshopDescription || "";
       form.elements["body"].value = button.dataset.workshopBody || "";
+      window.hobbyMarkdownEditor?.reset();
       form.elements["workshop_url"].value = button.dataset.workshopUrl || "";
       form.elements["download_url"].value = button.dataset.workshopDownload || "";
       window.hobbyEditor.render(button.dataset.workshopGallery || "[]");

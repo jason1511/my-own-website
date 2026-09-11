@@ -719,8 +719,25 @@
 
           <div>
             <label for="workshopBody"><strong>Full description</strong></label>
-            <textarea id="workshopBody" name="body" rows="10" maxlength="20000" placeholder="Explain what the mod changes, installation steps, requirements, compatibility, and credits." style="width:100%;"></textarea>
-            <small>Optional. Shown on the dedicated detail page. Use blank lines between paragraphs; the short description above stays in the table.</small>
+            <div class="markdown-editor" data-markdown-editor>
+              <div class="markdown-tabs" role="tablist" aria-label="Description editor">
+                <button type="button" role="tab" id="hobbyWriteTab" aria-controls="hobbyWritePanel" data-markdown-tab>Write</button>
+                <button type="button" role="tab" id="hobbyPreviewTab" aria-controls="hobbyPreviewPanel" data-markdown-tab>Preview</button>
+              </div>
+              <div class="markdown-toolbar" data-markdown-toolbar role="group" aria-label="Formatting">
+                <button type="button" data-format="bold" title="Bold (Ctrl+B)"><strong>Bold</strong></button>
+                <button type="button" data-format="italic" title="Italic (Ctrl+I)"><em>Italic</em></button>
+                <button type="button" data-format="heading">Heading</button>
+                <button type="button" data-format="bullet">Bullet list</button>
+                <button type="button" data-format="number">Numbered list</button>
+                <button type="button" data-format="link">Link</button>
+              </div>
+              <div id="hobbyWritePanel" role="tabpanel" aria-labelledby="hobbyWriteTab" data-markdown-write>
+                <textarea id="workshopBody" name="body" rows="10" maxlength="20000" aria-describedby="hobbyMarkdownHelp" placeholder="Explain what the mod changes, installation steps, compatibility, and credits."></textarea>
+              </div>
+              <div id="hobbyPreviewPanel" role="tabpanel" aria-labelledby="hobbyPreviewTab" data-markdown-preview tabindex="0" hidden></div>
+            </div>
+            <small id="hobbyMarkdownHelp">Markdown supported: **bold**, *italic*, ## Heading, - bullet, 1. step, [link text](https://…). Use Preview to check formatting.</small>
           </div>
 
           <div>
@@ -922,6 +939,10 @@
   </main>
 
   <script src="js/file-size.js"></script>
+  <script src="js/vendor/marked.umd.js"></script>
+  <script src="js/vendor/purify.min.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/markdown-editor.js"></script>
   <script src="js/admin-hobbies.js"></script>
   <script src="js/admin.js"></script>
 </body>
